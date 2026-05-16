@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waypoint — Kingsford University</title>
+  <link rel="icon" type="image/png" href="assets/university-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --font-primary: "Google Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      --color-primary: rgb(18, 19, 23);
+      --color-secondary: rgb(69, 71, 77);
+      --color-tertiary: rgb(106, 106, 113);
+      --bg-primary: #FFFFFF;
+      --bg-secondary: rgba(183, 191, 217, 0.1);
+      --border-primary: rgba(33, 34, 38, 0.06);
+      --border-secondary: rgba(33, 34, 38, 0.12);
+      --accent-teal: #0D9488;
+      --accent-teal-hover: #0B7C72;
+      --accent-teal-light: rgba(13, 148, 136, 0.06);
+      --radius-sm: 8px;
+      --radius-lg: 32px;
+      --radius-rounded: 9999px;
+      --ease-out-quint: cubic-bezier(.23, 1, .32, 1);
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: var(--font-primary);
+      background: #f0f4f8 url('assets/campus-hero.png') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--color-primary);
+    }
+
+    /* ── App background overlay for readability ── */
+    .app {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      overflow: hidden;
+      background: rgba(240, 244, 248, 0.6);
+      /* Frosty overlay */
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── Left: agent panel (VoZara style) ── */
+    .via-panel {
+      width: 460px;
+      min-width: 280px;
+      max-width: 75%;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 0 0 1px var(--border-primary), 12px 0 40px rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ── Resize handle (Slider style) ── */
+    .resize-handle {
+      width: 16px;
+      flex-shrink: 0;
+      background: var(--bg-primary);
+      cursor: col-resize;
+      position: relative;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-left: 1px solid var(--border-primary);
+      border-right: 1px solid var(--border-primary);
+      transition: background 0.2s, border-color 0.2s, width 0.2s;
+    }
+
+    .resize-handle::before {
+      content: '';
+      width: 4px;
+      height: 40px;
+      background: var(--border-secondary);
+      border-radius: 2px;
+      transition: all 0.2s ease;
+    }
+
+    .resize-handle:hover,
+    .resize-handle.dragging {
+      background: var(--accent-teal-light);
+      border-color: var(--accent-teal);
+      width: 18px;
+    }
+
+    .resize-handle:hover::before,
+    .resize-handle.dragging::before {
+      background: var(--accent-teal);
+      height: 64px;
+      width: 6px;
+    }
+
+    /* ── Responsive: stack vertically on narrow screens ── */
+    @media (max-width: 767px) {
+      .app {
+        flex-direction: column;
+      }
+
+      .resize-handle {
+        width: 100% !important;
+        height: 14px;
+        cursor: row-resize;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .resize-handle::before {
+        width: 60px;
+        height: 4px;
+      }
+
+      .via-panel {
+        width: 100% !important;
+        min-width: unset;
+        max-width: unset;
+        height: 55vh;
+        min-height: 200px;
+        max-height: 80vh;
+      }
+
+      .sidebar {
+        height: auto !important;
+        flex: 1;
+        min-height: 160px;
+      }
+    }
+
+    /* Header */
+    .via-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid var(--border-primary);
+    }
+
+    .via-avatar {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: box-shadow 0.3s ease;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25);
+      overflow: hidden;
+    }
+
+    .via-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .via-avatar.via-speaking {
+      animation: viaPulseRing 1.5s ease-in-out infinite;
+    }
+
+    @keyframes viaPulseRing {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25);
+      }
+
+      50% {
+        box-shadow: 0 0 0 8px rgba(13, 148, 136, 0.12), 0 0 20px rgba(13, 148, 136, 0.15);
+      }
+    }
+
+    .via-avatar-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+
+    .via-avatar-ring.via-listening {
+      border-color: var(--accent-teal);
+      animation: viaListenPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes viaListenPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.08);
+        opacity: 0.7;
+      }
+    }
+
+    .via-avatar-letter {
+      font-size: 22px;
+      font-weight: 600;
+      color: white;
+      line-height: 1;
+    }
+
+    .via-header-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .via-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .via-subtitle {
+      font-size: 13px;
+      color: var(--color-tertiary);
+      margin: 4px 0 0;
+      line-height: 1.3;
+    }
+
+    /* Status indicator in header */
+    .via-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--color-tertiary);
+    }
+
+    .via-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #d1d5db;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .via-status-dot.connected {
+      background: var(--accent-teal);
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+    }
+
+    /* Disconnect / End Session */
+    .via-disconnect {
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #ef4444;
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-left: 10px;
+    }
+
+    .via-disconnect:hover {
+      background: #fecaca;
+      transform: translateY(-1px);
+    }
+
+    .via-disconnect:active {
+      transform: translateY(0);
+    }
+
+    /* Voice bar */
+    .via-voice-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-primary);
+      min-height: 0;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.35s var(--ease-out-quint);
+    }
+
+    .via-voice-bar.via-active {
+      opacity: 1;
+      max-height: 60px;
+      padding: 10px 24px;
+    }
+
+    .via-voice-bar.via-muted .via-wave span {
+      background: #ef4444;
+      opacity: 0.5;
+    }
+
+    .via-wave {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 20px;
+    }
+
+    .via-wave span {
+      display: block;
+      width: 3px;
+      height: 4px;
+      background: var(--accent-teal);
+      border-radius: 2px;
+      opacity: 0.35;
+      transition: height 0.15s ease, opacity 0.15s ease;
+    }
+
+    .via-wave.via-wave-active span {
+      animation: viaWaveAnim 1.2s ease-in-out infinite;
+    }
+
+    .via-wave.via-wave-active span:nth-child(1) {
+      animation-delay: -0.36s;
+    }
+
+    .via-wave.via-wave-active span:nth-child(2) {
+      animation-delay: -0.24s;
+    }
+
+    .via-wave.via-wave-active span:nth-child(3) {
+      animation-delay: -0.12s;
+    }
+
+    .via-wave.via-wave-active span:nth-child(4) {
+      animation-delay: 0.00s;
+    }
+
+    .via-wave.via-wave-active span:nth-child(5) {
+      animation-delay: 0.12s;
+    }
+
+    .via-wave.via-wave-active span:nth-child(6) {
+      animation-delay: 0.24s;
+    }
+
+    .via-wave.via-wave-active span:nth-child(7) {
+      animation-delay: 0.36s;
+    }
+
+    @keyframes viaWaveAnim {
+
+      0%,
+      100% {
+        height: 4px;
+        opacity: 0.35;
+      }
+
+      50% {
+        height: 18px;
+        opacity: 1;
+      }
+    }
+
+    .via-voice-label {
+      font-size: 12px;
+      color: var(--color-tertiary);
+      white-space: nowrap;
+    }
+
+    /* Messages */
+    .via-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+      scroll-behavior: smooth;
+    }
+
+    .via-messages::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .via-messages::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.12);
+      border-radius: 3px;
+    }
+
+    .via-msg {
+      display: flex;
+      animation: viaMsgIn 0.3s var(--ease-out-quint);
+    }
+
+    @keyframes viaMsgIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .via-msg-user {
+      justify-content: flex-end;
+    }
+
+    .via-msg-ai {
+      justify-content: flex-start;
+    }
+
+    .via-msg-bubble {
+      max-width: 82%;
+      padding: 10px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      font-family: var(--font-primary);
+      line-height: 1.55;
+      word-wrap: break-word;
+    }
+
+    .via-msg-ai .via-msg-bubble {
+      background: var(--bg-secondary);
+      color: var(--color-primary);
+      border-bottom-left-radius: 6px;
+    }
+
+    .via-msg-user .via-msg-bubble {
+      background: var(--accent-teal);
+      color: white;
+      border-bottom-right-radius: 6px;
+    }
+
+    .via-text {
+      display: inline;
+    }
+
+    .via-msg-bubble.via-typing {
+      opacity: 0.85;
+      position: relative;
+    }
+
+    /* Thinking dots animation */
+    .via-thinking-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .via-thinking-dots span {
+      width: 4px;
+      height: 4px;
+      background: currentColor;
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: viaThinking 1.4s infinite both;
+    }
+
+    .via-thinking-dots span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .via-thinking-dots span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes viaThinkingDot {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.6);
+        opacity: 0.4;
+      }
+
+      40% {
+        transform: scale(1.1);
+        opacity: 0.9;
+      }
+    }
+
+    /* Input bar */
+    .via-input-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-primary);
+      background: var(--bg-primary);
+    }
+
+    .via-mode-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border-secondary);
+      background: var(--bg-primary);
+      color: var(--accent-teal);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .via-mode-btn:hover:not(:disabled) {
+      background: var(--accent-teal-light);
+      border-color: var(--accent-teal);
+      transform: scale(1.08);
+    }
+
+    .via-mode-btn.via-active {
+      background: var(--accent-teal);
+      color: white;
+      border-color: var(--accent-teal);
+    }
+
+    .via-mode-btn.via-muted {
+      background: #fee2e2;
+      color: #ef4444;
+      border-color: #fca5a5;
+    }
+
+    .via-mode-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .via-mode-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .via-input {
+      flex: 1;
+      padding: 10px 16px;
+      border: 1.5px solid var(--border-secondary);
+      border-radius: var(--radius-rounded);
+      font-size: 15px;
+      font-family: var(--font-primary);
+      background: var(--bg-primary);
+      color: var(--color-primary);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .via-input:focus {
+      border-color: var(--accent-teal);
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+    }
+
+    .via-input::placeholder {
+      color: var(--color-tertiary);
+    }
+
+    .via-input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .via-send {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent-teal);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .via-send:hover:not(:disabled) {
+      background: var(--accent-teal-hover);
+      transform: scale(1.05);
+    }
+
+    .via-send:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Powered by */
+    .via-powered {
+      text-align: center;
+      padding: 8px 16px 12px;
+      font-size: 11px;
+      color: var(--color-tertiary);
+      letter-spacing: 0.3px;
+    }
+
+    .via-powered strong {
+      color: var(--accent-teal);
+      font-weight: 600;
+    }
+
+    /* ── Right: card sidebar ── */
+    .sidebar {
+      flex: 1;
+      min-width: 240px;
+      display: flex;
+      flex-direction: column;
+      background: rgba(248, 250, 252, 0.55);
+      /* Reduced from 0.65 */
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 24px 24px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-tertiary);
+      border-bottom: 1px solid var(--border-primary);
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.12);
+      border-radius: 3px;
+    }
+
+    .no-cards {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-tertiary);
+      gap: 12px;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .no-cards-icon {
+      color: var(--color-tertiary);
+      opacity: 0.5;
+      margin-bottom: 4px;
+    }
+
+    .no-cards p {
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 240px;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border: 1px solid rgba(13, 148, 136, 0.15);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      animation: viaMsgIn 0.3s var(--ease-out-quint);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(13, 148, 136, 0.08), 0 2px 8px rgba(13, 148, 136, 0.04);
+      border-color: rgba(13, 148, 136, 0.3);
+    }
+
+    .card-type-bar {
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .card-type-bar.course {
+      background: rgba(13, 148, 136, 0.05);
+      color: var(--accent-teal);
+    }
+
+    .card-type-bar.event {
+      background: rgba(99, 102, 241, 0.05);
+      color: #6366f1;
+    }
+
+    .card-type-bar.booking {
+      background: rgba(13, 148, 136, 0.08);
+      color: var(--accent-teal);
+    }
+
+    .card-type-bar.info {
+      background: rgba(245, 158, 11, 0.05);
+      color: #d97706;
+    }
+
+    .card-type-bar.scholarship {
+      background: rgba(139, 92, 246, 0.05);
+      color: #7c3aed;
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.35;
+      color: var(--color-primary);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .tag {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: var(--radius-rounded);
+      background: rgba(13, 148, 136, 0.06);
+      color: var(--accent-teal);
+      border: 1px solid rgba(13, 148, 136, 0.15);
+    }
+
+    .card-detail {
+      font-size: 13px;
+      color: var(--color-secondary);
+      line-height: 1.5;
+      margin-bottom: 6px;
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+
+    .card-detail svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .card-fee {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .card-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+    }
+
+    .card-detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .card-detail-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-tertiary);
+    }
+
+    .card-detail-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .card-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-tertiary);
+      margin: 12px 0 4px;
+    }
+
+    .card-spots {
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 8px;
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .card-spots.low {
+      color: #d946ef;
+      background: rgba(217, 70, 239, 0.1);
+    }
+
+    .card-spots.open {
+      color: var(--accent-teal);
+      background: rgba(13, 148, 136, 0.1);
+    }
+
+    .booking-ref {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent-teal);
+      letter-spacing: 0.04em;
+      margin: 4px 0 8px;
+    }
+
+    /* Card group navigation */
+    .card-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 24px;
+      border-bottom: 1px solid var(--border-primary);
+      background: white;
+      flex-wrap: wrap;
+      min-height: 0;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.3s var(--ease-out-quint);
+    }
+
+    .card-nav.has-groups {
+      min-height: auto;
+      max-height: 100px;
+      opacity: 1;
+      padding: 10px 24px;
+    }
+
+    .card-nav-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-tertiary);
+      margin-right: 4px;
+    }
+
+    .card-nav-pill {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: var(--radius-rounded);
+      border: 1px solid var(--border-secondary);
+      background: var(--bg-primary);
+      color: var(--color-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .card-nav-pill:hover {
+      border-color: var(--accent-teal);
+      color: var(--accent-teal);
+      background: var(--accent-teal-light);
+    }
+
+    .card-nav-pill.active {
+      background: var(--accent-teal);
+      color: white;
+      border-color: var(--accent-teal);
+    }
+
+    .card-nav-pill .pill-icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    .card-nav-pill .pill-count {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.08);
+      padding: 1px 5px;
+      border-radius: 8px;
+    }
+
+    .card-nav-pill.active .pill-count {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .card-info-content {
+      font-size: 13px;
+      color: var(--color-secondary);
+      line-height: 1.6;
+      margin-top: 8px;
+      word-break: break-word;
+    }
+
+    .card-info-md h1,
+    .card-info-md h2,
+    .card-info-md h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin: 10px 0 4px;
+    }
+
+    .card-info-md h1:first-child,
+    .card-info-md h2:first-child,
+    .card-info-md h3:first-child {
+      margin-top: 0;
+    }
+
+    .card-info-md p {
+      margin: 4px 0;
+    }
+
+    .card-info-md ul,
+    .card-info-md ol {
+      padding-left: 18px;
+      margin: 4px 0;
+    }
+
+    .card-info-md li {
+      margin: 2px 0;
+    }
+
+    .card-info-md table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin: 6px 0;
+    }
+
+    .card-info-md th,
+    .card-info-md td {
+      text-align: left;
+      padding: 4px 8px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .card-info-md th {
+      font-weight: 600;
+      color: var(--color-primary);
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .card-info-md strong {
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .card-info-md code {
+      font-family: monospace;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .card-topic-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: var(--radius-rounded);
+      background: rgba(245, 158, 11, 0.08);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      margin-bottom: 8px;
+      text-transform: capitalize;
+    }
+
+    .card-schol-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #7c3aed;
+      margin: 6px 0 4px;
+    }
+
+    .card-schol-value span {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-tertiary);
+    }
+
+    .card-deadline {
+      font-size: 12px;
+      color: var(--color-tertiary);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .card-deadline strong {
+      color: #d97706;
+    }
+
+    .card-group {
+      display: none;
+    }
+
+    .card-group.visible {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: viaMsgIn 0.3s var(--ease-out-quint);
+    }
+
+    .via-msg-img {
+      max-width: 180px;
+      border-radius: 10px;
+      display: block;
+      margin-top: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* Media Menu */
+    .via-media-wrap {
+      position: relative;
+    }
+
+    .via-media-menu {
+      position: absolute;
+      bottom: 50px;
+      left: 0;
+      background: white;
+      border: 1px solid var(--border-secondary);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      width: 160px;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 100;
+    }
+
+    .via-media-menu.show {
+      display: flex;
+    }
+
+    .via-media-menu button {
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      text-align: left;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--color-primary);
+      transition: background 0.2s;
+    }
+
+    .via-media-menu button:hover {
+      background: var(--bg-secondary);
+    }
+
+    /* Screen Share Status */
+    .screen-share-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fffbeb;
+      border-bottom: 1px solid #fde68a;
+      padding: 8px 16px;
+      animation: viaMsgIn 0.3s var(--ease-out-quint);
+    }
+
+    .screen-share-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+      animation: viaListenPulse 1s infinite;
+    }
+
+    .screen-share-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #92400e;
+      flex: 1;
+    }
+
+    .stop-screen-btn {
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #991b1b;
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- Left: VoZara-style agent panel -->
+    <div class="via-panel">
+
+      <div class="via-header">
+        <div class="via-avatar" id="viaAvatar">
+          <div class="via-avatar-ring" id="viaAvatarRing"></div>
+          <img src="assets/clara-avatar.png" alt="Clara" />
+        </div>
+        <div class="via-header-info">
+          <h3 class="via-name">Clara</h3>
+          <p class="via-subtitle" id="viaSubtitle">Waypoint Assistant</p>
+        </div>
+
+        <div class="via-status">
+          <div class="via-status-dot" id="statusDot"></div>
+          <span id="statusLabel">Connecting…</span>
+          <button class="via-disconnect" id="disconnectBtn" style="display:none"
+            title="End session and close connection">End Session</button>
+          <button class="via-disconnect" id="newSessionBtn" style="display:none"
+            title="Start a fresh conversation">New Session</button>
+        </div>
+      </div>
+
+      <!-- Floating Screen Share Indicator -->
+      <div id="screen-share-status" class="screen-share-status" style="display:none">
+        <span class="screen-share-dot"></span>
+        <span class="screen-share-label">Sharing Screen</span>
+        <button id="stop-screen-btn" class="stop-screen-btn">Stop Sharing</button>
+      </div>
+
+      <div class="via-voice-bar" id="viaVoiceBar">
+        <div class="via-wave" id="viaWave">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <span class="via-voice-label" id="viaVoiceLabel">Voice active — speak or type</span>
+      </div>
+
+      <div class="via-messages" id="viaMessages">
+        <div class="via-msg via-msg-ai" id="emptyMsg">
+          <div class="via-msg-bubble">Connecting to Clara…</div>
+        </div>
+      </div>
+
+      <div class="via-input-bar">
+        <button class="via-mode-btn" id="voiceBtn" disabled title="Enable microphone">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+            <path
+              d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+          </svg>
+        </button>
+        <div class="via-media-wrap">
+          <button class="via-mode-btn" id="mediaBtn" disabled title="Share media">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </button>
+          <div id="mediaMenu" class="via-media-menu">
+            <button id="optUpload"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg> Upload Image</button>
+            <button id="optScreen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg> Share Screen</button>
+          </div>
+        </div>
+        <input type="file" id="imageInput" accept="image/*" style="display:none" />
+        <input class="via-input" id="textInput" type="text" placeholder="Type a message…" disabled autocomplete="off" />
+        <button class="via-send" id="sendBtn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="via-powered"><strong>Waypoint</strong> · Powered by Google ADK</div>
+    </div>
+
+    <!-- Resize handle -->
+    <div class="resize-handle" id="resizeHandle" title="Drag to resize panels"></div>
+
+    <!-- Right: card sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header"
+        style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px;">
+        <span style="font-size: 11px; opacity: 0.7;">Research Panel</span>
+        <img src="assets/university-logo.png" alt="Kingsford University"
+          style="height: 60px; width: auto; opacity: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));" />
+      </div>
+      <div class="card-nav" id="cardNav"></div>
+      <div class="sidebar-scroll" id="sidebarScroll">
+        <div class="no-cards" id="noCards">
+          <div class="no-cards-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+          </div>
+          <p>Cards will appear here as Clara finds courses, events, and information for you.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Config ────────────────────────────────────────────────────────────────────
+    const getWsUrl = () => `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${crypto.randomUUID()}`;
+    let WS_URL = getWsUrl();
+    const INPUT_RATE = 16000;
+    const OUTPUT_RATE = 24000;
+
+    // ── State ─────────────────────────────────────────────────────────────────────
+    let ws = null, recording = false, muted = false, userInitiatedDisconnect = false;
+    let audioCtxIn = null, audioCtxOut = null, workletNode = null, mediaStream = null;
+    let nextPlayTime = 0;
+    let agentMsgEl = null, agentSpeaking = false;
+    let userMsgEl = null;
+    let analyser = null, dataArray = null, animationId = null; // Volume Meter state
+    let screenStream = null, isSharingScreen = false;
+    let screenCanvas = null, screenCtx = null, screenVideo = null;
+    let screenFrameSentThisTurn = false;
+
+    // ── DOM ───────────────────────────────────────────────────────────────────────
+    const voiceBtn = document.getElementById("voiceBtn");
+    const mediaBtn = document.getElementById("mediaBtn");
+    const mediaMenu = document.getElementById("mediaMenu");
+    const optUpload = document.getElementById("optUpload");
+    const optScreen = document.getElementById("optScreen");
+    const stopScreenBtn = document.getElementById("stop-screen-btn");
+    const screenShareStatus = document.getElementById("screen-share-status");
+    const imageInput = document.getElementById("imageInput");
+    const textInput = document.getElementById("textInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const messages = document.getElementById("viaMessages");
+    const emptyMsg = document.getElementById("emptyMsg");
+    const sidebarScroll = document.getElementById("sidebarScroll");
+    const noCards = document.getElementById("noCards");
+    const cardNav = document.getElementById("cardNav");
+    const statusDot = document.getElementById("statusDot");
+    const statusLabel = document.getElementById("statusLabel");
+    const disconnectBtn = document.getElementById("disconnectBtn");
+    const newSessionBtn = document.getElementById("newSessionBtn");
+    const avatar = document.getElementById("viaAvatar");
+    const avatarRing = document.getElementById("viaAvatarRing");
+    const voiceBar = document.getElementById("viaVoiceBar");
+    const wave = document.getElementById("viaWave");
+    const voiceLabel = document.getElementById("viaVoiceLabel");
+
+    // ── WebSocket ─────────────────────────────────────────────────────────────────
+    function connect() {
+      ws = new WebSocket(WS_URL);
+      ws.binaryType = "arraybuffer";
+
+      ws.onopen = () => {
+        setStatus("connected", "Connected");
+        voiceBtn.disabled = false;
+        mediaBtn.disabled = false;
+        textInput.disabled = false;
+        sendBtn.disabled = false;
+        disconnectBtn.style.display = "block";
+
+        // Auto-start recording if possible
+        startRecording().catch(err => {
+          console.warn("Auto-start mic blocked by browser policy, waiting for user interaction.");
+          appendMsg("ai", "I'm ready! Click the microphone button in the input bar to enable voice.", true);
+        });
+      };
+
+      ws.onclose = (ev) => {
+        const wasClean = ev.wasClean || userInitiatedDisconnect;
+        setStatus("", wasClean ? "Session Ended" : "Reconnecting…");
+        voiceBtn.disabled = true; mediaBtn.disabled = true; textInput.disabled = true; sendBtn.disabled = true;
+        disconnectBtn.style.display = "none";
+        voiceBar.classList.remove("via-active");
+        stopScreenSharing();
+        stopRecording();
+        if (wasClean) {
+          newSessionBtn.style.display = "block";
+        } else {
+          setTimeout(connect, 3000);
+        }
+      };
+
+      ws.onerror = () => ws.close();
+
+      ws.onmessage = (ev) => {
+        if (ev.data instanceof ArrayBuffer) {
+          if (!muted) playPCM(ev.data);
+        } else {
+          handleMessage(JSON.parse(ev.data));
+        }
+      };
+    }
+
+    function handleMessage(msg) {
+      switch (msg.type) {
+        case "transcript":
+          if (msg.text && !msg.text.trim().startsWith("**")) {
+            const finished = msg.finished ?? msg.final ?? false;
+            if (msg.role === "agent") {
+              appendOrUpdateAgent(msg.text, finished);
+            } else {
+              appendOrUpdateUser(msg.text, finished);
+            }
+          }
+          break;
+        case "interrupted":
+          stopAgentAudio();
+          flushAgent();
+          break;
+        case "turn_complete":
+          flushAgent();
+          flushUser();
+          setAgentSpeaking(false);
+          screenFrameSentThisTurn = false;
+          break;
+        case "card":
+          renderCard(msg);
+          break;
+        case "error":
+          const errorIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+          appendMsg("ai", `${errorIcon} ${msg.message}`, true);
+          break;
+      }
+    }
+
+    // ── Messages ──────────────────────────────────────────────────────────────────
+    function removeEmptyMsg() {
+      if (emptyMsg?.parentNode) emptyMsg.remove();
+    }
+
+    function appendMsg(role, text, isHtml = false) {
+      removeEmptyMsg();
+      const wrap = document.createElement("div");
+      wrap.className = `via-msg via-msg-${role === "user" ? "user" : "ai"}`;
+      const bubble = document.createElement("div");
+      bubble.className = "via-msg-bubble";
+      if (isHtml) bubble.innerHTML = text;
+      else bubble.textContent = text;
+      wrap.appendChild(bubble);
+      messages.appendChild(wrap);
+      messages.scrollTop = messages.scrollHeight;
+      return wrap;
+    }
+
+    function appendOrUpdateUser(text, finished = false) {
+      if (!userMsgEl) {
+        removeEmptyMsg();
+        userMsgEl = document.createElement("div");
+        userMsgEl.className = "via-msg via-msg-user";
+        const bubble = document.createElement("div");
+        bubble.className = "via-msg-bubble via-typing";
+        bubble.innerHTML = `<span class="via-text"></span>`;
+        userMsgEl.appendChild(bubble);
+        messages.appendChild(userMsgEl);
+      }
+
+      // Backend sends cumulative text — just replace in-place
+      userMsgEl.querySelector(".via-text").textContent = text;
+      if (finished) flushUser();
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function flushUser() {
+      if (userMsgEl) {
+        const textEl = userMsgEl.querySelector(".via-text");
+        if (textEl && textEl.textContent.trim()) {
+          userMsgEl.querySelector(".via-msg-bubble").classList.remove("via-typing");
+        } else {
+          userMsgEl.remove();
+        }
+        userMsgEl = null;
+      }
+    }
+
+    function appendOrUpdateAgent(text, finished = false) {
+      setAgentSpeaking(true);
+      if (!agentMsgEl) {
+        removeEmptyMsg();
+        agentMsgEl = document.createElement("div");
+        agentMsgEl.className = "via-msg via-msg-ai";
+        const bubble = document.createElement("div");
+        bubble.className = "via-msg-bubble via-typing";
+        bubble.innerHTML = `<span class="via-text"></span>`;
+        agentMsgEl.appendChild(bubble);
+        messages.appendChild(agentMsgEl);
+      }
+
+      // Backend sends cumulative text — just replace in-place
+      const bubble = agentMsgEl.querySelector(".via-msg-bubble");
+      bubble.querySelector(".via-text").textContent = text;
+
+      if (!finished) {
+        if (!bubble.querySelector(".via-thinking-dots")) {
+          const dots = document.createElement("span");
+          dots.className = "via-thinking-dots";
+          dots.innerHTML = "<span></span><span></span><span></span>";
+          bubble.appendChild(dots);
+        }
+      } else {
+        const dots = bubble.querySelector(".via-thinking-dots");
+        if (dots) dots.remove();
+        flushAgent();
+      }
+
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function flushAgent() {
+      if (agentMsgEl) {
+        agentMsgEl.querySelector(".via-msg-bubble").classList.remove("via-typing");
+        agentMsgEl = null;
+      }
+    }
+
+    function setAgentSpeaking(speaking) {
+      agentSpeaking = speaking;
+      if (speaking) {
+        voiceBar.classList.add("via-active");
+        avatar.classList.add("via-speaking");
+        avatarRing.classList.remove("via-listening");
+        if (muted) {
+          voiceBar.classList.add("via-muted");
+          wave.classList.remove("via-wave-active");
+          voiceLabel.textContent = "Muted (text only)";
+        } else {
+          voiceBar.classList.remove("via-muted");
+          wave.classList.add("via-wave-active");
+          voiceLabel.textContent = "Clara is speaking…";
+        }
+      } else {
+        avatar.classList.remove("via-speaking");
+        if (recording) {
+          if (muted) {
+            voiceLabel.textContent = "Muted (text only)";
+            voiceBar.classList.add("via-muted");
+            avatarRing.classList.remove("via-listening");
+            wave.classList.remove("via-wave-active");
+          } else {
+            voiceLabel.textContent = "Listening…";
+            voiceBar.classList.remove("via-muted");
+            avatarRing.classList.add("via-listening");
+            wave.classList.add("via-wave-active");
+          }
+        } else {
+          voiceBar.classList.remove("via-active");
+        }
+      }
+    }
+
+    function setUserListening(listening) {
+      // User listening means the mic is actively capturing/sending
+      if (listening) {
+        voiceBar.classList.add("via-active");
+        if (muted) {
+          voiceBar.classList.add("via-muted");
+          voiceLabel.textContent = "Muted (text only)";
+          avatarRing.classList.remove("via-listening");
+          wave.classList.remove("via-wave-active");
+        } else {
+          voiceBar.classList.remove("via-muted");
+          voiceLabel.textContent = "Listening…";
+          avatarRing.classList.add("via-listening");
+          wave.classList.add("via-wave-active");
+        }
+        avatar.classList.remove("via-speaking");
+      } else if (!agentSpeaking) {
+        voiceBar.classList.remove("via-active");
+        avatarRing.classList.remove("via-listening");
+      }
+    }
+
+    // ── Cards ─────────────────────────────────────────────────────────────────────
+    function esc(s) { return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+    // Card group tracking
+    let cardGroups = []; // [{id, label, type, el, pillEl}]
+    let activeGroupId = null;
+
+    function renderCard(msg) {
+      if (noCards?.parentNode) noCards.remove();
+      const { card_type, data } = msg;
+
+      // Create group container
+      const group = document.createElement("div");
+      group.className = "card-group";
+      const groupId = `cg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      group.id = groupId;
+
+      // Determine label and item count
+      let label = card_type || "Info";
+      let count = 0;
+
+      if (card_type === "course_detail") {
+        count = 1;
+        group.appendChild(makeCourseDetailCard(data));
+        label = "Courses";
+      } else if (card_type === "courses") {
+        const items = data.courses || data.recommendations || [];
+        count = items.length;
+        items.forEach(c => group.appendChild(makeCourseCard(c)));
+        label = "Courses";
+      } else if (card_type === "events") {
+        const items = data.events || [];
+        count = items.length;
+        items.forEach(e => group.appendChild(makeEventCard(e)));
+        label = "Events";
+      } else if (card_type === "booking") {
+        count = 1;
+        group.appendChild(makeBookingCard(data));
+        label = "Booking";
+      } else if (card_type === "scholarships") {
+        const items = data.scholarships || [];
+        count = items.length;
+        items.forEach(s => group.appendChild(makeScholarshipCard(s)));
+        label = "Scholarships";
+      } else if (card_type === "info") {
+        const chunks = data.chunks || [];
+        count = chunks.length || 1;
+        if (chunks.length > 0) {
+          chunks.forEach(chunk => group.appendChild(makeInfoCard(chunk)));
+        } else {
+          group.appendChild(makeInfoCard({ title: "Information", content: msg.spoken_summary || "", topic: "" }));
+        }
+        label = "Info";
+      } else {
+        count = 1;
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `<div class="card-type-bar info">Info</div>
+      <div class="card-body"><div class="card-detail">${esc(msg.spoken_summary || "")}</div></div>`;
+        group.appendChild(card);
+        label = "Info";
+      }
+
+      // Add group to sidebar
+      sidebarScroll.insertBefore(group, sidebarScroll.firstChild);
+
+      // Add "Results" label on first group
+      if (cardGroups.length === 0) {
+        const navLabel = document.createElement("span");
+        navLabel.className = "card-nav-label";
+        navLabel.textContent = "Results:";
+        cardNav.appendChild(navLabel);
+      }
+
+      // Create nav pill with icon and count
+      const icons = {
+        Courses: `<svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+        Events: `<svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+        Booking: `<svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+        Info: `<svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+        Scholarships: `<svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+      };
+      const time = new Date().toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" });
+      const pill = document.createElement("button");
+      pill.className = "card-nav-pill";
+      pill.innerHTML = `${icons[label] || ""} ${label} <span class="pill-count">${count}</span>`;
+      pill.title = `${label} results · ${time}`;
+      pill.onclick = () => showCardGroup(groupId);
+      cardNav.appendChild(pill);
+      cardNav.classList.add("has-groups");
+
+      // Track this group
+      cardGroups.push({ id: groupId, label, type: card_type, el: group, pillEl: pill });
+
+      // Show this group (latest)
+      showCardGroup(groupId);
+    }
+
+    function showCardGroup(groupId) {
+      activeGroupId = groupId;
+      cardGroups.forEach(g => {
+        g.el.classList.toggle("visible", g.id === groupId);
+        g.pillEl.classList.toggle("active", g.id === groupId);
+      });
+    }
+
+    function makeCourseDetailCard(c) {
+      const card = document.createElement("div");
+      card.className = "card card-detail-view";
+      const atar = c.atar_cutoff ? `ATAR ${c.atar_cutoff}+` : "No ATAR required";
+      const fee = `$${(c.annual_fee_aud || 0).toLocaleString()}/yr`;
+      card.innerHTML = `
+    <div class="card-type-bar course">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Course Detail
+    </div>
+    <div class="card-body">
+      <div class="card-title">${esc(c.name)}</div>
+      <div class="tags">
+        <span class="tag">${esc(c.faculty)}</span>
+        <span class="tag">${esc(c.level)}</span>
+        <span class="tag">${esc(c.study_mode)}</span>
+      </div>
+      <div class="card-detail-grid">
+        <div class="card-detail-item"><span class="card-detail-label">Duration</span><span class="card-detail-val">${c.duration_years} years</span></div>
+        <div class="card-detail-item"><span class="card-detail-label">Annual Fee</span><span class="card-detail-val">${fee}</span></div>
+        <div class="card-detail-item"><span class="card-detail-label">Entry</span><span class="card-detail-val">${atar}</span></div>
+        <div class="card-detail-item"><span class="card-detail-label">Code</span><span class="card-detail-val">${esc(c.code || "")}</span></div>
+      </div>
+      ${c.description ? `<div class="card-section-label">About</div><div class="card-detail">${esc(c.description)}</div>` : ""}
+      ${c.career_outcomes ? `<div class="card-section-label">Career Outcomes</div><div class="card-detail">${esc(c.career_outcomes)}</div>` : ""}
+    </div>`;
+      return card;
+    }
+
+    function makeCourseCard(c) {
+      const card = document.createElement("div");
+      card.className = "card";
+      const atar = c.atar_cutoff ? `ATAR ${c.atar_cutoff}+` : "No ATAR req.";
+      const match = c.match_pct ? `<span class="tag">${c.match_pct}% match</span>` : "";
+      card.innerHTML = `
+    <div class="card-type-bar course">Course</div>
+    <div class="card-body">
+      <div class="card-title">${esc(c.name)}</div>
+      <div class="tags">
+        <span class="tag">${esc(c.faculty)}</span>
+        <span class="tag">${esc(c.level)}</span>
+        <span class="tag">${esc(c.study_mode)}</span>${match}
+      </div>
+      <div class="card-detail">${esc(c.career_outcomes || "")}</div>
+      <div class="card-fee">$${(c.annual_fee_aud || 0).toLocaleString()}/yr · ${atar} · ${c.duration_years} yrs</div>
+    </div>`;
+      return card;
+    }
+
+    function makeEventCard(e) {
+      const card = document.createElement("div");
+      card.className = "card";
+      const dt = e.start_at ? new Date(e.start_at).toLocaleString("en-AU", { dateStyle: "medium", timeStyle: "short" }) : "";
+      const spotsClass = (e.spots_left || 0) < 15 ? "low" : "open";
+      card.innerHTML = `
+    <div class="card-type-bar event">${esc(e.event_type || "Event")}</div>
+    <div class="card-body">
+      <div class="card-title">${esc(e.title)}</div>
+      <div class="card-detail">${dt}</div>
+      <div class="card-detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${esc(e.location || "")}</div>
+      ${e.spots_left != null ? `<div class="card-spots ${spotsClass}">${e.spots_left} spots left</div>` : ""}
+    </div>`;
+      return card;
+    }
+
+    function makeBookingCard(d) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+    <div class="card-type-bar booking">Tour Booked</div>
+        <div class="card-body">
+          <div class="booking-ref">${esc(d.booking_id || "")}</div>
+          <div class="card-detail">${esc(d.student_name || "")} · Party of ${d.party_size || 1}<br>
+            ${esc(d.preferred_date || "")} · ${esc(d.email || "")}</div>
+        </div>`;
+      return card;
+    }
+
+    function makeInfoCard(chunk) {
+      const card = document.createElement("div");
+      card.className = "card";
+      // Strip the leading ## heading line from content (it's already in the title)
+      const rawContent = (chunk.content || "").replace(/^##[^\n]*\n/, "").trim();
+      // Truncate long content for the card — user can see the full answer via Clara's voice
+      const MAX = 400;
+      const preview = rawContent.length > MAX ? rawContent.slice(0, MAX).trimEnd() + "…" : rawContent;
+      const topicLabel = (chunk.topic || "").replace(/-/g, " ");
+      card.innerHTML = `
+    <div class="card-type-bar info">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      University Info
+    </div>
+    <div class="card-body">
+      ${topicLabel ? `<div class="card-topic-tag">${esc(topicLabel)}</div>` : ""}
+      <div class="card-title">${esc(chunk.title || "Information")}</div>
+      <div class="card-info-content card-info-md">${marked.parse(preview)}</div>
+    </div>`;
+      return card;
+    }
+
+    function makeScholarshipCard(s) {
+      const card = document.createElement("div");
+      card.className = "card";
+      const value = s.annual_value_aud ? `$${s.annual_value_aud.toLocaleString()}` : "";
+      const duration = s.duration_years ? `${s.duration_years} yr${s.duration_years > 1 ? "s" : ""}` : "";
+      const facultyTag = s.faculty ? `<span class="tag">${esc(s.faculty)}</span>` : "";
+      const deadline = s.application_deadline
+        ? `<div class="card-deadline">Apply by <strong>${new Date(s.application_deadline).toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" })}</strong></div>`
+        : `<div class="card-deadline">Rolling applications — no fixed deadline</div>`;
+      card.innerHTML = `
+    <div class="card-type-bar scholarship">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      ${esc(s.type || "Scholarship")}
+    </div>
+    <div class="card-body">
+      <div class="card-title">${esc(s.name)}</div>
+      <div class="tags">
+        <span class="tag" style="background:rgba(139,92,246,0.06);color:#7c3aed;border-color:rgba(139,92,246,0.2)">${esc(s.type)}</span>
+        ${facultyTag}
+      </div>
+      <div class="card-schol-value">${value}/yr <span>· ${duration}</span></div>
+      <div class="card-detail">${esc(s.eligibility || "")}</div>
+      ${deadline}
+    </div>`;
+      return card;
+    }
+
+    // ── Audio capture (VoZara-style 2048-sample buffer) ───────────────────────────
+    const WORKLET_CODE = `
+class AudioProcessor extends AudioWorkletProcessor {
+  constructor(options) {
+    super();
+    this.bufferSize = options.processorOptions.bufferSize || 4096;
+    this.buffer = new Float32Array(this.bufferSize);
+    this.bufferIndex = 0;
+  }
+  process(inputs) {
+    const input = inputs[0][0];
+    if (!input || !input.length) return true;
+    for (let i = 0; i < input.length; i++) {
+      if (this.bufferIndex < this.bufferSize) {
+        this.buffer[this.bufferIndex++] = Math.max(-0.95, Math.min(0.95, input[i]));
+      }
+    }
+    if (this.bufferIndex >= this.bufferSize) {
+      const pcm = new Int16Array(this.bufferIndex);
+      for (let i = 0; i < this.bufferIndex; i++)
+        pcm[i] = Math.max(-32768, Math.min(32767, Math.round(this.buffer[i] * 32767)));
+      this.port.postMessage(pcm.buffer, [pcm.buffer]);
+      this.buffer = new Float32Array(this.bufferSize);
+      this.bufferIndex = 0;
+    }
+    return true;
+  }
+}
+registerProcessor("uni-audio-processor", AudioProcessor);
+`;
+
+    async function startRecording() {
+      if (recording) {
+        toggleMute();
+        return;
+      }
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1, sampleRate: INPUT_RATE }
+        });
+        audioCtxIn = new AudioContext({ sampleRate: INPUT_RATE, latencyHint: "interactive" });
+
+        // Setup Analyser for volume feedback
+        analyser = audioCtxIn.createAnalyser();
+        analyser.fftSize = 32;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        const blobUrl = URL.createObjectURL(new Blob([WORKLET_CODE], { type: "application/javascript" }));
+        await audioCtxIn.audioWorklet.addModule(blobUrl);
+        URL.revokeObjectURL(blobUrl);
+
+        const source = audioCtxIn.createMediaStreamSource(mediaStream);
+        workletNode = new AudioWorkletNode(audioCtxIn, "uni-audio-processor", {
+          processorOptions: { bufferSize: 2048 }
+        });
+
+        workletNode.port.onmessage = (e) => {
+          if (!muted && ws?.readyState === WebSocket.OPEN) {
+            if (isSharingScreen && !screenFrameSentThisTurn && isUserSpeaking()) {
+              captureScreenFrame();
+              screenFrameSentThisTurn = true;
+            }
+            ws.send(e.data);
+          }
+        };
+
+        source.connect(analyser);
+        analyser.connect(workletNode);
+
+        recording = true;
+        muted = false;
+        voiceBtn.classList.add("via-active");
+        voiceBtn.classList.remove("via-muted");
+        voiceBtn.title = "Mute microphone";
+        setUserListening(true);
+        drawWave();
+      } catch (err) {
+        console.error("Mic error:", err);
+        voiceLabel.textContent = `Mic error: ${err.name}`;
+      }
+    }
+
+    function drawWave() {
+      if (!recording || muted) {
+        cancelAnimationFrame(animationId);
+        flattenWave();
+        return;
+      }
+      animationId = requestAnimationFrame(drawWave);
+      analyser.getByteFrequencyData(dataArray);
+
+      const average = dataArray.reduce((src, next) => src + next, 0) / dataArray.length;
+      const spans = wave.querySelectorAll("span");
+
+      spans.forEach((span, i) => {
+        // Randomize height slightly based on volume for a natural wave look
+        const vol = average / 128; // scale 0-1 (approx)
+        const h = Math.max(4, 20 * vol * (0.8 + Math.random() * 0.4));
+        span.style.height = `${h}px`;
+        span.style.opacity = Math.max(0.35, vol);
+      });
+    }
+
+    function flattenWave() {
+      const spans = wave.querySelectorAll("span");
+      spans.forEach(span => {
+        span.style.height = "4px";
+        span.style.opacity = "0.2";
+      });
+    }
+
+    function stopRecording() {
+      if (!recording) return;
+      recording = false;
+      muted = false;
+      cancelAnimationFrame(animationId);
+      flattenWave();
+      workletNode?.disconnect();
+      analyser?.disconnect();
+      mediaStream?.getTracks().forEach(t => t.stop());
+      audioCtxIn?.close();
+      workletNode = null; audioCtxIn = null; mediaStream = null; analyser = null;
+      voiceBtn.classList.remove("via-active", "via-muted");
+      voiceBtn.title = "Enable microphone";
+      setUserListening(false);
+      // Ensure UI reflects inactive state if not speaking
+      if (!agentSpeaking) {
+        voiceBar.classList.remove("via-active");
+        voiceLabel.textContent = "Voice active — speak or type";
+      }
+      // Signal end of audio turn to server
+      if (ws?.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "audio_stop" }));
+      }
+    }
+
+    function toggleMute() {
+      muted = !muted;
+      voiceBtn.classList.toggle("via-muted", muted);
+
+      if (muted) {
+        voiceBtn.title = "Switch to Voice Mode";
+        voiceBtn.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
+          </svg>
+        `;
+        voiceLabel.textContent = "Text Mode — muted";
+        voiceBar.classList.add("via-muted");
+        avatarRing.classList.remove("via-listening");
+        wave.classList.remove("via-wave-active");
+        cancelAnimationFrame(animationId);
+        flattenWave();
+        // Stop Clara's current audio output immediately
+        stopAgentAudio();
+        // Focus text input when switching to Text Mode
+        setTimeout(() => textInput.focus(), 10);
+      } else {
+        voiceBtn.title = "Switch to Text Mode";
+        voiceBtn.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+          </svg>
+        `;
+        voiceLabel.textContent = recording ? "Listening…" : "Voice active — speak or type";
+        voiceBar.classList.remove("via-muted");
+        if (recording) {
+          avatarRing.classList.add("via-listening");
+          wave.classList.add("via-wave-active");
+          drawWave();
+        }
+      }
+    }
+
+    // ── Audio playback ────────────────────────────────────────────────────────────
+    function getPlaybackCtx() {
+      if (!audioCtxOut || audioCtxOut.state === "closed") {
+        audioCtxOut = new AudioContext({ sampleRate: OUTPUT_RATE });
+        nextPlayTime = 0;
+      }
+      return audioCtxOut;
+    }
+
+    function stopAgentAudio() {
+      if (audioCtxOut && audioCtxOut.state !== "closed") {
+        audioCtxOut.close();
+        audioCtxOut = null;
+        nextPlayTime = 0;
+      }
+      setAgentSpeaking(false);
+    }
+
+    function playPCM(buffer) {
+      const ctx = getPlaybackCtx();
+      const i16 = new Int16Array(buffer);
+      const buf = ctx.createBuffer(1, i16.length, OUTPUT_RATE);
+      const ch = buf.getChannelData(0);
+      for (let i = 0; i < i16.length; i++) ch[i] = i16[i] / 32768;
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      const when = Math.max(ctx.currentTime + 0.02, nextPlayTime);
+      src.start(when);
+      nextPlayTime = when + buf.duration;
+    }
+
+    // ── Controls ──────────────────────────────────────────────────────────────────
+    voiceBtn.addEventListener("click", () => {
+      if (!recording) startRecording();
+      else toggleMute();
+    });
+
+    // ── Media Menu ──────────────────────────────────────────────────────────────
+    mediaBtn.onclick = (e) => {
+      e.stopPropagation();
+      mediaMenu.classList.toggle("show");
+    };
+
+    optUpload.onclick = () => {
+      mediaMenu.classList.remove("show");
+      imageInput.click();
+    };
+
+    optScreen.onclick = () => {
+      mediaMenu.classList.remove("show");
+      if (isSharingScreen) stopScreenSharing();
+      else startScreenSharing();
+    };
+
+    stopScreenBtn.onclick = stopScreenSharing;
+
+    document.addEventListener("click", () => {
+      mediaMenu.classList.remove("show");
+    });
+
+    disconnectBtn.addEventListener("click", () => {
+      userInitiatedDisconnect = true;
+      stopAgentAudio();
+      ws?.close();
+      stopRecording();
+    });
+
+    newSessionBtn.addEventListener("click", () => {
+      newSessionBtn.style.display = "none";
+      userInitiatedDisconnect = false;
+      // Clear conversation
+      messages.innerHTML = '';
+      messages.appendChild(emptyMsg);
+      agentMsgEl = null; userMsgEl = null;
+      // Clear cards
+      sidebarScroll.querySelectorAll('.card-group').forEach(g => g.remove());
+      cardGroups = []; activeGroupId = null;
+      cardNav.innerHTML = '';
+      cardNav.classList.remove("has-groups");
+      noCards.style.display = "block";
+      // Fresh session URL
+      WS_URL = getWsUrl();
+      connect();
+    });
+
+    sendBtn.addEventListener("click", sendText);
+    textInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendText(); } });
+
+    function sendText() {
+      const text = textInput.value.trim();
+      if (!text || ws?.readyState !== WebSocket.OPEN) return;
+      appendMsg("user", text);
+      textInput.value = "";
+      ws.send(JSON.stringify({ type: "text", content: text }));
+    }
+
+    function setStatus(cls, label) {
+      statusDot.className = "via-status-dot" + (cls ? " " + cls : "");
+      statusLabel.textContent = label;
+    }
+
+    // ── Image upload ──────────────────────────────────────────────────────────────
+
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files[0];
+      if (!file || ws?.readyState !== WebSocket.OPEN) return;
+      imageInput.value = ""; // reset so same file can be re-sent
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        // dataUrl = "data:<mime>;base64,<data>"
+        const commaIdx = dataUrl.indexOf(",");
+        const mime_type = dataUrl.slice(5, dataUrl.indexOf(";"));
+        const b64 = dataUrl.slice(commaIdx + 1);
+
+        // Show thumbnail as a user message
+        removeEmptyMsg();
+        const wrap = document.createElement("div");
+        wrap.className = "via-msg via-msg-user";
+        const bubble = document.createElement("div");
+        bubble.className = "via-msg-bubble";
+        const img = document.createElement("img");
+        img.src = dataUrl;
+        img.className = "via-msg-img";
+        img.alt = "Shared photo";
+        bubble.appendChild(img);
+        wrap.appendChild(bubble);
+        messages.appendChild(wrap);
+        messages.scrollTop = messages.scrollHeight;
+
+        ws.send(JSON.stringify({ type: "image", data: b64, mime_type }));
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // ── Panel resize ──────────────────────────────────────────────────────────────
+    (function initResize() {
+      const handle = document.getElementById("resizeHandle");
+      const panel = document.querySelector(".via-panel");
+      const app = document.querySelector(".app");
+      const STORAGE_KEY = "waypoint_panel_width";
+      const MIN_W = 280, MIN_SIDEBAR = 240;
+
+      // Restore saved width
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) panel.style.width = saved + "px";
+
+      let dragging = false;
+      let isVertical = false; // true on mobile (column layout)
+
+      function startDrag(e) {
+        isVertical = window.innerWidth <= 767;
+        dragging = true;
+        handle.classList.add("dragging");
+        document.body.style.cursor = isVertical ? "row-resize" : "col-resize";
+        document.body.style.userSelect = "none";
+        e.preventDefault();
+      }
+
+      function onDrag(clientX, clientY) {
+        if (!dragging) return;
+        const rect = app.getBoundingClientRect();
+        if (isVertical) {
+          const newH = clientY - rect.top;
+          const maxH = rect.height - MIN_SIDEBAR - 6;
+          panel.style.height = Math.max(200, Math.min(maxH, newH)) + "px";
+        } else {
+          const newW = clientX - rect.left;
+          const maxW = rect.width - MIN_SIDEBAR - 6;
+          panel.style.width = Math.max(MIN_W, Math.min(maxW, newW)) + "px";
+        }
+      }
+
+      function stopDrag() {
+        if (!dragging) return;
+        dragging = false;
+        handle.classList.remove("dragging");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        if (!isVertical) localStorage.setItem(STORAGE_KEY, parseInt(panel.style.width));
+      }
+
+      handle.addEventListener("mousedown", startDrag);
+      document.addEventListener("mousemove", e => onDrag(e.clientX, e.clientY));
+      document.addEventListener("mouseup", stopDrag);
+
+      handle.addEventListener("touchstart", startDrag, { passive: false });
+      document.addEventListener("touchmove", e => { if (dragging) { onDrag(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } }, { passive: false });
+      document.addEventListener("touchend", stopDrag);
+    })();
+
+    // ── Screen Sharing ──────────────────────────────────────────────────────────
+    async function startScreenSharing() {
+      try {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: { frameRate: 5 },
+          audio: false
+        });
+
+        isSharingScreen = true;
+        screenFrameSentThisTurn = false;
+        screenShareStatus.style.display = "flex";
+
+        // Chat indicator
+        removeEmptyMsg();
+        const screenStartMsg = document.createElement("div");
+        screenStartMsg.className = "via-msg via-msg-user";
+        screenStartMsg.innerHTML = `<div class="via-msg-bubble" style="display:flex;align-items:center;gap:8px;color:var(--color-secondary);font-size:13px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Screen sharing started
+        </div>`;
+        messages.appendChild(screenStartMsg);
+        messages.scrollTop = messages.scrollHeight;
+
+        // Persist canvas/video so captureScreenFrame() can use them
+        screenCanvas = document.createElement("canvas");
+        screenCtx = screenCanvas.getContext("2d");
+        screenVideo = document.createElement("video");
+        screenVideo.srcObject = screenStream;
+        screenVideo.play();
+
+        screenStream.getVideoTracks()[0].onended = () => stopScreenSharing();
+
+      } catch (err) {
+        console.error("Error sharing screen:", err);
+        stopScreenSharing();
+      }
+    }
+
+    function isUserSpeaking() {
+      if (!analyser) return false;
+      const buf = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteTimeDomainData(buf);
+      const rms = Math.sqrt(buf.reduce((s, x) => s + (x - 128) ** 2, 0) / buf.length);
+      return rms > 8; // silence ≈ 0–3, whisper ≈ 5–8, speech ≈ 10+
+    }
+
+    function captureScreenFrame() {
+      if (!screenVideo || screenVideo.videoWidth === 0) return;
+      const scale = Math.min(1, 1024 / Math.max(screenVideo.videoWidth, screenVideo.videoHeight));
+      screenCanvas.width = screenVideo.videoWidth * scale;
+      screenCanvas.height = screenVideo.videoHeight * scale;
+      screenCtx.drawImage(screenVideo, 0, 0, screenCanvas.width, screenCanvas.height);
+      const b64 = screenCanvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+      ws.send(JSON.stringify({ type: "screen_frame", data: b64, mime_type: "image/jpeg" }));
+    }
+
+    function stopScreenSharing() {
+      if (!isSharingScreen) return;
+      isSharingScreen = false;
+      screenFrameSentThisTurn = false;
+      screenShareStatus.style.display = "none";
+      screenStream?.getTracks().forEach(t => t.stop());
+      screenStream = null; screenCanvas = null; screenCtx = null; screenVideo = null;
+
+      // Chat indicator
+      const screenStopMsg = document.createElement("div");
+      screenStopMsg.className = "via-msg via-msg-user";
+      screenStopMsg.innerHTML = `<div class="via-msg-bubble" style="display:flex;align-items:center;gap:8px;color:var(--color-tertiary);font-size:13px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Screen sharing stopped
+      </div>`;
+      messages.appendChild(screenStopMsg);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+
+    // ── Boot ──────────────────────────────────────────────────────────────────────
+    connect();
+  </script>
+</body>
+
+</html>

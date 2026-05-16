@@ -1,0 +1,29 @@
+Waypoint
+Copyright 2026 Eliot Chen
+
+This product includes software developed as an entry to the
+Gemini Live Agent Challenge (https://googleai.devpost.com).
+
+This product depends on the following third-party software:
+
+  - Google Agent Development Kit (google-adk) — Apache License 2.0
+    https://github.com/google/adk-python
+
+  - Google Gen AI Python SDK (google-genai) — Apache License 2.0
+    https://github.com/googleapis/python-genai
+
+  - FastAPI — MIT License
+    https://github.com/tiangolo/fastapi
+
+  - pgvector — PostgreSQL License
+    https://github.com/pgvector/pgvector
+
+  - asyncpg — Apache License 2.0
+    https://github.com/MagicStack/asyncpg
+
+  - psycopg2 — LGPL with OpenSSL exception
+    https://github.com/psycopg/psycopg2
+
+Avatar and campus imagery in frontend/assets/ were generated using
+generative AI tools and depict a fictional institution ("Kingsford
+University"). No real institutional branding is reproduced.
