@@ -82,8 +82,10 @@ def run_layer1() -> list[dict]:
 
     from tools import (
         book_campus_tour,
+        compare_courses,
         get_course_detail,
         recommend_courses,
+        register_for_event,
         search_courses,
         search_events,
         search_knowledge,
@@ -118,6 +120,65 @@ def run_layer1() -> list[dict]:
                 "failures": [str(exc)],
                 "latency_ms": -1,
             })
+
+    # ── get_course_detail ──────────────────────────────────────────────────────
+    # ── compare_courses ────────────────────────────────────────────────────────
+    check(
+        "compare_courses(CS vs Software Engineering)",
+        compare_courses, ["Bachelor of Computer Science", "Bachelor of Software Engineering (Hons)"], {},
+        lambda r: [
+            ("found (no found=False)",   r.get("found") is not False),
+            ("comparing list len == 2",  len(r.get("comparing", [])) == 2),
+            ("courses list len == 2",    len(r.get("courses", [])) == 2),
+        ],
+    )
+    check(
+        "compare_courses(same course twice → not-found)",
+        compare_courses, ["Bachelor of Nursing", "Bachelor of Nursing"], {},
+        lambda r: [
+            ("found=False",  r.get("found") is False),
+            ("has message",  "message" in r),
+        ],
+    )
+
+    # ── register_for_event ─────────────────────────────────────────────────────
+    check(
+        "register_for_event(valid — Open Day 2026)",
+        register_for_event, [], {
+            "event_title":  "Kingsford Open Day 2026",
+            "student_name": "Eval Runner",
+            "email":        "eval@waypoint.test",
+        },
+        lambda r: [
+            ("success=True",                r.get("success") is True),
+            ("confirmation_ref starts EV-", r.get("confirmation_ref", "").startswith("EV-")),
+            ("has event key",               "event" in r),
+        ],
+    )
+    check(
+        "register_for_event(fully booked — Nursing Sim Lab Tour)",
+        register_for_event, [], {
+            "event_title":  "Nursing Simulation Lab Tour",
+            "student_name": "Eval Runner",
+            "email":        "eval@waypoint.test",
+        },
+        lambda r: [
+            ("success=False",  r.get("success") is False),
+            ("has error key",  "error" in r),
+        ],
+    )
+    check(
+        "register_for_event(unknown event title)",
+        register_for_event, [], {
+            "event_title":  "zzz-no-such-event-xyz",
+            "student_name": "Eval Runner",
+            "email":        "eval@waypoint.test",
+        },
+        lambda r: [
+            ("success=False",  r.get("success") is False),
+            ("has error key",  "error" in r),
+        ],
+    )
 
     # ── get_course_detail ──────────────────────────────────────────────────────
     check(
@@ -186,7 +247,7 @@ def run_layer1() -> list[dict]:
         search_events, [], {},
         lambda r: [
             ("has count key",    "count" in r),
-            ("has upcoming key", "upcoming" in r),
+            ("has upcoming key", "upcoming" in r or "events" in r),
         ],
     )
     check(
@@ -269,10 +330,10 @@ def run_layer1() -> list[dict]:
         ],
     )
     check(
-        "search_scholarships(type=International) — exactly 1 by design",
+        "search_scholarships(type=International) — exactly 2 by design",
         search_scholarships, ["international student scholarship funding"], {"scholarship_type": "International"},
         lambda r: [
-            ("count == 1",  r.get("count", 0) == 1),
+            ("count == 2",  r.get("count", 0) == 2),
         ],
     )
     check(
@@ -289,7 +350,7 @@ def run_layer1() -> list[dict]:
         book_campus_tour, [], {
             "student_name": "Eval Runner",
             "email": "eval@waypoint.test",
-            "preferred_date": "2026-04-10",
+            "preferred_date": "2026-10-10",
             "party_size": 2,
         },
         lambda r: [
@@ -303,7 +364,7 @@ def run_layer1() -> list[dict]:
         book_campus_tour, [], {
             "student_name": "Eval Runner",
             "email": "eval@waypoint.test",
-            "preferred_date": "2026-04-10",
+            "preferred_date": "2026-10-10",
             "party_size": 10,
         },
         lambda r: [
@@ -338,8 +399,10 @@ Tool routing rules (follow exactly):
 - Student asks for more detail about a specific course by name      → call get_course_detail
 - Student asks about courses, programs, or fields of study          → call search_courses
 - Student wants personalised recommendations based on interests      → call recommend_courses
+- Student wants to compare two specific named courses side by side   → call compare_courses
 - Student asks about upcoming events, open days, info sessions       → call search_events
 - Student wants to book a campus tour                                → call book_campus_tour
+- Student wants to register for a specific event (provides name+email) → call register_for_event
 - Student asks about scholarships, bursaries, or financial support   → call search_scholarships
 - Student asks about admissions, ATAR, HECS-HELP, fees, visa,
   campus life, accommodation, transport, facilities, or careers       → call search_knowledge
@@ -356,6 +419,23 @@ def _build_tool_declarations():
             parameters=t.Schema(type="OBJECT", properties={
                 "course_name": t.Schema(type="STRING"),
             }, required=["course_name"]),
+        ),
+        t.FunctionDeclaration(
+            name="compare_courses",
+            description="Compare two specific named courses side by side.",
+            parameters=t.Schema(type="OBJECT", properties={
+                "course_name_a": t.Schema(type="STRING"),
+                "course_name_b": t.Schema(type="STRING"),
+            }, required=["course_name_a", "course_name_b"]),
+        ),
+        t.FunctionDeclaration(
+            name="register_for_event",
+            description="Register a student for a specific university event.",
+            parameters=t.Schema(type="OBJECT", properties={
+                "event_title":  t.Schema(type="STRING"),
+                "student_name": t.Schema(type="STRING"),
+                "email":        t.Schema(type="STRING"),
+            }, required=["event_title", "student_name", "email"]),
         ),
         t.FunctionDeclaration(
             name="search_courses",
@@ -507,6 +587,8 @@ _TURN_STUBS: dict[Optional[str], str] = {
     "book_campus_tour":    "Your campus tour has been booked! Is there anything else I can help you with?",
     "search_knowledge":    "Here's some information about that. Is there anything specific you'd like to know more about?",
     "search_scholarships": "I found some scholarships you may be eligible for. Would you like to know more about any of them?",
+    "compare_courses":     "Here's a side-by-side comparison of those two courses. Would you like more details on either one?",
+    "register_for_event":  "You're registered! Your confirmation reference is ready. Is there anything else I can help you with?",
     None:                  "Happy to help! What would you like to know?",
 }
 

@@ -120,10 +120,11 @@ log        = logging.getLogger(__name__)
 
 HIDDEN_GREETING_PROMPT = "(System: The student has just arrived. Please greet them warmly as Clara, the Kingsford University course counsellor. Introduce yourself briefly and ask what brings them to Kingsford University today — do NOT search for anything yet, just wait for their response.)"
 logging.basicConfig(
-    level=logging.INFO, 
+    level=logging.INFO,
     format="%(asctime)s.%(msecs)03d %(levelname)s  %(message)s",
     datefmt="%H:%M:%S"
 )
+logging.getLogger("google.adk.models.gemini_llm_connection").setLevel(logging.WARNING)
 
 # Global singletons for session management
 session_service = InMemorySessionService()
@@ -379,16 +380,18 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                             # model sometimes emits after tool responses
                             chunk = re.sub(r'<ctrl\d+>', '', chunk)
                             if chunk and not chunk.strip().startswith("**"):
+                                if turn_start_at is None:
+                                    turn_start_at = time.time()
                                 finished = not is_partial
                                 if finished:
-                                    # Final already contains full text from ADK — use as-is
                                     display_text = chunk.strip()
                                     agent_tx_buf = ""
                                 else:
                                     agent_tx_buf += chunk
-                                display_text = agent_tx_buf.strip()
-                                dt = time.time() - turn_start_at if turn_start_at else 0
-                                log.info("Clara%s [+%.2fs]: %s", "" if finished else " (partial)", dt, display_text)
+                                    display_text = agent_tx_buf.strip()
+                                dt = time.time() - turn_start_at
+                                if finished:
+                                    log.info("Clara [+%.2fs]: %s", dt, display_text)
                                 await websocket.send_text(json.dumps({
                                     "type": "transcript",
                                     "role": "agent",
@@ -400,9 +403,10 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                         if event.input_transcription:
                             chunk = (getattr(event.input_transcription, "text", "") or "")
                             if chunk:
+                                if turn_start_at is None:
+                                    turn_start_at = time.time()
                                 finished = not is_partial
                                 if finished:
-                                    # Final already contains full text from ADK — use as-is
                                     display_text = chunk.strip()
                                     user_tx_buf = ""
                                 else:
@@ -412,8 +416,9 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                                     if finished:
                                         user_tx_buf = ""
                                     continue
-                                dt = time.time() - turn_start_at if turn_start_at else 0
-                                log.info("User%s [+%.2fs]: %s", "" if finished else " (partial)", dt, display_text)
+                                dt = time.time() - turn_start_at
+                                if finished:
+                                    log.info("User [+%.2fs]: %s", dt, display_text)
                                 await websocket.send_text(json.dumps({
                                     "type": "transcript",
                                     "role": "user",

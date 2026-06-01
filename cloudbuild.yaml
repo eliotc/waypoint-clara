@@ -1,7 +1,8 @@
 substitutions:
   _REGION: us-central1
   _SERVICE: waypoint
-  _CLOUDSQL_INSTANCE: waypoint-db
+  _CLOUDSQL_PROJECT: universal-cs-assistant-agent
+  _CLOUDSQL_INSTANCE: customer-assistant-vectordb
   _AR_REPO: waypoint
 
 steps:
@@ -25,7 +26,7 @@ steps:
       - --platform=managed
       - --allow-unauthenticated
       - --service-account=waypoint-runner@$PROJECT_ID.iam.gserviceaccount.com
-      - --add-cloudsql-instances=$PROJECT_ID:${_REGION}:${_CLOUDSQL_INSTANCE}
+      - --add-cloudsql-instances=${_CLOUDSQL_PROJECT}:${_REGION}:${_CLOUDSQL_INSTANCE}
       - --set-secrets=DATABASE_URL=waypoint-db-url:latest,GOOGLE_API_KEY=google-api-key:latest
       - --set-env-vars=GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_GENAI_USE_VERTEXAI=FALSE,MODEL_NAME=gemini-3.1-flash-live-preview
       - --memory=1Gi

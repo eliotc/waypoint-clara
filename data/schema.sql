@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS courses (
     study_mode      TEXT NOT NULL,                 -- Full-time, Part-time, Online
     duration_years  NUMERIC(3,1) NOT NULL,
     atar_cutoff     INTEGER,                       -- NULL = no ATAR required
+    entry_requirements TEXT,                       -- NULL = no specific requirements (e.g. undergraduate ATAR-only)
     annual_fee_aud  INTEGER NOT NULL,
     description     TEXT NOT NULL,
     career_outcomes TEXT NOT NULL,
@@ -29,7 +30,23 @@ CREATE TABLE IF NOT EXISTS events (
     location    TEXT NOT NULL,    -- Building/room or "Online"
     description TEXT NOT NULL,
     max_capacity INTEGER,
-    spots_left   INTEGER
+    spots_left   INTEGER,
+    registration_url TEXT
+);
+
+-- Idempotent column additions: CREATE TABLE IF NOT EXISTS above is a no-op when
+-- the table already exists, so newly-added columns must be applied explicitly for
+-- databases seeded before these columns existed. Safe to run repeatedly.
+ALTER TABLE courses ADD COLUMN IF NOT EXISTS entry_requirements TEXT;
+ALTER TABLE events  ADD COLUMN IF NOT EXISTS registration_url   TEXT;
+
+-- ── Event registrations ──────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS event_registrations (
+    id              SERIAL PRIMARY KEY,
+    event_id        INTEGER NOT NULL REFERENCES events(id),
+    student_name    TEXT NOT NULL,
+    email           TEXT NOT NULL,
+    registered_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- ── Tour bookings ─────────────────────────────────────────────────────────────

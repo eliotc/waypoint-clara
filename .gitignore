@@ -15,3 +15,12 @@ HACKATHON_PLAN.md
 # Agent memory (local context, not committed)
 .memory/
 .claude/settings.local.json
+
+# Generated test output — never commit
+eval_report.json
+
+# Secrets / credential dumps — never commit
+*secret*.txt
+extracted_secrets.txt
+
+.tmp/

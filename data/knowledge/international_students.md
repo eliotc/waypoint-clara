@@ -103,6 +103,15 @@ The International Centre coordinates the **Airport Pickup Service** for students
 ### Peer Mentor drop-in
 Trained Peer Mentors (current international students in their second year or above) hold drop-in sessions in the Welcome Lounge every Monday and Thursday 11am–1pm. They can answer practical questions that advisers can't — like the best cheap grocery stores nearby, how to open a bank account without a fixed address, or which buses run late at night.
 
+## International Financial Hardship and Emergency Support
+Kingsford University offers limited financial assistance and hardship support for international students experiencing unexpected financial difficulties.
+
+### Hardship Support and Emergency Funds
+- **Emergency Welfare Grants**: One-off crisis grants of up to **AUD $1,000** are available for international students facing sudden, unforeseen emergencies (such as medical crises, natural disasters in their home country, or sudden loss of support).
+- **Interest-Free Loans**: Small interest-free loans of up to **AUD $1,500** may be approved to cover study-related costs like textbooks, computers, or critical living expenses. These must be repaid within the semester.
+- **Strict Limits**: This support is for temporary, short-term relief only. It cannot be used to pay tuition fees, which international students must be able to fund independently as a condition of their student visa.
+- **How to Apply**: Applications can be made confidentially through the Student Welfare office at the International Centre. You will need to provide bank statements and evidence of your circumstances.
+
 ## Contact
 - **International Centre**: Level G, Student Centre | international@kingsford.edu.au | +61 3 9555 0300
 - **Open**: Monday–Friday 9am–5pm AEST
