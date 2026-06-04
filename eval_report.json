@@ -1,137 +1,165 @@
 {
   "summary": {
-    "total": 64,
-    "passed": 63,
-    "pct": 98
+    "total": 71,
+    "passed": 71,
+    "pct": 100
   },
   "layer1": [
+    {
+      "test": "compare_courses(CS vs Software Engineering)",
+      "passed": true,
+      "failures": [],
+      "latency_ms": 3558
+    },
+    {
+      "test": "compare_courses(same course twice \u2192 not-found)",
+      "passed": true,
+      "failures": [],
+      "latency_ms": 1171
+    },
+    {
+      "test": "register_for_event(valid \u2014 Open Day 2026)",
+      "passed": true,
+      "failures": [],
+      "latency_ms": 604
+    },
+    {
+      "test": "register_for_event(fully booked \u2014 Nursing Sim Lab Tour)",
+      "passed": true,
+      "failures": [],
+      "latency_ms": 201
+    },
+    {
+      "test": "register_for_event(unknown event title)",
+      "passed": true,
+      "failures": [],
+      "latency_ms": 241
+    },
     {
       "test": "get_course_detail('Master of Data Science')",
       "passed": true,
       "failures": [],
-      "latency_ms": 3650
+      "latency_ms": 934
     },
     {
       "test": "get_course_detail('zzz-no-such-course-xyz')",
       "passed": true,
       "failures": [],
-      "latency_ms": 592
+      "latency_ms": 1052
     },
     {
       "test": "search_courses('software engineering')",
       "passed": true,
       "failures": [],
-      "latency_ms": 609
+      "latency_ms": 875
     },
     {
       "test": "search_courses('nursing', faculty='Health Sciences')",
       "passed": true,
       "failures": [],
-      "latency_ms": 516
+      "latency_ms": 884
     },
     {
       "test": "search_courses('business management')",
       "passed": true,
       "failures": [],
-      "latency_ms": 502
+      "latency_ms": 867
     },
     {
       "test": "recommend_courses(maths + problem solving)",
       "passed": true,
       "failures": [],
-      "latency_ms": 501
+      "latency_ms": 858
     },
     {
       "test": "recommend_courses(creative arts, Online mode)",
       "passed": true,
       "failures": [],
-      "latency_ms": 522
+      "latency_ms": 904
     },
     {
       "test": "search_events(no filter \u2014 next 30 days)",
-      "passed": false,
-      "failures": [
-        "has upcoming key"
-      ],
-      "latency_ms": 32
+      "passed": true,
+      "failures": [],
+      "latency_ms": 201
     },
     {
       "test": "search_events(type=CampusTour)",
       "passed": true,
       "failures": [],
-      "latency_ms": 18
+      "latency_ms": 237
     },
     {
       "test": "search_knowledge('ATAR requirements for medicine')",
       "passed": true,
       "failures": [],
-      "latency_ms": 613
+      "latency_ms": 932
     },
     {
       "test": "search_knowledge('HECS-HELP domestic student fees')",
       "passed": true,
       "failures": [],
-      "latency_ms": 512
+      "latency_ms": 848
     },
     {
       "test": "search_knowledge('student visa requirements international')",
       "passed": true,
       "failures": [],
-      "latency_ms": 556
+      "latency_ms": 928
     },
     {
       "test": "search_knowledge('on-campus accommodation options')",
       "passed": true,
       "failures": [],
-      "latency_ms": 544
+      "latency_ms": 966
     },
     {
       "test": "search_knowledge('graduate salary career outcomes')",
       "passed": true,
       "failures": [],
-      "latency_ms": 497
+      "latency_ms": 1047
     },
     {
       "test": "search_knowledge('campus facilities library gym')",
       "passed": true,
       "failures": [],
-      "latency_ms": 512
+      "latency_ms": 965
     },
     {
       "test": "search_scholarships(general query \u2014 no type filter)",
       "passed": true,
       "failures": [],
-      "latency_ms": 521
+      "latency_ms": 965
     },
     {
       "test": "search_scholarships(type=Merit)",
       "passed": true,
       "failures": [],
-      "latency_ms": 525
+      "latency_ms": 922
     },
     {
       "test": "search_scholarships(type=Equity)",
       "passed": true,
       "failures": [],
-      "latency_ms": 518
+      "latency_ms": 918
     },
     {
-      "test": "search_scholarships(type=International) \u2014 exactly 1 by design",
+      "test": "search_scholarships(type=International) \u2014 exactly 2 by design",
       "passed": true,
       "failures": [],
-      "latency_ms": 475
+      "latency_ms": 892
     },
     {
       "test": "search_scholarships(type=Faculty)",
       "passed": true,
       "failures": [],
-      "latency_ms": 504
+      "latency_ms": 946
     },
     {
       "test": "book_campus_tour(valid booking)",
       "passed": true,
       "failures": [],
-      "latency_ms": 23
+      "latency_ms": 203
     },
     {
       "test": "book_campus_tour(party_size=10 \u2014 out of range)",
@@ -153,7 +181,7 @@
       "expected_tool": "get_course_detail",
       "actual_tool": "get_course_detail",
       "passed": true,
-      "latency_ms": 1539
+      "latency_ms": 1803
     },
     {
       "id": "R01",
@@ -161,7 +189,7 @@
       "expected_tool": "search_courses",
       "actual_tool": "search_courses",
       "passed": true,
-      "latency_ms": 1150
+      "latency_ms": 1765
     },
     {
       "id": "R02",
@@ -169,7 +197,7 @@
       "expected_tool": "search_courses",
       "actual_tool": "search_courses",
       "passed": true,
-      "latency_ms": 1637
+      "latency_ms": 1639
     },
     {
       "id": "R03",
@@ -177,7 +205,7 @@
       "expected_tool": "search_courses",
       "actual_tool": "search_courses",
       "passed": true,
-      "latency_ms": 1841
+      "latency_ms": 1737
     },
     {
       "id": "R04",
@@ -185,7 +213,7 @@
       "expected_tool": "recommend_courses",
       "actual_tool": "recommend_courses",
       "passed": true,
-      "latency_ms": 1745
+      "latency_ms": 1844
     },
     {
       "id": "R05",
@@ -193,7 +221,7 @@
       "expected_tool": "recommend_courses",
       "actual_tool": "recommend_courses",
       "passed": true,
-      "latency_ms": 4932
+      "latency_ms": 2044
     },
     {
       "id": "R06",
@@ -201,7 +229,7 @@
       "expected_tool": "recommend_courses",
       "actual_tool": "recommend_courses",
       "passed": true,
-      "latency_ms": 1726
+      "latency_ms": 1614
     },
     {
       "id": "R07",
@@ -209,7 +237,7 @@
       "expected_tool": "search_events",
       "actual_tool": "search_events",
       "passed": true,
-      "latency_ms": 1635
+      "latency_ms": 1768
     },
     {
       "id": "R08",
@@ -217,7 +245,7 @@
       "expected_tool": "search_events",
       "actual_tool": "search_events",
       "passed": true,
-      "latency_ms": 1715
+      "latency_ms": 1634
     },
     {
       "id": "R09",
@@ -225,7 +253,7 @@
       "expected_tool": "search_events",
       "actual_tool": "search_events",
       "passed": true,
-      "latency_ms": 2577
+      "latency_ms": 1571
     },
     {
       "id": "R10",
@@ -233,7 +261,7 @@
       "expected_tool": "book_campus_tour",
       "actual_tool": "book_campus_tour",
       "passed": true,
-      "latency_ms": 1952
+      "latency_ms": 1914
     },
     {
       "id": "R11",
@@ -241,7 +269,7 @@
       "expected_tool": "search_knowledge",
       "actual_tool": "search_knowledge",
       "passed": true,
-      "latency_ms": 1742
+      "latency_ms": 1377
     },
     {
       "id": "R12",
@@ -249,7 +277,7 @@
       "expected_tool": "search_knowledge",
       "actual_tool": "search_knowledge",
       "passed": true,
-      "latency_ms": 1604
+      "latency_ms": 1388
     },
     {
       "id": "R13",
@@ -257,7 +285,7 @@
       "expected_tool": "search_knowledge",
       "actual_tool": "search_knowledge",
       "passed": true,
-      "latency_ms": 1196
+      "latency_ms": 1204
     },
     {
       "id": "R14",
@@ -265,7 +293,7 @@
       "expected_tool": "search_knowledge",
       "actual_tool": "search_knowledge",
       "passed": true,
-      "latency_ms": 1547
+      "latency_ms": 1682
     },
     {
       "id": "R15",
@@ -273,7 +301,7 @@
       "expected_tool": "search_knowledge",
       "actual_tool": "search_knowledge",
       "passed": true,
-      "latency_ms": 1389
+      "latency_ms": 1619
     },
     {
       "id": "R16",
@@ -281,7 +309,7 @@
       "expected_tool": "search_knowledge",
       "actual_tool": "search_knowledge",
       "passed": true,
-      "latency_ms": 1330
+      "latency_ms": 1773
     },
     {
       "id": "R17",
@@ -289,7 +317,7 @@
       "expected_tool": "search_scholarships",
       "actual_tool": "search_scholarships",
       "passed": true,
-      "latency_ms": 1553
+      "latency_ms": 1871
     },
     {
       "id": "R18",
@@ -297,7 +325,7 @@
       "expected_tool": "search_scholarships",
       "actual_tool": "search_scholarships",
       "passed": true,
-      "latency_ms": 1635
+      "latency_ms": 1884
     },
     {
       "id": "R19",
@@ -305,7 +333,7 @@
       "expected_tool": "search_scholarships",
       "actual_tool": "search_scholarships",
       "passed": true,
-      "latency_ms": 1627
+      "latency_ms": 1708
     },
     {
       "id": "R20",
@@ -313,7 +341,7 @@
       "expected_tool": "search_scholarships",
       "actual_tool": "search_scholarships",
       "passed": true,
-      "latency_ms": 1840
+      "latency_ms": 1467
     },
     {
       "id": "R21",
@@ -321,7 +349,7 @@
       "expected_tool": null,
       "actual_tool": null,
       "passed": true,
-      "latency_ms": 1638
+      "latency_ms": 1537
     },
     {
       "id": "R22",
@@ -329,7 +357,7 @@
       "expected_tool": null,
       "actual_tool": null,
       "passed": true,
-      "latency_ms": 1421
+      "latency_ms": 1125
     },
     {
       "id": "R23",
@@ -337,7 +365,23 @@
       "expected_tool": null,
       "actual_tool": null,
       "passed": true,
-      "latency_ms": 2397
+      "latency_ms": 2357
+    },
+    {
+      "id": "R24",
+      "query": "Can you compare the Bachelor of Computer Science and Bachelor of Software Engineering for me?",
+      "expected_tool": "compare_courses",
+      "actual_tool": "compare_courses",
+      "passed": true,
+      "latency_ms": 1740
+    },
+    {
+      "id": "R25",
+      "query": "I'd like to register for the Kingsford Open Day. My name is Sam Lee and my email is sam@example.com.",
+      "expected_tool": "register_for_event",
+      "actual_tool": "register_for_event",
+      "passed": true,
+      "latency_ms": 1715
     }
   ],
   "layer2b": [
@@ -352,7 +396,7 @@
           "expected_tool": "search_courses",
           "actual_tool": "search_courses",
           "passed": true,
-          "latency_ms": 1800
+          "latency_ms": 1719
         },
         {
           "turn": 2,
@@ -360,7 +404,7 @@
           "expected_tool": "get_course_detail",
           "actual_tool": "get_course_detail",
           "passed": true,
-          "latency_ms": 1427
+          "latency_ms": 2050
         },
         {
           "turn": 3,
@@ -368,7 +412,7 @@
           "expected_tool": "search_scholarships",
           "actual_tool": "search_scholarships",
           "passed": true,
-          "latency_ms": 1577
+          "latency_ms": 1742
         },
         {
           "turn": 4,
@@ -376,7 +420,7 @@
           "expected_tool": "search_knowledge",
           "actual_tool": "search_knowledge",
           "passed": true,
-          "latency_ms": 1645
+          "latency_ms": 2047
         },
         {
           "turn": 5,
@@ -384,7 +428,7 @@
           "expected_tool": "search_events",
           "actual_tool": "search_events",
           "passed": true,
-          "latency_ms": 1872
+          "latency_ms": 1880
         }
       ]
     },
@@ -399,7 +443,7 @@
           "expected_tool": "search_courses",
           "actual_tool": "search_courses",
           "passed": true,
-          "latency_ms": 1879
+          "latency_ms": 1314
         },
         {
           "turn": 2,
@@ -407,7 +451,7 @@
           "expected_tool": "get_course_detail",
           "actual_tool": "get_course_detail",
           "passed": true,
-          "latency_ms": 1591
+          "latency_ms": 1536
         },
         {
           "turn": 3,
@@ -415,7 +459,7 @@
           "expected_tool": "search_knowledge",
           "actual_tool": "search_knowledge",
           "passed": true,
-          "latency_ms": 1430
+          "latency_ms": 1633
         },
         {
           "turn": 4,
@@ -423,7 +467,7 @@
           "expected_tool": "search_scholarships",
           "actual_tool": "search_scholarships",
           "passed": true,
-          "latency_ms": 1446
+          "latency_ms": 1737
         }
       ]
     },
@@ -438,7 +482,7 @@
           "expected_tool": "recommend_courses",
           "actual_tool": "recommend_courses",
           "passed": true,
-          "latency_ms": 1542
+          "latency_ms": 1979
         },
         {
           "turn": 2,
@@ -446,7 +490,7 @@
           "expected_tool": "get_course_detail",
           "actual_tool": "get_course_detail",
           "passed": true,
-          "latency_ms": 1134
+          "latency_ms": 1616
         },
         {
           "turn": 3,
@@ -454,7 +498,7 @@
           "expected_tool": "search_knowledge",
           "actual_tool": "search_knowledge",
           "passed": true,
-          "latency_ms": 1734
+          "latency_ms": 1737
         },
         {
           "turn": 4,
@@ -462,7 +506,7 @@
           "expected_tool": "book_campus_tour",
           "actual_tool": "book_campus_tour",
           "passed": true,
-          "latency_ms": 1946
+          "latency_ms": 1701
         }
       ]
     },
@@ -477,7 +521,7 @@
           "expected_tool": "search_courses",
           "actual_tool": "search_courses",
           "passed": true,
-          "latency_ms": 1455
+          "latency_ms": 1230
         },
         {
           "turn": 2,
@@ -485,7 +529,7 @@
           "expected_tool": "get_course_detail",
           "actual_tool": "get_course_detail",
           "passed": true,
-          "latency_ms": 1142
+          "latency_ms": 1910
         },
         {
           "turn": 3,
@@ -493,7 +537,7 @@
           "expected_tool": "search_scholarships",
           "actual_tool": "search_scholarships",
           "passed": true,
-          "latency_ms": 1121
+          "latency_ms": 1284
         },
         {
           "turn": 4,
@@ -501,7 +545,7 @@
           "expected_tool": "search_events",
           "actual_tool": "search_events",
           "passed": true,
-          "latency_ms": 2068
+          "latency_ms": 2248
         }
       ]
     }

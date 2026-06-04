@@ -9,6 +9,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Google Analytics (production only — skipped on localhost) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-V65KVWNQTZ';
+      document.head.appendChild(s);
+      gtag('js', new Date());
+      gtag('config', 'G-V65KVWNQTZ');
+    }
+  </script>
   <style>
     *,
     *::before,
@@ -1184,6 +1197,160 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
+    /* ── Under-the-hood toggle ──────────────────────────────────────────────── */
+    .via-hood-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 8px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-tertiary);
+      background: transparent;
+      border: 1px solid var(--border-secondary);
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .via-hood-toggle:hover {
+      border-color: var(--accent-teal);
+      color: var(--accent-teal);
+    }
+
+    .via-hood-toggle.on {
+      background: rgba(13, 148, 136, 0.1);
+      border-color: var(--accent-teal);
+      color: var(--accent-teal);
+    }
+
+    .via-hood-toggle svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+    }
+
+    /* ── Tool-call trace blocks (inline in transcript) ──────────────────────── */
+    .via-trace {
+      margin: 6px 0;
+      border: 1px solid var(--border-secondary);
+      border-radius: 10px;
+      background: #0f1115;
+      overflow: hidden;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 12px;
+      animation: viaTraceIn 0.25s ease;
+      flex-shrink: 0;  /* never let the flex column crush the trace to a line */
+    }
+
+    /* Hidden unless the hood toggle is on (set on .via-panel) */
+    .via-panel:not(.hood-on) .via-trace { display: none; }
+
+    @keyframes viaTraceIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .via-trace-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      cursor: pointer;
+      user-select: none;
+      color: #e6edf3;
+    }
+
+    .via-trace-head:hover { background: rgba(255, 255, 255, 0.03); }
+
+    .via-trace-bolt {
+      color: var(--accent-teal);
+      flex-shrink: 0;
+      display: flex;
+    }
+
+    .via-trace-name {
+      font-weight: 600;
+      color: #9ecbff;
+    }
+
+    .via-trace-name::after {
+      content: "()";
+      color: #6e7681;
+      font-weight: 400;
+    }
+
+    .via-trace-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      color: #8b949e;
+    }
+
+    .via-trace-latency {
+      color: #6e7681;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .via-trace-spinner {
+      width: 11px;
+      height: 11px;
+      border: 2px solid rgba(158, 203, 255, 0.25);
+      border-top-color: #9ecbff;
+      border-radius: 50%;
+      animation: viaTraceSpin 0.7s linear infinite;
+    }
+
+    @keyframes viaTraceSpin { to { transform: rotate(360deg); } }
+
+    .via-trace-check { color: #3fb950; display: flex; }
+
+    .via-trace-caret {
+      color: #6e7681;
+      transition: transform 0.18s ease;
+      display: flex;
+    }
+
+    .via-trace.collapsed .via-trace-caret { transform: rotate(-90deg); }
+    .via-trace.collapsed .via-trace-body { display: none; }
+
+    .via-trace-body {
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 9px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .via-trace-io-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6e7681;
+      margin-bottom: 3px;
+    }
+
+    .via-trace-io-label.out { color: var(--accent-teal); }
+
+    .via-trace-pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #c9d1d9;
+      line-height: 1.5;
+    }
+
+    .via-trace-pre .k { color: #79c0ff; }
+    .via-trace-pre .s { color: #a5d6ff; }
+    .via-trace-pre .n { color: #d2a8ff; }
+    .via-trace-pre .b { color: #ffa657; }
   </style>
 </head>
 
@@ -1206,6 +1373,11 @@
         <div class="via-status">
           <div class="via-status-dot" id="statusDot"></div>
           <span id="statusLabel">Connecting…</span>
+          <button class="via-hood-toggle" id="hoodToggle" type="button"
+            title="Show the tool calls Clara makes under the hood">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span id="hoodToggleLabel">Under the hood</span>
+          </button>
           <button class="via-disconnect" id="disconnectBtn" style="display:none"
             title="End session and close connection">End Session</button>
           <button class="via-disconnect" id="newSessionBtn" style="display:none"
@@ -1273,7 +1445,7 @@
         </button>
       </div>
 
-      <div class="via-powered"><strong>Waypoint</strong> · Powered by Google ADK</div>
+      <div class="via-powered"><strong>Waypoint</strong> · Powered by Google ADK · <a href="/byo" style="color:var(--accent-teal);text-decoration:none;font-weight:600;">For Universities →</a></div>
     </div>
 
     <!-- Resize handle -->
@@ -1304,8 +1476,19 @@
   </div>
 
   <script>
+    // ── Analytics ─────────────────────────────────────────────────────────────────
+    function ga(name, params) {
+      if (typeof gtag === 'function') gtag('event', name, params);
+    }
+
     // ── Config ────────────────────────────────────────────────────────────────────
-    const getWsUrl = () => `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${crypto.randomUUID()}`;
+    // A /demo/<id> path selects a Build-Your-Own counsellor instance; forward the
+    // id to the backend as a ?demo=<id> query param on the WebSocket.
+    const DEMO_ID = (location.pathname.match(/^\/demo\/([A-Za-z0-9_-]+)/) || [])[1] || null;
+    const getWsUrl = () => {
+      const base = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${crypto.randomUUID()}`;
+      return DEMO_ID ? `${base}?demo=${encodeURIComponent(DEMO_ID)}` : base;
+    };
     let WS_URL = getWsUrl();
     const INPUT_RATE = 16000;
     const OUTPUT_RATE = 24000;
@@ -1346,6 +1529,50 @@
     const voiceBar = document.getElementById("viaVoiceBar");
     const wave = document.getElementById("viaWave");
     const voiceLabel = document.getElementById("viaVoiceLabel");
+
+    // ── Under-the-hood toggle ───────────────────────────────────────────────────
+    const hoodToggle = document.getElementById("hoodToggle");
+    const hoodPanel = document.querySelector(".via-panel");
+    function applyHood(on) {
+      hoodPanel.classList.toggle("hood-on", on);
+      hoodToggle.classList.toggle("on", on);
+      hoodToggle.setAttribute("aria-pressed", String(on));
+    }
+    applyHood(localStorage.getItem("waypointHood") === "1");
+    hoodToggle.addEventListener("click", () => {
+      const on = !hoodPanel.classList.contains("hood-on");
+      localStorage.setItem("waypointHood", on ? "1" : "0");
+      applyHood(on);
+      ga('hood_toggled', { enabled: on });
+    });
+
+    // ── BYO instance branding ───────────────────────────────────────────────────
+    // On a /demo/<id> page, relabel the header to the configured counsellor.
+    if (DEMO_ID) {
+      fetch(`/api/byo/${encodeURIComponent(DEMO_ID)}`)
+        .then(r => r.json())
+        .then(cfg => {
+          if (!cfg || !cfg.ok) return;
+          if (cfg.agentName) {
+            document.querySelector(".via-name").textContent = cfg.agentName;
+            document.title = `${cfg.agentName} · ${cfg.instName || "Waypoint"}`;
+            // Replace Clara's photo with a lettered avatar for this instance.
+            const img = avatar.querySelector("img");
+            if (img) img.remove();
+            if (!avatar.querySelector(".via-avatar-letter")) {
+              const letter = document.createElement("span");
+              letter.className = "via-avatar-letter";
+              letter.style.cssText = "display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--accent-teal);color:#fff;";
+              letter.textContent = (cfg.agentName.trim()[0] || "A").toUpperCase();
+              avatar.appendChild(letter);
+            }
+          }
+          if (cfg.instName) {
+            document.getElementById("viaSubtitle").textContent = `${cfg.instName} · Powered by Waypoint`;
+          }
+        })
+        .catch(() => {});
+    }
 
     // ── WebSocket ─────────────────────────────────────────────────────────────────
     function connect() {
@@ -1418,11 +1645,85 @@
         case "card":
           renderCard(msg);
           break;
+        case "tool_call":
+          renderToolCall(msg);
+          break;
+        case "tool_result":
+          renderToolResult(msg);
+          break;
         case "error":
           const errorIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
           appendMsg("ai", `${errorIcon} ${msg.message}`, true);
           break;
       }
+    }
+
+    // ── Tool-call traces ("under the hood") ─────────────────────────────────────
+    const traceEls = {};  // id → trace element
+
+    // Minimal JSON syntax highlighter for the trace output.
+    function highlightJson(obj) {
+      const json = JSON.stringify(obj, null, 2);
+      return esc(json).replace(
+        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g,
+        (m) => {
+          let cls = "n";
+          if (/^"/.test(m)) cls = /:$/.test(m) ? "k" : "s";
+          else if (/true|false|null/.test(m)) cls = "b";
+          return `<span class="${cls}">${m}</span>`;
+        }
+      );
+    }
+
+    function renderToolCall(msg) {
+      if (msg.id && traceEls[msg.id]) return;  // already rendered this call
+      removeEmptyMsg();
+      flushUser();  // close any in-progress user bubble so the trace sits after it
+      const el = document.createElement("div");
+      el.className = "via-trace";
+      el.dataset.start = String(performance.now());
+      el.innerHTML = `
+        <div class="via-trace-head">
+          <span class="via-trace-bolt"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></span>
+          <span class="via-trace-name">${esc(msg.name)}</span>
+          <span class="via-trace-status">
+            <span class="via-trace-spinner"></span>
+            <span class="via-trace-caret"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+          </span>
+        </div>
+        <div class="via-trace-body">
+          <div>
+            <div class="via-trace-io-label">Input</div>
+            <pre class="via-trace-pre">${highlightJson(msg.args || {})}</pre>
+          </div>
+        </div>`;
+      el.querySelector(".via-trace-head").addEventListener("click", () => {
+        el.classList.toggle("collapsed");
+      });
+      messages.appendChild(el);
+      if (msg.id) traceEls[msg.id] = el;
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function renderToolResult(msg) {
+      const el = (msg.id && traceEls[msg.id]) || null;
+      if (!el) return;  // no matching call (shouldn't happen) — skip silently
+      const start = parseFloat(el.dataset.start || "0");
+      const secs = start ? ((performance.now() - start) / 1000).toFixed(2) : null;
+
+      const status = el.querySelector(".via-trace-status");
+      status.querySelector(".via-trace-spinner")?.remove();
+      const latency = secs ? `<span class="via-trace-latency">${secs}s</span>` : "";
+      status.insertAdjacentHTML("afterbegin",
+        `${latency}<span class="via-trace-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>`);
+
+      const body = el.querySelector(".via-trace-body");
+      const out = document.createElement("div");
+      out.innerHTML = `<div class="via-trace-io-label out">Output → model</div>
+        <pre class="via-trace-pre">${highlightJson(msg.response)}</pre>`;
+      body.appendChild(out);
+      if (msg.id) delete traceEls[msg.id];
+      messages.scrollTop = messages.scrollHeight;
     }
 
     // ── Messages ──────────────────────────────────────────────────────────────────
@@ -1765,6 +2066,7 @@
       const msg = `I'd like to register for ${eventTitle}`;
       appendMsg("user", msg);
       ws.send(JSON.stringify({ type: "text", content: msg }));
+      ga('event_registration_clicked', { event_title: eventTitle });
     }
 
     function makeBookingCard(d) {
@@ -2030,6 +2332,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
         voiceBtn.title = "Mute microphone";
         setUserListening(true);
         drawWave();
+        ga('voice_started');
       } catch (err) {
         console.error("Mic error:", err);
         voiceLabel.textContent = `Mic error: ${err.name}`;
@@ -2092,6 +2395,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
 
     function toggleMute() {
       muted = !muted;
+      ga(muted ? 'voice_muted' : 'voice_unmuted');
       voiceBtn.classList.toggle("via-muted", muted);
 
       if (muted) {
@@ -2171,6 +2475,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
     mediaBtn.onclick = (e) => {
       e.stopPropagation();
       mediaMenu.classList.toggle("show");
+      ga('media_menu_opened');
     };
 
     optUpload.onclick = () => {
@@ -2191,6 +2496,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
     });
 
     disconnectBtn.addEventListener("click", () => {
+      ga('session_ended');
       userInitiatedDisconnect = true;
       stopAgentAudio();
       ws?.close();
@@ -2198,12 +2504,14 @@ registerProcessor("uni-audio-processor", AudioProcessor);
     });
 
     newSessionBtn.addEventListener("click", () => {
+      ga('new_session');
       newSessionBtn.style.display = "none";
       userInitiatedDisconnect = false;
       // Clear conversation
       messages.innerHTML = '';
       messages.appendChild(emptyMsg);
       agentMsgEl = null; userMsgEl = null;
+      for (const k in traceEls) delete traceEls[k];
       // Clear cards
       sidebarScroll.querySelectorAll('.card-group').forEach(g => g.remove());
       cardGroups = []; activeGroupId = null;
@@ -2224,6 +2532,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
       appendMsg("user", text);
       textInput.value = "";
       ws.send(JSON.stringify({ type: "text", content: text }));
+      ga('message_sent', { method: 'text', message_length: text.length });
     }
 
     function setStatus(cls, label) {
@@ -2262,6 +2571,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
         messages.scrollTop = messages.scrollHeight;
 
         ws.send(JSON.stringify({ type: "image", data: b64, mime_type }));
+        ga('image_uploaded', { mime_type });
       };
       reader.readAsDataURL(file);
     });
@@ -2333,6 +2643,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
         isSharingScreen = true;
         screenFrameSentThisTurn = false;
         screenShareStatus.style.display = "flex";
+        ga('screen_share_started');
 
         // Chat indicator
         removeEmptyMsg();
@@ -2383,6 +2694,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
       isSharingScreen = false;
       screenFrameSentThisTurn = false;
       screenShareStatus.style.display = "none";
+      ga('screen_share_stopped');
       screenStream?.getTracks().forEach(t => t.stop());
       screenStream = null; screenCanvas = null; screenCtx = null; screenVideo = null;
 

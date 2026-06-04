@@ -1,0 +1,2386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waypoint by VoZara — Build your own AI counsellor</title>
+  <link rel="icon" type="image/png" href="assets/vozara/vozara-mark-transparent.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- VoZara design system: Plus Jakarta Sans + Material Symbols Rounded -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* VoZara design tokens (clean, airy, trust-forward) */
+    :root {
+      --font-primary: 'Plus Jakarta Sans', 'Google Sans Flex', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --color-primary: #121317;
+      --color-secondary: #45474D;
+      --color-tertiary: #6A6A71;
+      --bg-primary: #FFFFFF;
+      --bg-secondary: rgba(183, 191, 217, 0.10);
+      --border-primary: rgba(33, 34, 38, 0.06);
+      --border-secondary: rgba(33, 34, 38, 0.10);
+      --accent-teal: #0D9488;
+      --accent-teal-hover: #0B7C72;
+      --accent-teal-light: rgba(13, 148, 136, 0.06);
+      --accent-teal-mid: rgba(13, 148, 136, 0.12);
+      --voice-gradient: linear-gradient(135deg, #0D9488, #06B6D4);
+      --radius-sm: 8px;
+      --radius-md: 20px;
+      --radius-lg: 32px;
+      --radius-xl: 48px;
+      --radius-rounded: 9999px;
+      --ease-out-quint: cubic-bezier(.23, 1, .32, 1);
+      --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+      --shadow-card-hover: 0 16px 48px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(13, 148, 136, 0.08);
+    }
+
+    /* Material Symbols Rounded — outlined, light-weight (VoZara icon axes) */
+    .material-symbols-rounded {
+      font-family: 'Material Symbols Rounded';
+      font-weight: normal;
+      font-style: normal;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      direction: ltr;
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      font-family: var(--font-primary);
+      color: var(--color-primary);
+      background: var(--bg-primary);
+      min-height: 100%;
+      letter-spacing: 0.1px;
+    }
+
+    /* ── Nav ───────────────────────────────────────────────────────────── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-primary);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--color-primary);
+    }
+
+    .nav-brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--accent-teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .nav-brand-name {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .nav-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: var(--radius-rounded);
+      background: var(--accent-teal-light);
+      color: var(--accent-teal);
+      border: 1px solid rgba(13, 148, 136, 0.2);
+      margin-left: 4px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-link {
+      font-size: 14px;
+      color: var(--color-secondary);
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary);
+      background: var(--bg-secondary);
+    }
+
+    .btn-primary {
+      padding: 9px 18px;
+      background: var(--accent-teal);
+      color: white;
+      border: none;
+      border-radius: var(--radius-rounded);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-primary);
+      transition: background 0.2s, transform 0.15s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-teal-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      padding: 9px 18px;
+      background: var(--bg-primary);
+      color: var(--color-primary);
+      border: 1.5px solid var(--border-secondary);
+      border-radius: var(--radius-rounded);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font-primary);
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-teal);
+      color: var(--accent-teal);
+      background: var(--accent-teal-light);
+    }
+
+    /* ── Hero ───────────────────────────────────────────────────────────── */
+    .hero {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 80px 32px 64px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-teal);
+      background: var(--accent-teal-light);
+      border: 1px solid rgba(13, 148, 136, 0.2);
+      padding: 6px 14px;
+      border-radius: var(--radius-rounded);
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: clamp(34px, 5.5vw, 56px);
+      font-weight: 450;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      color: var(--color-primary);
+      margin-bottom: 20px;
+    }
+
+    .hero-title span {
+      color: var(--accent-teal);
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--color-secondary);
+      line-height: 1.6;
+      max-width: 620px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      margin-top: 56px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat-value {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .hero-stat-label {
+      font-size: 13px;
+      color: var(--color-tertiary);
+      margin-top: 4px;
+    }
+
+    .hero-stat-divider {
+      width: 1px;
+      background: var(--border-secondary);
+      height: 40px;
+      align-self: center;
+    }
+
+    /* ── Section common ─────────────────────────────────────────────────── */
+    .section {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 64px 32px;
+    }
+
+    .section-header {
+      margin-bottom: 40px;
+    }
+
+    .section-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-teal);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+
+    .section-subtitle {
+      font-size: 15px;
+      color: var(--color-secondary);
+      line-height: 1.6;
+      max-width: 560px;
+    }
+
+    /* ── Template Cards ─────────────────────────────────────────────────── */
+    .templates-bg {
+      background: rgba(255, 255, 255, 0.5);
+      border-top: 1px solid var(--border-primary);
+      border-bottom: 1px solid var(--border-primary);
+    }
+
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .templates-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .templates-grid { grid-template-columns: 1fr; }
+    }
+
+    .template-card {
+      background: var(--bg-primary);
+      border: 1.5px solid var(--border-primary);
+      border-radius: var(--radius-md);
+      padding: 0;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s var(--ease-out-quint);
+      box-shadow: var(--shadow-card);
+      position: relative;
+    }
+
+    .template-card:hover {
+      border-color: var(--accent-teal);
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-3px);
+    }
+
+    .template-card.selected {
+      border-color: var(--accent-teal);
+      background: rgba(13, 148, 136, 0.02);
+    }
+
+    .template-card.selected .template-select-check {
+      opacity: 1;
+    }
+
+    .template-card-top {
+      padding: 20px 20px 14px;
+      position: relative;
+    }
+
+    .template-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 14px;
+      flex-shrink: 0;
+    }
+
+    .template-category {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: var(--radius-rounded);
+      margin-bottom: 10px;
+      display: inline-block;
+    }
+
+    .template-name {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .template-desc {
+      font-size: 13px;
+      color: var(--color-secondary);
+      line-height: 1.55;
+    }
+
+    .template-card-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.01);
+    }
+
+    .template-caps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .template-cap {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: var(--radius-rounded);
+      background: var(--bg-secondary);
+      color: var(--color-secondary);
+      border: 1px solid var(--border-primary);
+    }
+
+    .template-cta {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-teal);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding: 6px 12px;
+      border-radius: var(--radius-rounded);
+      border: 1px solid rgba(13, 148, 136, 0.25);
+      background: var(--accent-teal-light);
+      transition: all 0.2s;
+    }
+
+    .template-cta:hover {
+      background: var(--accent-teal);
+      color: white;
+      border-color: var(--accent-teal);
+    }
+
+    .template-select-check {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent-teal);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    /* ── BYO Form ───────────────────────────────────────────────────────── */
+    .byo-section {
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-primary);
+    }
+
+    .byo-layout {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 48px;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .byo-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Form steps */
+    .form-steps {
+      display: flex;
+      gap: 0;
+      margin-bottom: 36px;
+    }
+
+    .form-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .form-step:not(:last-child)::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-secondary);
+      margin: 0 8px;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 2px solid var(--border-secondary);
+      color: var(--color-tertiary);
+      transition: all 0.3s;
+    }
+
+    .form-step.active .step-num {
+      background: var(--accent-teal);
+      border-color: var(--accent-teal);
+      color: white;
+    }
+
+    .form-step.done .step-num {
+      background: var(--accent-teal);
+      border-color: var(--accent-teal);
+      color: white;
+    }
+
+    .step-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-tertiary);
+      white-space: nowrap;
+      transition: color 0.3s;
+    }
+
+    .form-step.active .step-label,
+    .form-step.done .step-label {
+      color: var(--accent-teal);
+    }
+
+    /* Form panels */
+    .form-panel {
+      display: none;
+      animation: panelIn 0.3s var(--ease-out-quint);
+    }
+
+    .form-panel.active {
+      display: block;
+    }
+
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateX(12px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .form-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .form-subtitle {
+      font-size: 14px;
+      color: var(--color-secondary);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-secondary);
+      margin-bottom: 8px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border-secondary);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: var(--font-primary);
+      color: var(--color-primary);
+      background: var(--bg-primary);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--accent-teal);
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.08);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 96px;
+      line-height: 1.5;
+    }
+
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236a6a71' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 520px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    /* Checkbox chips for capabilities */
+    .cap-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cap-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border-secondary);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-secondary);
+      background: var(--bg-primary);
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .cap-chip:hover {
+      border-color: var(--accent-teal);
+      color: var(--accent-teal);
+      background: var(--accent-teal-light);
+    }
+
+    .cap-chip.selected {
+      border-color: var(--accent-teal);
+      background: var(--accent-teal-light);
+      color: var(--accent-teal);
+    }
+
+    .cap-chip-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .cap-chip.selected .cap-chip-dot {
+      background: var(--accent-teal);
+      border-color: var(--accent-teal);
+      color: white;
+    }
+
+    /* Form nav */
+    .form-nav {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      align-items: center;
+    }
+
+    .form-back {
+      padding: 10px 18px;
+      border: 1.5px solid var(--border-secondary);
+      border-radius: var(--radius-rounded);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      background: none;
+      color: var(--color-secondary);
+      font-family: var(--font-primary);
+      transition: all 0.2s;
+    }
+
+    .form-back:hover {
+      border-color: var(--accent-teal);
+      color: var(--accent-teal);
+    }
+
+    .form-next {
+      flex: 1;
+      padding: 11px 20px;
+      background: var(--accent-teal);
+      color: white;
+      border: none;
+      border-radius: var(--radius-rounded);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-primary);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .form-next:hover {
+      background: var(--accent-teal-hover);
+      transform: translateY(-1px);
+    }
+
+    .form-next:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Preview Card ────────────────────────────────────────────────────── */
+    .preview-sticky {
+      position: sticky;
+      top: 80px;
+    }
+
+    .preview-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-primary);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: all 0.4s var(--ease-out-quint);
+    }
+
+    .preview-top {
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(13, 148, 136, 0.06) 0%, rgba(13, 148, 136, 0.02) 100%);
+      border-bottom: 1px solid var(--border-primary);
+    }
+
+    .preview-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-tertiary);
+      margin-bottom: 16px;
+    }
+
+    .preview-agent {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .preview-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--accent-teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-online {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #22c55e;
+      border: 2px solid white;
+    }
+
+    .preview-agent-name {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .preview-agent-role {
+      font-size: 13px;
+      color: var(--color-tertiary);
+      margin-top: 3px;
+    }
+
+    .preview-powered {
+      font-size: 11px;
+      color: var(--accent-teal);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .preview-chat {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 200px;
+    }
+
+    .preview-msg {
+      display: flex;
+      gap: 8px;
+      animation: msgIn 0.4s var(--ease-out-quint);
+    }
+
+    .preview-msg-ai {
+      justify-content: flex-start;
+    }
+
+    .preview-msg-user {
+      justify-content: flex-end;
+    }
+
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .preview-bubble {
+      max-width: 78%;
+      padding: 9px 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .preview-msg-ai .preview-bubble {
+      background: var(--bg-secondary);
+      color: var(--color-primary);
+      border-bottom-left-radius: 5px;
+    }
+
+    .preview-msg-user .preview-bubble {
+      background: var(--accent-teal);
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+    .preview-typing {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 10px 14px;
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      border-bottom-left-radius: 5px;
+      width: fit-content;
+    }
+
+    .preview-typing span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--color-tertiary);
+      animation: typingDot 1.4s infinite;
+    }
+
+    .preview-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .preview-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingDot {
+      0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
+      40% { transform: scale(1.1); opacity: 1; }
+    }
+
+    .preview-features {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-primary);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .preview-feat-badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: var(--radius-rounded);
+      background: var(--accent-teal-light);
+      color: var(--accent-teal);
+      border: 1px solid rgba(13, 148, 136, 0.15);
+    }
+
+    .preview-footer {
+      padding: 14px 20px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .preview-footer-inst {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-secondary);
+    }
+
+    .preview-footer-brand {
+      font-size: 11px;
+      color: var(--color-tertiary);
+    }
+
+    .preview-footer-brand strong {
+      color: var(--accent-teal);
+    }
+
+    /* ── Success State ───────────────────────────────────────────────────── */
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+      animation: panelIn 0.5s var(--ease-out-quint);
+    }
+
+    .success-state.visible {
+      display: block;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(34, 197, 94, 0.1);
+      border: 2px solid rgba(34, 197, 94, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: #16a34a;
+    }
+
+    .success-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .success-subtitle {
+      font-size: 14px;
+      color: var(--color-secondary);
+      line-height: 1.6;
+      max-width: 380px;
+      margin: 0 auto 28px;
+    }
+
+    .success-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── GTM Prop Card (final output) ───────────────────────────────────── */
+    .gtm-prop {
+      margin-top: 24px;
+      border: 2px solid var(--accent-teal);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 0 6px rgba(13, 148, 136, 0.08);
+    }
+
+    .gtm-prop-header {
+      background: linear-gradient(135deg, #0D9488, #0B7C72);
+      padding: 24px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gtm-prop-header::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .gtm-prop-header::after {
+      content: '';
+      position: absolute;
+      bottom: -60px;
+      left: 40%;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .gtm-header-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .gtm-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .gtm-agent-name {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .gtm-inst-name {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-top: 3px;
+    }
+
+    .gtm-tagline {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-top: 14px;
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+
+    .gtm-prop-body {
+      background: white;
+      padding: 20px 24px;
+    }
+
+    .gtm-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-tertiary);
+      margin-bottom: 12px;
+    }
+
+    .gtm-capabilities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .gtm-cap {
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: var(--radius-rounded);
+      background: var(--accent-teal-light);
+      color: var(--accent-teal);
+      border: 1px solid rgba(13, 148, 136, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gtm-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .gtm-metric {
+      text-align: center;
+      padding: 12px 8px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-primary);
+    }
+
+    .gtm-metric-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent-teal);
+    }
+
+    .gtm-metric-label {
+      font-size: 11px;
+      color: var(--color-tertiary);
+      margin-top: 2px;
+    }
+
+    .gtm-use-case {
+      background: linear-gradient(135deg, rgba(13, 148, 136, 0.04), rgba(13, 148, 136, 0.01));
+      border: 1px solid rgba(13, 148, 136, 0.15);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .gtm-use-case-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-teal);
+      margin-bottom: 4px;
+    }
+
+    .gtm-use-case-text {
+      font-size: 13px;
+      color: var(--color-secondary);
+      line-height: 1.5;
+    }
+
+    .gtm-prop-footer {
+      padding: 14px 24px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .gtm-footer-text {
+      font-size: 12px;
+      color: var(--color-tertiary);
+    }
+
+    .gtm-footer-brand {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-teal);
+    }
+
+    /* ── Scrollbar ───────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+
+    /* ── Print / Download GTM Prop ───────────────────────────────────────── */
+    @media print {
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body { background: white !important; }
+      .nav, .hero, .templates-bg,
+      .byo-section > .section > .section-header,
+      .byo-form-col, footer { display: none !important; }
+      .section { padding: 0 !important; max-width: 100% !important; }
+      .byo-section { border: none !important; }
+      .byo-layout { grid-template-columns: 1fr !important; gap: 0 !important; }
+      .byo-preview-col { width: 100% !important; }
+      .preview-sticky { position: static !important; top: auto !important; }
+      .preview-sticky > div:first-child { display: none !important; }
+      .preview-card { display: none !important; }
+      .gtm-prop { display: block !important; box-shadow: none !important;
+        margin-top: 0 !important; border: 2px solid #0D9488 !important; }
+      .gtm-prop-header { background: linear-gradient(135deg, #0D9488, #0B7C72) !important; }
+    }
+
+    /* ── Utilities ───────────────────────────────────────────────────────── */
+    .text-teal { color: var(--accent-teal); }
+    .divider { height: 1px; background: var(--border-primary); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: var(--radius-rounded);
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+      50% { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
+    }
+
+    /* Color themes for template cards */
+    .theme-transfer { --tc: #6366f1; --tc-bg: rgba(99, 102, 241, 0.08); --tc-border: rgba(99, 102, 241, 0.15); }
+    .theme-pathways { --tc: #0D9488; --tc-bg: rgba(13, 148, 136, 0.08); --tc-border: rgba(13, 148, 136, 0.15); }
+    .theme-fees     { --tc: #d97706; --tc-bg: rgba(217, 119, 6, 0.08); --tc-border: rgba(217, 119, 6, 0.15); }
+    .theme-scholar  { --tc: #7c3aed; --tc-bg: rgba(124, 58, 237, 0.08); --tc-border: rgba(124, 58, 237, 0.15); }
+    .theme-grad     { --tc: #0369a1; --tc-bg: rgba(3, 105, 161, 0.08); --tc-border: rgba(3, 105, 161, 0.15); }
+    .theme-events   { --tc: #d946ef; --tc-bg: rgba(217, 70, 239, 0.08); --tc-border: rgba(217, 70, 239, 0.15); }
+
+    .themed-icon {
+      background: var(--tc-bg);
+      border: 1px solid var(--tc-border);
+    }
+
+    .themed-cat {
+      background: var(--tc-bg);
+      color: var(--tc);
+      border: 1px solid var(--tc-border);
+    }
+
+    /* ── Material Symbols sizing within VoZara chips ─────────────────────── */
+    .template-icon .material-symbols-rounded { font-size: 26px; color: var(--tc); }
+    .gtm-avatar .material-symbols-rounded { font-size: 28px; }
+    .gtm-cap .material-symbols-rounded { font-size: 17px; vertical-align: -3px; }
+    .tpl-radio-ic {
+      font-size: 19px;
+      color: var(--accent-teal);
+      vertical-align: -4px;
+      margin-right: 7px;
+    }
+    .gtm-starter-ic { font-size: 17px; color: var(--accent-teal); flex-shrink: 0; }
+    /* "by VoZara" footer lockup */
+    .vz-by {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--color-tertiary);
+    }
+    .vz-by img { height: 18px; width: 18px; border-radius: 5px; }
+    .vz-by strong { color: var(--color-secondary); font-weight: 600; }
+  </style>
+</head>
+
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-brand-logo">W</div>
+      <span class="nav-brand-name">Waypoint</span>
+      <span class="nav-badge">for Universities</span>
+    </a>
+    <div class="nav-actions">
+      <a href="#templates" class="nav-link">Templates</a>
+      <a href="#configure" class="nav-link">Configure</a>
+      <a href="index.html" id="navLiveDemo" class="btn-secondary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span id="navLiveDemoLabel">Live Demo</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <div class="pulse-dot"></div>
+      Now Available · Powered by Gemini Live API
+    </div>
+    <h1 class="hero-title">Your University.<br><span>Your AI Counsellor.</span></h1>
+    <p class="hero-subtitle">Deploy a real-time voice AI admissions counsellor for your institution in minutes — pre-built templates or fully custom-configured for your programs, fees, and student journey.</p>
+    <div class="hero-ctas">
+      <a href="#configure" class="btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>
+        Build Your Own
+      </a>
+      <a href="#templates" class="btn-secondary">Browse Templates</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value">< 2min</div>
+        <div class="hero-stat-label">Setup time</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">6</div>
+        <div class="hero-stat-label">Pre-built templates</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">Voice + Text</div>
+        <div class="hero-stat-label">Multimodal</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">Real-time</div>
+        <div class="hero-stat-label">Live AI responses</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Template Cards -->
+  <div class="templates-bg" id="templates">
+    <section class="section">
+      <div class="section-header">
+        <div class="section-eyebrow">Pre-Built Templates</div>
+        <h2 class="section-title">Start with a proven use case</h2>
+        <p class="section-subtitle">Choose a template calibrated for your admissions use case. Each comes pre-configured with tools, conversation flows, and card layouts.</p>
+      </div>
+
+      <div class="templates-grid">
+
+        <!-- 1. Credit Transfer Evaluator -->
+        <div class="template-card theme-transfer" data-template="transfer" onclick="selectTemplate(this)">
+          <div class="template-select-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="template-card-top">
+            <div class="template-icon themed-icon"><span class="material-symbols-rounded">school</span></div>
+            <div class="template-category themed-cat">International / Transfer</div>
+            <div class="template-name">Credit Transfer Evaluator</div>
+            <div class="template-desc">Evaluates existing academic credits against your programs. Helps students understand advanced standing eligibility and pathway options.</div>
+          </div>
+          <div class="template-card-footer">
+            <div class="template-caps">
+              <span class="template-cap">Credit mapping</span>
+              <span class="template-cap">ATAR equiv.</span>
+              <span class="template-cap">Pathway advice</span>
+            </div>
+            <button class="template-cta" onclick="selectTemplateAndScroll(event, 'transfer')">
+              Use
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Domestic Pathways Counselor -->
+        <div class="template-card theme-pathways" data-template="pathways" onclick="selectTemplate(this)">
+          <div class="template-select-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="template-card-top">
+            <div class="template-icon themed-icon"><span class="material-symbols-rounded">explore</span></div>
+            <div class="template-category themed-cat">Admissions</div>
+            <div class="template-name">Domestic Pathways Counselor</div>
+            <div class="template-desc">Guides Year 11–12 students through course selection, ATAR requirements, scholarships, and direct application for domestic enrolment.</div>
+          </div>
+          <div class="template-card-footer">
+            <div class="template-caps">
+              <span class="template-cap">ATAR guidance</span>
+              <span class="template-cap">Course match</span>
+              <span class="template-cap">Tour booking</span>
+            </div>
+            <button class="template-cta" onclick="selectTemplateAndScroll(event, 'pathways')">
+              Use
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. International Fee Guide -->
+        <div class="template-card theme-fees" data-template="fees" onclick="selectTemplate(this)">
+          <div class="template-select-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="template-card-top">
+            <div class="template-icon themed-icon"><span class="material-symbols-rounded">payments</span></div>
+            <div class="template-category themed-cat">Student Finance</div>
+            <div class="template-name">International Fee Guide</div>
+            <div class="template-desc">Calculates total cost-of-study for international students including tuition, living costs, student services, and available scholarships.</div>
+          </div>
+          <div class="template-card-footer">
+            <div class="template-caps">
+              <span class="template-cap">Fee calculator</span>
+              <span class="template-cap">Scholarship match</span>
+              <span class="template-cap">Visa info</span>
+            </div>
+            <button class="template-cta" onclick="selectTemplateAndScroll(event, 'fees')">
+              Use
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Scholarship Matchmaker -->
+        <div class="template-card theme-scholar" data-template="scholarships" onclick="selectTemplate(this)">
+          <div class="template-select-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="template-card-top">
+            <div class="template-icon themed-icon"><span class="material-symbols-rounded">workspace_premium</span></div>
+            <div class="template-category themed-cat">Scholarships</div>
+            <div class="template-name">Scholarship Matchmaker</div>
+            <div class="template-desc">Personalises scholarship recommendations based on academic background, extracurriculars, financial need, and intended study area.</div>
+          </div>
+          <div class="template-card-footer">
+            <div class="template-caps">
+              <span class="template-cap">Eligibility check</span>
+              <span class="template-cap">Deadline alerts</span>
+              <span class="template-cap">Apply guidance</span>
+            </div>
+            <button class="template-cta" onclick="selectTemplateAndScroll(event, 'scholarships')">
+              Use
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. Graduate Admissions Advisor -->
+        <div class="template-card theme-grad" data-template="grad" onclick="selectTemplate(this)">
+          <div class="template-select-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="template-card-top">
+            <div class="template-icon themed-icon"><span class="material-symbols-rounded">science</span></div>
+            <div class="template-category themed-cat">Postgraduate</div>
+            <div class="template-name">Graduate Admissions Advisor</div>
+            <div class="template-desc">Helps prospective postgraduate and HDR students explore research areas, supervisor availability, entry requirements, and funding options.</div>
+          </div>
+          <div class="template-card-footer">
+            <div class="template-caps">
+              <span class="template-cap">Research match</span>
+              <span class="template-cap">HDR pathways</span>
+              <span class="template-cap">Supervisor search</span>
+            </div>
+            <button class="template-cta" onclick="selectTemplateAndScroll(event, 'grad')">
+              Use
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 6. Open Day Experience Guide -->
+        <div class="template-card theme-events" data-template="events" onclick="selectTemplate(this)">
+          <div class="template-select-check">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="template-card-top">
+            <div class="template-icon themed-icon"><span class="material-symbols-rounded">calendar_month</span></div>
+            <div class="template-category themed-cat">Events & Tours</div>
+            <div class="template-name">Open Day Experience Guide</div>
+            <div class="template-desc">Manages personalised event registrations, campus tour scheduling, faculty-specific sessions, and real-time open day Q&A at scale.</div>
+          </div>
+          <div class="template-card-footer">
+            <div class="template-caps">
+              <span class="template-cap">Tour booking</span>
+              <span class="template-cap">Event calendar</span>
+              <span class="template-cap">Live Q&A</span>
+            </div>
+            <button class="template-cta" onclick="selectTemplateAndScroll(event, 'events')">
+              Use
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- BYO Configure Section -->
+  <div class="byo-section" id="configure">
+    <section class="section">
+      <div class="section-header">
+        <div class="section-eyebrow">Build Your Own</div>
+        <h2 class="section-title">Configure your Waypoint instance</h2>
+        <p class="section-subtitle">Tell us about your institution and we'll generate a tailored AI counsellor configuration — ready to preview and take into a discovery call.</p>
+      </div>
+
+      <div class="byo-layout">
+
+        <!-- LEFT: Form -->
+        <div class="byo-form-col">
+
+          <!-- Step Indicators -->
+          <div class="form-steps" id="formSteps">
+            <div class="form-step active" data-step="1">
+              <div class="step-num">1</div>
+              <div class="step-label">Template</div>
+            </div>
+            <div class="form-step" data-step="2">
+              <div class="step-num">2</div>
+              <div class="step-label">Institution</div>
+            </div>
+            <div class="form-step" data-step="3">
+              <div class="step-num">3</div>
+              <div class="step-label">Configure</div>
+            </div>
+            <div class="form-step" data-step="4">
+              <div class="step-num">4</div>
+              <div class="step-label">Contact</div>
+            </div>
+          </div>
+
+          <!-- Step 1: Template Selection -->
+          <div class="form-panel active" id="step1">
+            <div class="form-title">Choose your starting point</div>
+            <div class="form-subtitle">Pick a pre-built template or start from scratch. You can customise everything in the next steps.</div>
+
+            <div class="form-group">
+              <label class="form-label">Use case template</label>
+              <div style="display:flex;flex-direction:column;gap:10px;" id="templateRadios">
+                <label class="cap-chip" style="cursor:pointer;padding:14px 16px;" onclick="setFormTemplate('transfer', this)">
+                  <div class="cap-chip-dot" id="dot_transfer">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;"><span class="material-symbols-rounded tpl-radio-ic">school</span>Credit Transfer Evaluator</div>
+                    <div style="font-size:12px;color:var(--color-tertiary);margin-top:2px;">International & transfer students</div>
+                  </div>
+                </label>
+                <label class="cap-chip" style="cursor:pointer;padding:14px 16px;" onclick="setFormTemplate('pathways', this)">
+                  <div class="cap-chip-dot" id="dot_pathways">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;"><span class="material-symbols-rounded tpl-radio-ic">explore</span>Domestic Pathways Counselor</div>
+                    <div style="font-size:12px;color:var(--color-tertiary);margin-top:2px;">Year 11–12 domestic applicants</div>
+                  </div>
+                </label>
+                <label class="cap-chip" style="cursor:pointer;padding:14px 16px;" onclick="setFormTemplate('fees', this)">
+                  <div class="cap-chip-dot" id="dot_fees">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;"><span class="material-symbols-rounded tpl-radio-ic">payments</span>International Fee Guide</div>
+                    <div style="font-size:12px;color:var(--color-tertiary);margin-top:2px;">International student finance</div>
+                  </div>
+                </label>
+                <label class="cap-chip" style="cursor:pointer;padding:14px 16px;" onclick="setFormTemplate('scholarships', this)">
+                  <div class="cap-chip-dot" id="dot_scholarships">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;"><span class="material-symbols-rounded tpl-radio-ic">workspace_premium</span>Scholarship Matchmaker</div>
+                    <div style="font-size:12px;color:var(--color-tertiary);margin-top:2px;">Scholarship discovery & matching</div>
+                  </div>
+                </label>
+                <label class="cap-chip" style="cursor:pointer;padding:14px 16px;" onclick="setFormTemplate('grad', this)">
+                  <div class="cap-chip-dot" id="dot_grad">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;"><span class="material-symbols-rounded tpl-radio-ic">science</span>Graduate Admissions Advisor</div>
+                    <div style="font-size:12px;color:var(--color-tertiary);margin-top:2px;">Postgraduate & HDR programs</div>
+                  </div>
+                </label>
+                <label class="cap-chip" style="cursor:pointer;padding:14px 16px;" onclick="setFormTemplate('events', this)">
+                  <div class="cap-chip-dot" id="dot_events">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;"><span class="material-symbols-rounded tpl-radio-ic">calendar_month</span>Open Day Experience Guide</div>
+                    <div style="font-size:12px;color:var(--color-tertiary);margin-top:2px;">Events, tours & open days</div>
+                  </div>
+                </label>
+                <label class="cap-chip" style="cursor:pointer;padding:14px 16px;" onclick="setFormTemplate('custom', this)">
+                  <div class="cap-chip-dot" id="dot_custom">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;"><span class="material-symbols-rounded tpl-radio-ic">tune</span>Custom Configuration</div>
+                    <div style="font-size:12px;color:var(--color-tertiary);margin-top:2px;">Start from scratch</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-nav">
+              <button class="form-next" onclick="nextStep()" id="step1Next" disabled>
+                Continue
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Institution Details -->
+          <div class="form-panel" id="step2">
+            <div class="form-title">About your institution</div>
+            <div class="form-subtitle">We'll tailor the agent's knowledge base and conversation style to your institution's context.</div>
+
+            <div class="form-group">
+              <label class="form-label" for="instName">Institution name <span style="color:#ef4444">*</span></label>
+              <input class="form-input" id="instName" type="text" placeholder="e.g. University of Technology Sydney" oninput="updatePreview()" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="instType">Institution type</label>
+                <select class="form-select" id="instType" onchange="updatePreview()">
+                  <option value="">Select type…</option>
+                  <option value="go8">Group of Eight (Go8)</option>
+                  <option value="ati">Australian Technology Network</option>
+                  <option value="regional">Regional University</option>
+                  <option value="tafe">TAFE / VET Provider</option>
+                  <option value="private">Private Higher Education</option>
+                  <option value="international">International University</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="instLocation">Location</label>
+                <input class="form-input" id="instLocation" type="text" placeholder="e.g. Sydney, NSW" oninput="updatePreview()" />
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top:20px">
+              <label class="form-label" for="instStudents">Approximate student enrolment</label>
+              <select class="form-select" id="instStudents">
+                <option value="">Select range…</option>
+                <option value="small">Under 5,000</option>
+                <option value="medium">5,000 – 20,000</option>
+                <option value="large">20,000 – 50,000</option>
+                <option value="xlarge">50,000+</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="instFocus">Primary focus areas (optional)</label>
+              <input class="form-input" id="instFocus" type="text" placeholder="e.g. Engineering, Health Sciences, Business" oninput="updatePreview()" />
+            </div>
+
+            <div class="form-nav">
+              <button class="form-back" onclick="prevStep()">Back</button>
+              <button class="form-next" onclick="nextStep()" id="step2Next">
+                Continue
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Agent Configuration -->
+          <div class="form-panel" id="step3">
+            <div class="form-title">Configure your AI counsellor</div>
+            <div class="form-subtitle">Name your agent and select the capabilities that matter most to your prospective students.</div>
+
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="agentName">Agent name <span style="color:#ef4444">*</span></label>
+                <input class="form-input" id="agentName" type="text" placeholder="e.g. Aria, Sam, Jess" oninput="updatePreview()" />
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="agentTone">Conversation tone</label>
+                <select class="form-select" id="agentTone" onchange="updatePreview()">
+                  <option value="friendly">Friendly & approachable</option>
+                  <option value="professional">Professional & formal</option>
+                  <option value="enthusiastic">Enthusiastic & energetic</option>
+                  <option value="calm">Calm & reassuring</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top:20px">
+              <label class="form-label">Core capabilities</label>
+              <div class="cap-chips" id="capChips">
+                <div class="cap-chip selected" data-cap="course-search" onclick="toggleCap(this)">
+                  <div class="cap-chip-dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  Course Search
+                </div>
+                <div class="cap-chip selected" data-cap="scholarship-match" onclick="toggleCap(this)">
+                  <div class="cap-chip-dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  Scholarship Matching
+                </div>
+                <div class="cap-chip selected" data-cap="tour-booking" onclick="toggleCap(this)">
+                  <div class="cap-chip-dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  Tour Booking
+                </div>
+                <div class="cap-chip" data-cap="fee-calculator" onclick="toggleCap(this)">
+                  <div class="cap-chip-dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  Fee Calculator
+                </div>
+                <div class="cap-chip" data-cap="credit-transfer" onclick="toggleCap(this)">
+                  <div class="cap-chip-dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  Credit Transfer
+                </div>
+                <div class="cap-chip" data-cap="event-calendar" onclick="toggleCap(this)">
+                  <div class="cap-chip-dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  Event Calendar
+                </div>
+                <div class="cap-chip" data-cap="atar-guidance" onclick="toggleCap(this)">
+                  <div class="cap-chip-dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  ATAR Guidance
+                </div>
+                <div class="cap-chip" data-cap="live-qa" onclick="toggleCap(this)">
+                  <div class="cap-chip-dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  Live Q&A
+                </div>
+                <div class="cap-chip" data-cap="visa-info" onclick="toggleCap(this)">
+                  <div class="cap-chip-dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  Visa Information
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="agentPrompt">Custom instructions (optional)</label>
+              <textarea class="form-textarea" id="agentPrompt" placeholder="e.g. 'Always emphasise our research strengths. Focus on Health Sciences and Engineering faculties. Mention our new campus expansion opening in 2026.'" oninput="updatePreview()"></textarea>
+            </div>
+
+            <div class="form-nav">
+              <button class="form-back" onclick="prevStep()">Back</button>
+              <button class="form-next" onclick="nextStep()" id="step3Next">
+                Continue
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 4: Contact for GTM -->
+          <div class="form-panel" id="step4">
+            <div class="form-title">Almost done — let's connect</div>
+            <div class="form-subtitle">We'll send you a shareable preview card and set up a brief discovery call to walk through your configured instance.</div>
+
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="contactFirst">First name <span style="color:#ef4444">*</span></label>
+                <input class="form-input" id="contactFirst" type="text" placeholder="Alex" oninput="updatePreview()" />
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="contactLast">Last name</label>
+                <input class="form-input" id="contactLast" type="text" placeholder="Chen" />
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top:20px">
+              <label class="form-label" for="contactEmail">Work email <span style="color:#ef4444">*</span></label>
+              <input class="form-input" id="contactEmail" type="email" placeholder="alex.chen@university.edu.au" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="contactRole">Your role</label>
+                <select class="form-select" id="contactRole">
+                  <option value="">Select role…</option>
+                  <option value="admissions">Admissions Director / Manager</option>
+                  <option value="marketing">Marketing / Recruitment</option>
+                  <option value="digital">Digital / Technology</option>
+                  <option value="vc">VC / DVC Office</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="contactTimeline">Timeline to evaluate</label>
+                <select class="form-select" id="contactTimeline">
+                  <option value="">Select…</option>
+                  <option value="asap">ASAP — actively evaluating</option>
+                  <option value="quarter">This quarter</option>
+                  <option value="6months">Next 6 months</option>
+                  <option value="exploring">Just exploring</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-nav">
+              <button class="form-back" onclick="prevStep()">Back</button>
+              <button class="form-next" onclick="submitForm()" id="step4Next">
+                Generate My Preview
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Success State -->
+          <div class="success-state" id="successState">
+            <div class="success-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="success-title">Your Waypoint instance is configured!</div>
+            <div class="success-subtitle">Your discovery preview is ready. Share it with your team or use it in your next stakeholder meeting to demonstrate what Waypoint would look like for <span id="successInstName">your institution</span>.<span id="successSubtitleLive" style="display:none"><br><br>Your live counsellor is ready — <strong style="color:var(--accent-teal)">Try It Live</strong> to talk to it right now (illustrative demo data).</span></div>
+            <div class="success-actions">
+              <button class="btn-primary" id="launchLiveBtn" onclick="launchLivePreview()" style="display:none">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Try It Live
+              </button>
+              <button class="btn-secondary" onclick="sharePreview(this)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                Share Card
+              </button>
+              <button class="btn-secondary" onclick="downloadPreview()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download PDF
+              </button>
+              <button class="btn-secondary" onclick="requestDemo()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Request Demo
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: Live Preview -->
+        <div class="byo-preview-col">
+          <div class="preview-sticky">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-tertiary);margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+              <div class="pulse-dot" style="background:var(--accent-teal);animation:pulse 2s infinite;"></div>
+              Live Preview
+            </div>
+
+            <!-- Preview Agent Card -->
+            <div class="preview-card" id="previewCard">
+              <div class="preview-top">
+                <div class="preview-label">Your AI Counsellor Preview</div>
+                <div class="preview-agent">
+                  <div class="preview-avatar" id="previewAvatar">
+                    <span id="previewAvatarLetter">?</span>
+                    <div class="preview-online"></div>
+                  </div>
+                  <div>
+                    <div class="preview-agent-name" id="previewAgentName">Your Agent</div>
+                    <div class="preview-agent-role" id="previewAgentRole">AI Counsellor · Your University</div>
+                    <div class="preview-powered">Powered by Waypoint + Gemini</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="preview-chat" id="previewChat">
+                <div class="preview-msg preview-msg-ai">
+                  <div class="preview-bubble" id="previewGreeting">Hi! I'm here to help you explore your options. What would you like to know?</div>
+                </div>
+                <div class="preview-msg preview-msg-user" id="previewUserMsg" style="display:none">
+                  <div class="preview-bubble" id="previewUserBubble">What scholarships are available?</div>
+                </div>
+                <div class="preview-msg preview-msg-ai" id="previewAgentReply" style="display:none">
+                  <div class="preview-bubble" id="previewReplyBubble">Great question! I found several scholarships that could be a great match for you…</div>
+                </div>
+                <div class="preview-msg preview-msg-ai" id="previewTyping" style="display:none">
+                  <div class="preview-typing"><span></span><span></span><span></span></div>
+                </div>
+              </div>
+
+              <div class="preview-features" id="previewFeatures">
+                <span class="preview-feat-badge">Voice + Text</span>
+                <span class="preview-feat-badge">Course Search</span>
+                <span class="preview-feat-badge">Tour Booking</span>
+                <span class="preview-feat-badge">Scholarship Matching</span>
+              </div>
+
+              <div class="preview-footer">
+                <div class="preview-footer-inst" id="previewFooterInst">Your University</div>
+                <div class="preview-footer-brand"><strong>Waypoint</strong> · powered by Gemini</div>
+              </div>
+            </div>
+
+            <!-- GTM Prop (shown after submission) -->
+            <div class="gtm-prop" id="gtmProp" style="display:none">
+              <div class="gtm-prop-header">
+                <div class="gtm-header-top">
+                  <div class="gtm-avatar" id="gtmAvatar">?</div>
+                  <div>
+                    <div class="gtm-agent-name" id="gtmAgentName">Your Agent</div>
+                    <div class="gtm-inst-name" id="gtmInstName">Your University</div>
+                  </div>
+                </div>
+                <div class="gtm-tagline" id="gtmTagline">AI-powered admissions counsellor, personalised for your institution.</div>
+              </div>
+              <div class="gtm-prop-body">
+                <div class="gtm-section-title">Use Case</div>
+                <div class="gtm-use-case">
+                  <div class="gtm-use-case-label" id="gtmTemplateLabel">Template</div>
+                  <div class="gtm-use-case-text" id="gtmTemplateDesc">Configured for your admissions workflow.</div>
+                </div>
+
+                <div class="gtm-section-title">Capabilities</div>
+                <div class="gtm-capabilities" id="gtmCaps"></div>
+
+                <div class="gtm-section-title">Conversation Starters</div>
+                <div id="gtmStarters" style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px;"></div>
+
+                <div class="gtm-section-title">Key Metrics</div>
+                <div class="gtm-metrics">
+                  <div class="gtm-metric">
+                    <div class="gtm-metric-value">&lt;1s</div>
+                    <div class="gtm-metric-label">Response time</div>
+                  </div>
+                  <div class="gtm-metric">
+                    <div class="gtm-metric-value">24/7</div>
+                    <div class="gtm-metric-label">Availability</div>
+                  </div>
+                  <div class="gtm-metric">
+                    <div class="gtm-metric-value">Voice</div>
+                    <div class="gtm-metric-label">+ Text + Vision</div>
+                  </div>
+                </div>
+              </div>
+              <div class="gtm-prop-footer">
+                <div class="gtm-footer-text" id="gtmContactLine">Configured by</div>
+                <div class="gtm-footer-brand">Waypoint — waypoint.ai</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer style="border-top:1px solid var(--border-primary);padding:36px 32px;text-align:center;background:var(--bg-3, rgba(183,191,217,0.05));">
+    <div style="font-size:13px;color:var(--color-tertiary);max-width:420px;margin:0 auto;line-height:1.6;">
+      <strong style="color:var(--accent-teal)">Waypoint</strong> — AI admissions counsellor for higher education.<br>
+      Built with Google ADK + Gemini Live API.
+      <div class="vz-by">
+        <img src="assets/vozara/vozara-mark-transparent.png" alt="VoZara" />
+        A <strong>VoZara</strong> product for higher education
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── State ──────────────────────────────────────────────────────────────
+    let currentStep = 1;
+    let selectedTemplate = null;
+    let selectedCaps = new Set(['course-search', 'scholarship-match', 'tour-booking']);
+
+    const TEMPLATES = {
+      transfer: {
+        label: 'Credit Transfer Evaluator',
+        icon: 'school',
+        desc: 'Evaluates international and domestic credit transfers, advanced standing eligibility, and pathway options for incoming students.',
+        userMsg: 'I studied 2 years at RMIT — can I get credit towards your Business degree?',
+        agentReply: 'Absolutely! Based on your RMIT Business units, you\'d likely qualify for up to 1 year of credit recognition. Let me pull up the specific pathway…',
+        caps: ['Credit Mapping', 'ATAR Equivalency', 'Pathway Advice', 'Prerequisite Check'],
+        starters: [
+          'Can I get credit for my TAFE diploma towards a degree?',
+          'What ATAR equivalent do I need for Engineering transfer?',
+          'How many years can I reduce with my prior overseas study?',
+        ],
+      },
+      pathways: {
+        label: 'Domestic Pathways Counselor',
+        icon: 'explore',
+        desc: 'Guides Year 11–12 domestic students through ATAR requirements, course selection, scholarship matching, and campus tour booking.',
+        userMsg: 'I\'m in Year 12 and interested in Nursing — what ATAR do I need?',
+        agentReply: 'Great choice! Our Bachelor of Nursing requires an ATAR of 75+, and there are 3 scholarships you may be eligible for. Want me to book a tour with our Health Sciences faculty?',
+        caps: ['ATAR Guidance', 'Course Match', 'Scholarship Search', 'Tour Booking'],
+        starters: [
+          'What ATAR do I need for a Nursing degree?',
+          'Are there scholarships for Year 12 students?',
+          'Can I book a campus tour this Saturday?',
+        ],
+      },
+      fees: {
+        label: 'International Fee Guide',
+        icon: 'payments',
+        desc: 'Calculates total cost-of-study for international students including tuition, living expenses, health cover, and available fee scholarships.',
+        userMsg: 'How much does it cost to study a 3-year Commerce degree as an international student?',
+        agentReply: 'For a 3-year Commerce degree, you\'re looking at approx. $38,500/year in tuition. With living costs and OSHC, total is around $62K/year. But — there are 5 international scholarships worth up to $15K/year!',
+        caps: ['Fee Calculator', 'Scholarship Match', 'Visa Cost Info', 'Payment Plans'],
+        starters: [
+          'What are the total costs for an international student?',
+          'Is there a student health insurance requirement?',
+          'What international scholarships reduce tuition fees?',
+        ],
+      },
+      scholarships: {
+        label: 'Scholarship Matchmaker',
+        icon: 'workspace_premium',
+        desc: 'Personalises scholarship recommendations based on academic background, extracurriculars, financial need, and intended faculty.',
+        userMsg: 'Are there any scholarships for first-generation university students?',
+        agentReply: 'Yes! I found 4 scholarships specifically for first-generation students — including the Equity Excellence Award worth $8,000/year. Would you like to see the eligibility criteria?',
+        caps: ['Eligibility Check', 'Deadline Tracking', 'Application Guide', 'Merit Assessment'],
+        starters: [
+          'Are there scholarships for first-generation students?',
+          'What merit scholarships are available for Engineering?',
+          'When do scholarship applications close for 2026?',
+        ],
+      },
+      grad: {
+        label: 'Graduate Admissions Advisor',
+        icon: 'science',
+        desc: 'Helps prospective postgraduate students explore research programs, HDR requirements, supervisor availability, and funding options.',
+        userMsg: 'I want to do a PhD in AI and robotics — who are the supervisors in that area?',
+        agentReply: 'We have 8 active supervisors in AI and Robotics — including Professor Sarah Kim (Human-Robot Interaction) and Dr. James Lee (Machine Learning). All are currently accepting HDR candidates for 2026.',
+        caps: ['Research Matching', 'Supervisor Search', 'HDR Pathways', 'Funding Options'],
+        starters: [
+          'Who supervises AI and machine learning research?',
+          'What funding is available for PhD candidates?',
+          'What are the entry requirements for an MBA?',
+        ],
+      },
+      events: {
+        label: 'Open Day Experience Guide',
+        icon: 'calendar_month',
+        desc: 'Manages personalised event registrations, campus tour scheduling, faculty-specific sessions, and real-time open day Q&A.',
+        userMsg: 'When is the next Open Day and can I book a tour of the Engineering campus?',
+        agentReply: 'The next Open Day is 14 June 2026 — 9am to 3pm! I\'ve found a 10:30am Engineering campus tour with 12 spots still open. Want me to register you?',
+        caps: ['Tour Booking', 'Event Calendar', 'Faculty Tours', 'Live Q&A'],
+        starters: [
+          'When is the next Open Day?',
+          'Can I register for an Engineering faculty tour?',
+          'Are there info sessions for international students?',
+        ],
+      },
+      custom: {
+        label: 'Custom Configuration',
+        icon: 'tune',
+        desc: 'Fully custom AI counsellor configured for your specific admissions workflow, data sources, and student journey.',
+        userMsg: 'Tell me about the programs you offer.',
+        agentReply: 'I\'d be happy to walk you through our programs! What are you most interested in — undergraduate, postgraduate, or are you looking for something specific?',
+        caps: ['Course Search', 'Custom Tools', 'Tailored Flows'],
+        starters: [
+          'What programs do you offer?',
+          'How do I apply for a scholarship?',
+          'Can I speak to an admissions counsellor?',
+        ],
+      },
+    };
+
+    // ── Template Selection ────────────────────────────────────────────────
+    function selectTemplate(cardEl) {
+      document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+      cardEl.classList.add('selected');
+      const tmpl = cardEl.dataset.template;
+      setFormTemplate(tmpl, null);
+    }
+
+    function selectTemplateAndScroll(e, tmpl) {
+      e.stopPropagation();
+      const card = document.querySelector(`.template-card[data-template="${tmpl}"]`);
+      if (card) selectTemplate(card);
+      document.getElementById('configure').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => {
+        if (selectedTemplate) goToStep(2);
+      }, 600);
+    }
+
+    function setFormTemplate(tmpl, labelEl) {
+      selectedTemplate = tmpl;
+      conversationShown = false;
+
+      // Update radio chips
+      document.querySelectorAll('#templateRadios .cap-chip').forEach(c => c.classList.remove('selected'));
+      if (labelEl) labelEl.classList.add('selected');
+      else {
+        const dot = document.getElementById(`dot_${tmpl}`);
+        if (dot) dot.closest('.cap-chip').classList.add('selected');
+      }
+
+      // Auto-select caps from template
+      const tpl = TEMPLATES[tmpl];
+      if (tpl && tpl.caps) {
+        selectedCaps = new Set(tpl.caps.map(c => c.toLowerCase().replace(/[^a-z]+/g, '-')));
+      }
+
+      // Enable next button
+      document.getElementById('step1Next').disabled = false;
+
+      // Sync template card selection
+      document.querySelectorAll('.template-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.template === tmpl);
+      });
+
+      updatePreview();
+    }
+
+    // ── Capability Chips ─────────────────────────────────────────────────
+    function toggleCap(chipEl) {
+      const cap = chipEl.dataset.cap;
+      if (selectedCaps.has(cap)) {
+        selectedCaps.delete(cap);
+        chipEl.classList.remove('selected');
+      } else {
+        selectedCaps.add(cap);
+        chipEl.classList.add('selected');
+      }
+      updatePreview();
+    }
+
+    // ── Step Navigation ──────────────────────────────────────────────────
+    function goToStep(n) {
+      currentStep = n;
+      document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(`step${n}`).classList.add('active');
+
+      document.querySelectorAll('.form-step').forEach((s, i) => {
+        const stepNum = i + 1;
+        s.classList.remove('active', 'done');
+        if (stepNum < n) s.classList.add('done');
+        else if (stepNum === n) s.classList.add('active');
+      });
+
+      updatePreview();
+    }
+
+    function nextStep() {
+      if (currentStep === 1 && !selectedTemplate) return;
+      if (currentStep < 4) goToStep(currentStep + 1);
+    }
+
+    function prevStep() {
+      if (currentStep > 1) goToStep(currentStep - 1);
+    }
+
+    // ── Live Preview Update ──────────────────────────────────────────────
+    let typingTimer = null;
+
+    function updatePreview() {
+      const instName = document.getElementById('instName')?.value.trim() || 'Your University';
+      const agentName = document.getElementById('agentName')?.value.trim() || 'Your Agent';
+      const tpl = selectedTemplate ? TEMPLATES[selectedTemplate] : null;
+
+      // Avatar letter
+      const letter = agentName[0]?.toUpperCase() || '?';
+      document.getElementById('previewAvatarLetter').textContent = letter;
+
+      // Names
+      document.getElementById('previewAgentName').textContent = agentName;
+      document.getElementById('previewAgentRole').textContent = `AI Counsellor · ${instName}`;
+      document.getElementById('previewFooterInst').textContent = instName;
+
+      // Greeting
+      const greet = tpl
+        ? `Hi! I'm ${agentName || 'your counsellor'} from ${instName}. I can help with ${tpl.caps.slice(0, 2).join(' and ').toLowerCase()}. What would you like to know?`
+        : `Hi! I'm ${agentName || 'your counsellor'} from ${instName}. How can I help you today?`;
+      document.getElementById('previewGreeting').textContent = greet;
+
+      // Sample conversation
+      if (tpl) {
+        document.getElementById('previewUserBubble').textContent = tpl.userMsg;
+        document.getElementById('previewReplyBubble').textContent = tpl.agentReply;
+        showConversationAnimated();
+      } else {
+        document.getElementById('previewUserMsg').style.display = 'none';
+        document.getElementById('previewAgentReply').style.display = 'none';
+        document.getElementById('previewTyping').style.display = 'none';
+      }
+
+      // Feature badges
+      const feats = document.getElementById('previewFeatures');
+      const capList = Array.from(selectedCaps).slice(0, 4).map(c =>
+        c.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' ')
+      );
+      const allFeats = ['Voice + Text', ...capList];
+      feats.innerHTML = allFeats.slice(0, 5).map(f =>
+        `<span class="preview-feat-badge">${f}</span>`
+      ).join('');
+    }
+
+    let conversationShown = false;
+
+    function showConversationAnimated() {
+      if (conversationShown) {
+        document.getElementById('previewUserMsg').style.display = 'flex';
+        document.getElementById('previewAgentReply').style.display = 'flex';
+        return;
+      }
+      conversationShown = true;
+
+      setTimeout(() => {
+        document.getElementById('previewUserMsg').style.display = 'flex';
+        document.getElementById('previewTyping').style.display = 'flex';
+
+        setTimeout(() => {
+          document.getElementById('previewTyping').style.display = 'none';
+          document.getElementById('previewAgentReply').style.display = 'flex';
+        }, 1400);
+      }, 800);
+    }
+
+    // ── Form Submit ──────────────────────────────────────────────────────
+    function submitForm() {
+      const firstName = document.getElementById('contactFirst').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+
+      if (!firstName || !email) {
+        if (!firstName) {
+          document.getElementById('contactFirst').focus();
+          document.getElementById('contactFirst').style.borderColor = '#ef4444';
+          setTimeout(() => { document.getElementById('contactFirst').style.borderColor = ''; }, 2000);
+        }
+        if (!email) {
+          if (firstName) document.getElementById('contactEmail').focus();
+          document.getElementById('contactEmail').style.borderColor = '#ef4444';
+          setTimeout(() => { document.getElementById('contactEmail').style.borderColor = ''; }, 2000);
+        }
+        return;
+      }
+
+      // Animate next button
+      const btn = document.getElementById('step4Next');
+      btn.textContent = 'Generating…';
+      btn.disabled = true;
+
+      // Build the config and register a live BYO instance on the backend.
+      const config = {
+        template: selectedTemplate || 'custom',
+        instName: document.getElementById('instName').value.trim(),
+        instType: document.getElementById('instType').value,
+        instLocation: document.getElementById('instLocation').value.trim(),
+        instStudents: document.getElementById('instStudents').value,
+        instFocus: document.getElementById('instFocus').value.trim(),
+        agentName: document.getElementById('agentName').value.trim(),
+        agentTone: document.getElementById('agentTone').value,
+        capabilities: Array.from(selectedCaps),
+        agentPrompt: document.getElementById('agentPrompt').value.trim(),
+        contactFirst: firstName,
+        contactLast: document.getElementById('contactLast').value.trim(),
+        contactEmail: email,
+        contactRole: document.getElementById('contactRole').value,
+        contactTimeline: document.getElementById('contactTimeline').value,
+      };
+
+      fetch('/api/byo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+      })
+        .then(r => r.json())
+        .then(res => {
+          demoUrl = (res && res.ok) ? res.demo_url : null;
+          showSuccessAndGTM();
+        })
+        .catch(() => {
+          demoUrl = null;
+          showSuccessAndGTM();
+        });
+    }
+
+    let demoUrl = null;
+
+    function launchLivePreview() {
+      if (demoUrl) window.open(demoUrl, '_blank');
+    }
+
+    function showSuccessAndGTM() {
+      const instName = document.getElementById('instName')?.value.trim() || 'Your University';
+      const agentName = document.getElementById('agentName')?.value.trim() || 'Your Agent';
+      const firstName = document.getElementById('contactFirst').value.trim();
+      const contactEmail = document.getElementById('contactEmail').value.trim();
+      const tpl = selectedTemplate ? TEMPLATES[selectedTemplate] : TEMPLATES.custom;
+
+      // Hide form panels, show success
+      document.getElementById('step4').style.display = 'none';
+      document.querySelectorAll('.form-step').forEach(s => s.classList.add('done'));
+      document.getElementById('formSteps').style.opacity = '0.5';
+      document.getElementById('successState').classList.add('visible');
+      document.getElementById('successInstName').textContent = instName;
+
+      // Reveal the live-preview button if the backend registered an instance,
+      // and repoint the nav "Live Demo" button at the configured instance too
+      // (so neither button silently lands on default Clara/Kingsford).
+      const launchBtn = document.getElementById('launchLiveBtn');
+      if (demoUrl) {
+        launchBtn.style.display = '';
+        document.getElementById('successSubtitleLive').style.display = '';
+        const nav = document.getElementById('navLiveDemo');
+        nav.href = demoUrl;
+        nav.target = '_blank';
+        document.getElementById('navLiveDemoLabel').textContent = 'Try Your Agent';
+      }
+
+      // Build GTM prop
+      document.getElementById('previewCard').style.display = 'none';
+
+      const gtm = document.getElementById('gtmProp');
+      gtm.style.display = 'block';
+      document.getElementById('gtmAvatar').innerHTML = `<span class="material-symbols-rounded">${tpl.icon}</span>`;
+      document.getElementById('gtmAgentName').textContent = agentName;
+      document.getElementById('gtmInstName').textContent = instName;
+      document.getElementById('gtmTagline').textContent = `${tpl.desc.split('.')[0]}.`;
+      document.getElementById('gtmTemplateLabel').textContent = tpl.label;
+      document.getElementById('gtmTemplateDesc').textContent = tpl.desc;
+
+      // Capabilities — Material Symbols Rounded names (VoZara icon system)
+      const capIcons = {
+        'Course Search': 'search', 'Scholarship Matching': 'workspace_premium', 'Tour Booking': 'map',
+        'Fee Calculator': 'calculate', 'Credit Transfer': 'school', 'Event Calendar': 'calendar_month',
+        'ATAR Guidance': 'insights', 'Live Q&A': 'forum', 'Visa Information': 'badge',
+        'Credit Mapping': 'school', 'ATAR Equivalency': 'insights', 'Pathway Advice': 'explore',
+        'Prerequisite Check': 'checklist', 'Course Match': 'search', 'Scholarship Search': 'workspace_premium',
+        'Visa Cost Info': 'badge', 'Payment Plans': 'credit_card', 'Deadline Tracking': 'schedule',
+        'Application Guide': 'description', 'Merit Assessment': 'military_tech', 'Research Matching': 'science',
+        'Supervisor Search': 'person_search', 'HDR Pathways': 'school', 'Funding Options': 'payments',
+        'Faculty Tours': 'account_balance', 'Custom Tools': 'build', 'Tailored Flows': 'auto_awesome',
+      };
+
+      const allCaps = tpl.caps;
+      const gtmCapsEl = document.getElementById('gtmCaps');
+      gtmCapsEl.innerHTML = allCaps.map(cap => {
+        const icon = capIcons[cap] || 'check_circle';
+        return `<div class="gtm-cap"><span class="material-symbols-rounded">${icon}</span> ${cap}</div>`;
+      }).join('');
+
+      // Conversation starters
+      const startersEl = document.getElementById('gtmStarters');
+      const starters = tpl.starters || [];
+      startersEl.innerHTML = starters.map(s =>
+        `<div style="background:var(--bg-secondary);border:1px solid var(--border-primary);border-radius:var(--radius-sm);padding:9px 12px;font-size:12.5px;color:var(--color-secondary);display:flex;align-items:center;gap:8px;">
+          <span class="material-symbols-rounded gtm-starter-ic">chat_bubble</span>
+          <span>"${s}"</span>
+        </div>`
+      ).join('');
+
+      // Contact line
+      document.getElementById('gtmContactLine').textContent = `Configured by ${firstName} · ${contactEmail}`;
+
+      // Analytics (placeholder)
+      console.log('[GTM] Lead captured:', { instName, agentName, template: selectedTemplate, email: contactEmail, firstName });
+    }
+
+    // ── Actions ───────────────────────────────────────────────────────────
+    function _buildShareText() {
+      const instName = document.getElementById('instName')?.value.trim() || 'Your University';
+      const agentName = document.getElementById('agentName')?.value.trim() || 'Your Agent';
+      const tpl = selectedTemplate ? TEMPLATES[selectedTemplate] : TEMPLATES.custom;
+      return {
+        instName, agentName, tpl,
+        text: `Waypoint AI Counsellor — ${agentName} @ ${instName}\n\nTemplate: ${tpl.label}\nCapabilities: ${tpl.caps.join(', ')}\n\nConversation starters:\n${(tpl.starters || []).map(s => `• ${s}`).join('\n')}\n\nWaypoint by VoZara · Gemini Live API`,
+      };
+    }
+
+    function sharePreview(btnEl) {
+      const { instName, agentName, tpl, text } = _buildShareText();
+      const shareData = {
+        title: `${agentName} @ ${instName} — Waypoint AI Counsellor`,
+        text,
+        url: window.location.href,
+      };
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        navigator.share(shareData).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(text).then(() => {
+          if (btnEl) {
+            const orig = btnEl.innerHTML;
+            btnEl.textContent = '✓ Copied to clipboard!';
+            setTimeout(() => { btnEl.innerHTML = orig; }, 2000);
+          }
+        });
+      }
+    }
+
+    function downloadPreview() {
+      window.print();
+    }
+
+    function requestDemo() {
+      const email = document.getElementById('contactEmail').value.trim();
+      const instName = document.getElementById('instName')?.value.trim() || '';
+      const subject = encodeURIComponent(`Waypoint Demo Request — ${instName}`);
+      const body = encodeURIComponent(`Hi,\n\nI've just configured a Waypoint instance for ${instName} and I'd love to see a live demo.\n\nTemplate: ${selectedTemplate ? TEMPLATES[selectedTemplate].label : 'Custom'}\nCapabilities: ${Array.from(selectedCaps).join(', ')}\n\nBest,\n${document.getElementById('contactFirst').value}`);
+      window.open(`mailto:hello@waypoint.ai?subject=${subject}&body=${body}`, '_blank');
+    }
+
+    // ── Anchor scroll offset for sticky nav ──────────────────────────────
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          const offset = 70;
+          const top = target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      });
+    });
+
+    // ── Init ───────────────────────────────────────────────────────────────
+    updatePreview();
+  </script>
+
+</body>
+</html>

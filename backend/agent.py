@@ -84,20 +84,118 @@ FLOW:
 - Ask a follow-up question to keep the conversation going (e.g., "Would you like me to find related events or book a campus tour for you?").
 """.strip()
 
+_TOOLS = [
+    get_course_detail,
+    compare_courses,
+    search_courses,
+    recommend_courses,
+    search_events,
+    book_campus_tour,
+    register_for_event,
+    search_knowledge,
+    search_scholarships,
+]
+
 clara = Agent(
     name="clara",
     model=MODEL,
     description="Kingsford University AI course counsellor on Waypoint",
     instruction=INSTRUCTION,
-    tools=[
-        get_course_detail,
-        compare_courses,
-        search_courses,
-        recommend_courses,
-        search_events,
-        book_campus_tour,
-        register_for_event,
-        search_knowledge,
-        search_scholarships,
-    ],
+    tools=_TOOLS,
 )
+
+# ── Build-Your-Own (BYO) dynamic agent ────────────────────────────────────────
+# The "For Universities" page lets a visitor configure a counsellor for their own
+# institution. We reuse Clara's fully-tuned instruction verbatim (it carries all
+# the stability-critical tool-calling rules) and prepend a highest-priority
+# identity override — the same "treat X as Y" remapping trick already proven by
+# the screen-share fictional-identity handling. Tools/data stay Kingsford's, so
+# this is an illustrative DEMO of what the institution's agent would look like.
+
+import re
+
+_TONE_DESC = {
+    "friendly": "warm, friendly and approachable",
+    "professional": "polished, professional and formal",
+    "enthusiastic": "upbeat, enthusiastic and energetic",
+    "calm": "calm, patient and reassuring",
+}
+
+_CAP_LABELS = {
+    "course-search": "Course search",
+    "scholarship-match": "Scholarship matching",
+    "tour-booking": "Campus tour booking",
+    "fee-calculator": "Fee guidance",
+    "credit-transfer": "Credit transfer guidance",
+    "event-calendar": "Events & open days",
+    "atar-guidance": "ATAR guidance",
+    "live-qa": "Live Q&A",
+    "visa-info": "Visa information",
+}
+
+
+def _slug(name: str, fallback: str = "agent") -> str:
+    s = re.sub(r"[^a-zA-Z0-9_]", "_", (name or "").strip().lower()).strip("_")
+    if not s or not s[0].isalpha():
+        s = f"{fallback}_{s}" if s else fallback
+    return s[:40]
+
+
+def build_instruction(cfg: dict) -> str:
+    """Prepend a session identity override to Clara's base instruction."""
+    agent_name = (cfg.get("agentName") or "Aria").strip()
+    inst = (cfg.get("instName") or "your university").strip()
+    loc = (cfg.get("instLocation") or "").strip()
+    loc_phrase = f" in {loc}" if loc else ""
+    tone = _TONE_DESC.get(cfg.get("agentTone", "friendly"), _TONE_DESC["friendly"])
+    focus = (cfg.get("instFocus") or "").strip()
+    caps = [_CAP_LABELS.get(c, c) for c in (cfg.get("capabilities") or [])]
+    custom = (cfg.get("agentPrompt") or "").strip()
+
+    lines = [
+        "SESSION IDENTITY OVERRIDE — this block has the HIGHEST priority and "
+        "supersedes any conflicting identity stated later in your instructions:",
+        f"- Your name is {agent_name}. Introduce yourself as {agent_name}, never as Clara.",
+        f"- You are the AI course counsellor for {inst}{loc_phrase}, NOT Kingsford University.",
+        f'- Treat EVERY reference to "Kingsford University" (in your instructions or in any '
+        f'tool result) as "{inst}". The course catalog, events, and scholarships your tools '
+        f"return are illustrative sample data — present them naturally as examples of what "
+        f"{inst} offers.",
+        f"- Conversation tone: be {tone}.",
+    ]
+    if focus:
+        lines.append(f"- Emphasise these focus areas when relevant: {focus}.")
+    if caps:
+        lines.append(
+            f"- Capabilities enabled for this deployment: {', '.join(caps)}. "
+            f"If asked about something outside these, help if you can but gently note it "
+            f"isn't a focus of this preview."
+        )
+    if custom:
+        lines.append(f"- Additional instructions from {inst}: {custom}")
+
+    return "\n".join(lines) + "\n\n" + INSTRUCTION
+
+
+def build_greeting(cfg: dict) -> str:
+    """Custom hidden greeting trigger for a BYO instance."""
+    agent_name = (cfg.get("agentName") or "Aria").strip()
+    inst = (cfg.get("instName") or "your university").strip()
+    return (
+        f"(System: The student has just arrived. Please greet them warmly as {agent_name}, "
+        f"the {inst} course counsellor. Introduce yourself briefly and ask what brings them "
+        f"to {inst} today — do NOT search for anything yet, just wait for their response.)"
+    )
+
+
+def build_agent(cfg: dict) -> Agent:
+    """Construct a per-connection Agent customised for a BYO institution."""
+    agent_name = (cfg.get("agentName") or "Aria").strip()
+    inst = (cfg.get("instName") or "your university").strip()
+    return Agent(
+        name=_slug(agent_name, "byo"),
+        model=MODEL,
+        description=f"{inst} AI course counsellor on Waypoint",
+        instruction=build_instruction(cfg),
+        tools=_TOOLS,
+    )

@@ -48,7 +48,7 @@ from google.adk.sessions import InMemorySessionService
 from google.adk.agents.run_config import RunConfig, StreamingMode
 from google.adk.agents.live_request_queue import LiveRequestQueue
 
-from agent import clara, MODEL
+from agent import clara, MODEL, build_agent, build_greeting
 from db import init_pool, close_pool
 from tools import register_display_callback, unregister_display_callback
 
@@ -130,6 +130,24 @@ logging.getLogger("google.adk.models.gemini_llm_connection").setLevel(logging.WA
 session_service = InMemorySessionService()
 runner = Runner(agent=clara, app_name=APP_NAME, session_service=session_service)
 
+# ── Build-Your-Own (BYO) demo configs ─────────────────────────────────────────
+# In-memory store of visitor-configured counsellor instances from the "For
+# Universities" page. Demo-scoped: capped, no persistence (matches the
+# InMemorySessionService MVP convention). A config powers a per-connection Runner.
+import secrets
+from collections import OrderedDict
+
+_byo_configs: "OrderedDict[str, dict]" = OrderedDict()
+_BYO_MAX = 500  # cap to bound memory; oldest evicted first
+
+def _store_byo_config(cfg: dict) -> str:
+    demo_id = secrets.token_urlsafe(6)
+    _byo_configs[demo_id] = cfg
+    _byo_configs.move_to_end(demo_id)
+    while len(_byo_configs) > _BYO_MAX:
+        _byo_configs.popitem(last=False)
+    return demo_id
+
 # ── App lifecycle ─────────────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -179,6 +197,47 @@ async def index():
 async def health():
     return {"status": "ok"}
 
+@app.get("/byo")
+async def byo_page():
+    return FileResponse(STATIC_DIR / "byo.html")
+
+@app.post("/api/byo")
+async def create_byo(config: dict):
+    """Store a BYO counsellor config and return a shareable demo URL."""
+    if not (config.get("instName") and config.get("agentName")):
+        return {"ok": False, "error": "instName and agentName are required"}
+    # Keep only the fields the agent/greeting builders use (+ light contact info
+    # for lead context); drop anything unexpected to bound stored size.
+    allowed = {
+        "template", "instName", "instType", "instLocation", "instStudents",
+        "instFocus", "agentName", "agentTone", "capabilities", "agentPrompt",
+        "contactFirst", "contactLast", "contactEmail", "contactRole", "contactTimeline",
+    }
+    cfg = {k: config[k] for k in allowed if k in config}
+    demo_id = _store_byo_config(cfg)
+    log.info("BYO config stored: id=%s inst=%r agent=%r",
+             demo_id, cfg.get("instName"), cfg.get("agentName"))
+    return {"ok": True, "demo_id": demo_id, "demo_url": f"/demo/{demo_id}"}
+
+@app.get("/demo/{demo_id}")
+async def demo_page(demo_id: str):
+    """Serve the main UI for a configured BYO instance (falls back to default)."""
+    return FileResponse(STATIC_DIR / "index.html")
+
+@app.get("/api/byo/{demo_id}")
+async def get_byo(demo_id: str):
+    """Return public-safe identity for a BYO instance (no contact details)."""
+    cfg = _byo_configs.get(demo_id)
+    if not cfg:
+        return {"ok": False}
+    return {
+        "ok": True,
+        "agentName": cfg.get("agentName"),
+        "instName": cfg.get("instName"),
+        "agentTone": cfg.get("agentTone"),
+        "template": cfg.get("template"),
+    }
+
 def _sanitize_session_events(events):
     """Sanitize session events for safe replay on reconnect.
 
@@ -225,6 +284,19 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             pass
 
     register_display_callback(client_id, loop, send_card)
+
+    # Resolve agent: a `?demo=<id>` query param selects a Build-Your-Own instance
+    # (per-connection Runner with a customised agent); otherwise use the default
+    # Clara / Kingsford runner. Greeting is matched to whichever agent is active.
+    demo_id = websocket.query_params.get("demo")
+    byo_cfg = _byo_configs.get(demo_id) if demo_id else None
+    if byo_cfg:
+        active_runner = Runner(agent=build_agent(byo_cfg), app_name=APP_NAME, session_service=session_service)
+        greeting_prompt = build_greeting(byo_cfg)
+        log.info("WS using BYO instance: id=%s inst=%r", demo_id, byo_cfg.get("instName"))
+    else:
+        active_runner = runner
+        greeting_prompt = HIDDEN_GREETING_PROMPT
 
     # Always create a fresh session — never resume history.
     # Each page load generates a new crypto.randomUUID() as client_id, so
@@ -359,7 +431,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                         turn_start_at = time.time()
                         log.info("--- TURN START ---")
 
-                    async for event in runner.run_live(
+                    async for event in active_runner.run_live(
                         user_id=client_id,
                         session_id=session.id,
                         live_request_queue=live_request_queue,
@@ -372,6 +444,28 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                             for part in event.content.parts:
                                 if part.inline_data and part.inline_data.mime_type.startswith("audio/"):
                                     await websocket.send_bytes(part.inline_data.data)
+
+                        # Tool-call traces ("under the hood" view). These mirror the
+                        # genuine model↔tool loop: get_function_calls() carries the args
+                        # the model chose; get_function_responses() carries the slim
+                        # result the model receives back (full card data is a separate
+                        # side-channel). The browser decides whether to render them.
+                        for fc in (event.get_function_calls() or []):
+                            log.info("→ trace tool_call: %s args=%s", fc.name, fc.args)
+                            await websocket.send_text(json.dumps({
+                                "type": "tool_call",
+                                "id": fc.id,
+                                "name": fc.name,
+                                "args": fc.args or {},
+                            }, default=str))
+                        for fr in (event.get_function_responses() or []):
+                            log.info("→ trace tool_result: %s", fr.name)
+                            await websocket.send_text(json.dumps({
+                                "type": "tool_result",
+                                "id": fr.id,
+                                "name": fr.name,
+                                "response": fr.response,
+                            }, default=str))
 
                         # Transcriptions — role: agent (cumulative buffer)
                         if event.output_transcription:
@@ -412,7 +506,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                                 else:
                                     user_tx_buf += chunk
                                     display_text = user_tx_buf.strip()
-                                if display_text in HIDDEN_GREETING_PROMPT:
+                                if display_text in greeting_prompt:
                                     if finished:
                                         user_tx_buf = ""
                                     continue
@@ -464,7 +558,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                 if not session.events:
                     log.info("Fresh session: sending proactive greeting trigger")
                     live_request_queue.send_content(
-                        types.Content(parts=[types.Part(text=HIDDEN_GREETING_PROMPT)])
+                        types.Content(parts=[types.Part(text=greeting_prompt)])
                     )
                 await run_live_loop()
             except Exception as e:
