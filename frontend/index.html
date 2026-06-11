@@ -63,6 +63,7 @@
       display: flex;
       flex-direction: row;
       height: 100vh;
+      height: 100dvh;   /* dvh tracks the visible viewport so the input bar isn't hidden behind mobile browser chrome */
       overflow: hidden;
       background: rgba(240, 244, 248, 0.6);
       /* Frosty overlay */
@@ -158,6 +159,14 @@
         flex: 1;
         min-height: 160px;
       }
+
+      /* Tighten the header so the status row doesn't overflow on phones */
+      .via-header { padding: 16px 14px 12px; gap: 10px; }
+      .via-status { gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+      #statusLabel { display: none; }            /* the dot already conveys state */
+      .via-hood-toggle #hoodToggleLabel { display: none; }  /* icon-only on mobile */
+      .via-hood-toggle { padding: 5px 7px; }
+      .via-disconnect { padding: 5px 9px; font-size: 12px; }
     }
 
     /* Header */
@@ -1234,6 +1243,44 @@
       flex-shrink: 0;
     }
 
+    /* ── Under-the-hood toggle toast ────────────────────────────────────────── */
+    .hood-toast {
+      position: absolute;
+      bottom: 88px;
+      left: 50%;
+      transform: translate(-50%, 10px);
+      z-index: 40;
+      max-width: 86%;
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 11px 15px;
+      border-radius: 14px;
+      background: rgba(18, 19, 23, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #f4f5f7;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+      font-size: 12.5px;
+      line-height: 1.45;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s var(--ease-out-quint);
+    }
+
+    .hood-toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .hood-toast svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: var(--accent-teal);
+    }
+
+    .hood-toast b { font-weight: 600; color: #fff; }
+
     /* ── Tool-call trace blocks (inline in transcript) ──────────────────────── */
     .via-trace {
       margin: 6px 0;
@@ -1351,6 +1398,74 @@
     .via-trace-pre .s { color: #a5d6ff; }
     .via-trace-pre .n { color: #d2a8ff; }
     .via-trace-pre .b { color: #ffa657; }
+
+    /* ── First-run guided tour (coachmarks) ─────────────────────────────────── */
+    #tourRoot { position: fixed; inset: 0; z-index: 9990; display: none; }
+    #tourRoot.active { display: block; }
+
+    /* Spotlight: a positioned box whose huge box-shadow dims everything else. */
+    .tour-spotlight {
+      position: fixed;
+      border-radius: 14px;
+      box-shadow: 0 0 0 9999px rgba(18, 19, 23, 0.62);
+      pointer-events: none;
+      transition: top 0.35s var(--ease-out-quint), left 0.35s var(--ease-out-quint),
+                  width 0.35s var(--ease-out-quint), height 0.35s var(--ease-out-quint);
+      outline: 2px solid rgba(13, 148, 136, 0.9);
+      outline-offset: 2px;
+    }
+
+    .tour-tooltip {
+      position: fixed;
+      width: min(320px, 88vw);
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+      padding: 18px 18px 14px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s var(--ease-out-quint);
+    }
+    .tour-tooltip.show { opacity: 1; transform: translateY(0); }
+
+    .tour-eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--accent-teal); margin-bottom: 8px;
+    }
+    .tour-title { font-size: 16px; font-weight: 600; color: var(--color-primary); margin-bottom: 6px; }
+    .tour-body { font-size: 13.5px; line-height: 1.5; color: var(--color-secondary); }
+
+    .tour-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 16px; gap: 10px;
+    }
+    .tour-dots { display: flex; gap: 6px; }
+    .tour-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-secondary); transition: background 0.2s, width 0.2s; }
+    .tour-dot.on { background: var(--accent-teal); width: 16px; border-radius: 3px; }
+    .tour-actions { display: flex; align-items: center; gap: 8px; }
+    .tour-skip {
+      background: none; border: none; cursor: pointer; font-family: inherit;
+      font-size: 12.5px; color: var(--color-tertiary); padding: 6px 4px;
+    }
+    .tour-skip:hover { color: var(--color-secondary); }
+    .tour-next {
+      background: var(--accent-teal); color: #fff; border: none; cursor: pointer;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      padding: 8px 16px; border-radius: 9999px; transition: background 0.2s;
+    }
+    .tour-next:hover { background: var(--accent-teal-hover); }
+
+    /* Header "?" replay button */
+    .via-help-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 1px solid var(--border-secondary); background: transparent;
+      color: var(--color-tertiary); cursor: pointer; font-family: inherit;
+      font-size: 12px; font-weight: 700; line-height: 1; padding: 0;
+      transition: all 0.18s ease;
+    }
+    .via-help-btn:hover { border-color: var(--accent-teal); color: var(--accent-teal); }
   </style>
 </head>
 
@@ -1373,6 +1488,7 @@
         <div class="via-status">
           <div class="via-status-dot" id="statusDot"></div>
           <span id="statusLabel">Connecting…</span>
+          <button class="via-help-btn" id="tourBtn" type="button" title="Show me around">?</button>
           <button class="via-hood-toggle" id="hoodToggle" type="button"
             title="Show the tool calls Clara makes under the hood">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
@@ -1384,6 +1500,9 @@
             title="Start a fresh conversation">New Session</button>
         </div>
       </div>
+
+      <!-- Under-the-hood toggle toast (transient explainer) -->
+      <div id="hoodToast" class="hood-toast" role="status" aria-live="polite"></div>
 
       <!-- Floating Screen Share Indicator -->
       <div id="screen-share-status" class="screen-share-status" style="display:none">
@@ -1539,10 +1658,25 @@
       hoodToggle.setAttribute("aria-pressed", String(on));
     }
     applyHood(localStorage.getItem("waypointHood") === "1");
+
+    const hoodToast = document.getElementById("hoodToast");
+    let hoodToastTimer = null;
+    const _boltSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>`;
+    function showHoodToast(on) {
+      const agentName = document.querySelector(".via-name")?.textContent?.trim() || "the agent";
+      hoodToast.innerHTML = on
+        ? `${_boltSvg}<span><b>Under the hood is on.</b> You'll now see each tool ${esc(agentName)} calls — its inputs and the data it gets back — inline as you chat.</span>`
+        : `${_boltSvg}<span><b>Under the hood is off.</b> Tool calls are hidden. Toggle it anytime to peek at what the agent is doing.</span>`;
+      hoodToast.classList.add("show");
+      clearTimeout(hoodToastTimer);
+      hoodToastTimer = setTimeout(() => hoodToast.classList.remove("show"), 5000);
+    }
+
     hoodToggle.addEventListener("click", () => {
       const on = !hoodPanel.classList.contains("hood-on");
       localStorage.setItem("waypointHood", on ? "1" : "0");
       applyHood(on);
+      showHoodToast(on);
       ga('hood_toggled', { enabled: on });
     });
 
@@ -1678,7 +1812,11 @@
     function renderToolCall(msg) {
       if (msg.id && traceEls[msg.id]) return;  // already rendered this call
       removeEmptyMsg();
-      flushUser();  // close any in-progress user bubble so the trace sits after it
+      // NOTE: do not flushUser() here. The user's voice transcript can finalize
+      // *after* the tool_call arrives; flushing nulls userMsgEl, so that trailing
+      // transcript would spawn a second (duplicate) user bubble below the trace.
+      // Leaving the bubble open lets the trailing delta update it in place (above
+      // the trace), and turn_complete flushes it normally.
       const el = document.createElement("div");
       el.className = "via-trace";
       el.dataset.start = String(performance.now());
@@ -2713,6 +2851,180 @@ registerProcessor("uni-audio-processor", AudioProcessor);
     // ── Boot ──────────────────────────────────────────────────────────────────────
     connect();
   </script>
+  <!-- First-run guided tour -->
+  <div id="tourRoot" aria-hidden="true">
+    <div class="tour-spotlight" id="tourSpotlight"></div>
+    <div class="tour-tooltip" id="tourTooltip" role="dialog" aria-modal="true">
+      <div class="tour-eyebrow">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        <span id="tourStepLabel">Tour</span>
+      </div>
+      <div class="tour-title" id="tourTitle"></div>
+      <div class="tour-body" id="tourBody"></div>
+      <div class="tour-foot">
+        <div class="tour-dots" id="tourDots"></div>
+        <div class="tour-actions">
+          <button class="tour-skip" id="tourSkip" type="button">Skip</button>
+          <button class="tour-next" id="tourNext" type="button">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── First-run guided tour (coachmarks) ──────────────────────────────────────
+    (function () {
+      const STEPS = [
+        { sel: null, title: "Welcome to Waypoint", body: "Meet {agent} — your real-time voice AI course counsellor. Here's a quick 20-second tour.", place: "center" },
+        { sel: "#voiceBtn", title: "Voice is on — just start talking", body: "{agent} greets you and starts listening the moment you arrive, like a phone call. Tap the mic to mute and switch to text-only mode; tap again to unmute and return to voice.", place: "top",
+          titleMobile: "Tap the mic to talk", bodyMobile: "Tap the mic to start the conversation — {agent} listens and replies out loud. Tap it again to mute and switch to text-only mode." },
+        { sel: "#textInput", title: "Or just type", body: "Prefer to type? Ask your question here and {agent} answers the same way.", place: "top" },
+        { sel: "#mediaBtn", title: "Show, don't just tell", body: "Share a photo — like a school report — or your screen, and {agent} can see it and respond.", place: "top" },
+        { sel: "#hoodToggle", title: "Peek under the hood", body: "Turn this on to watch the exact tools {agent} calls, with their inputs and results, as you chat.", place: "bottom" },
+        { sel: ".sidebar", title: "Your research panel", body: "Courses, scholarships, events and booking confirmations appear here as the conversation unfolds.", place: "left" },
+      ];
+      const SEEN_KEY = "waypointTourSeen";
+
+      const root = document.getElementById("tourRoot");
+      const spot = document.getElementById("tourSpotlight");
+      const tip = document.getElementById("tourTooltip");
+      const elTitle = document.getElementById("tourTitle");
+      const elBody = document.getElementById("tourBody");
+      const elLabel = document.getElementById("tourStepLabel");
+      const elDots = document.getElementById("tourDots");
+      const btnNext = document.getElementById("tourNext");
+      const btnSkip = document.getElementById("tourSkip");
+      let i = 0;
+
+      function visible(el) {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+      }
+
+      function ensureInView(el) {
+        const r = el.getBoundingClientRect();
+        if (r.top < 0 || r.bottom > window.innerHeight || r.left < 0 || r.right > window.innerWidth) {
+          el.scrollIntoView({ block: "center", inline: "center" });
+        }
+      }
+
+      function place(step) {
+        const target = step.sel ? document.querySelector(step.sel) : null;
+        const pad = 8;
+
+        if (target && visible(target)) {
+          ensureInView(target);
+          const r = target.getBoundingClientRect();
+          spot.style.display = "block";
+          spot.style.top = (r.top - pad) + "px";
+          spot.style.left = (r.left - pad) + "px";
+          spot.style.width = (r.width + pad * 2) + "px";
+          spot.style.height = (r.height + pad * 2) + "px";
+          positionTip(step.place || "bottom", r);
+        } else {
+          // Centered step (welcome) — collapse spotlight to dim the whole screen.
+          spot.style.display = "block";
+          spot.style.top = "50%"; spot.style.left = "50%";
+          spot.style.width = "0px"; spot.style.height = "0px";
+          centerTip();
+        }
+      }
+
+      function centerTip() {
+        tip.style.top = "50%"; tip.style.left = "50%";
+        tip.style.transform = "translate(-50%, -50%)";
+        requestAnimationFrame(() => { tip.classList.add("show"); tip.style.transform = "translate(-50%, -50%)"; });
+      }
+
+      function positionTip(where, r) {
+        const tw = tip.offsetWidth || 320;
+        const th = tip.offsetHeight || 160;
+        const gap = 14, vw = window.innerWidth, vh = window.innerHeight, m = 12;
+        let top, left;
+
+        let pos = where;
+        if (pos === "top" && r.top - th - gap < m) pos = "bottom";
+        if (pos === "bottom" && r.bottom + th + gap > vh - m) pos = "top";
+        if (pos === "left" && r.left - tw - gap < m) pos = "bottom";
+
+        if (pos === "top")       { top = r.top - th - gap;  left = r.left + r.width / 2 - tw / 2; }
+        else if (pos === "left") { top = r.top + r.height / 2 - th / 2; left = r.left - tw - gap; }
+        else                     { top = r.bottom + gap;    left = r.left + r.width / 2 - tw / 2; }
+
+        left = Math.max(m, Math.min(left, vw - tw - m));
+        top = Math.max(m, Math.min(top, vh - th - m));
+        tip.style.left = left + "px";
+        tip.style.top = top + "px";
+        tip.style.transform = "none";
+        requestAnimationFrame(() => tip.classList.add("show"));
+      }
+
+      const coarse = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+
+      function render() {
+        const step = STEPS[i];
+        const agent = document.querySelector(".via-name")?.textContent?.trim() || "Clara";
+        const title = (coarse && step.titleMobile) || step.title;
+        const body = (coarse && step.bodyMobile) || step.body;
+        tip.classList.remove("show");
+        elLabel.textContent = step.sel ? `Step ${i} of ${STEPS.length - 1}` : "Tour";
+        elTitle.textContent = title.replace(/\{agent\}/g, agent);
+        elBody.textContent = body.replace(/\{agent\}/g, agent);
+        btnNext.textContent = (i === STEPS.length - 1) ? "Got it" : "Next";
+        elDots.innerHTML = STEPS.map((_, k) => `<span class="tour-dot${k === i ? " on" : ""}"></span>`).join("");
+        // let layout settle so offsetWidth/Height are correct
+        requestAnimationFrame(() => place(step));
+      }
+
+      function start() {
+        i = 0;
+        root.classList.add("active");
+        root.setAttribute("aria-hidden", "false");
+        render();
+      }
+      function end() {
+        root.classList.remove("active");
+        root.setAttribute("aria-hidden", "true");
+        tip.classList.remove("show");
+        try { localStorage.setItem(SEEN_KEY, "1"); } catch (e) {}
+        window.removeEventListener("resize", onResize);
+        if (typeof ga === "function") ga("tour_finished", { step: i });
+      }
+      function next() { if (i < STEPS.length - 1) { i++; render(); } else end(); }
+      function onResize() { if (root.classList.contains("active")) place(STEPS[i]); }
+
+      btnNext.addEventListener("click", next);
+      btnSkip.addEventListener("click", end);
+      // Tapping the dimmed backdrop advances (familiar Tips-style behaviour).
+      root.addEventListener("click", (e) => { if (e.target === root || e.target === spot) next(); });
+      document.addEventListener("keydown", (e) => {
+        if (!root.classList.contains("active")) return;
+        if (e.key === "Escape") end();
+        else if (e.key === "ArrowRight" || e.key === "Enter") next();
+        else if (e.key === "ArrowLeft" && i > 0) { i--; render(); }
+      });
+      window.addEventListener("resize", onResize);
+
+      // Replay button (always available)
+      document.getElementById("tourBtn")?.addEventListener("click", () => {
+        window.addEventListener("resize", onResize);
+        start();
+        if (typeof ga === "function") ga("tour_started", { trigger: "manual" });
+      });
+
+      // Auto-run on first visit, after the page settles.
+      let seen = false;
+      try { seen = localStorage.getItem(SEEN_KEY) === "1"; } catch (e) {}
+      if (!seen) {
+        setTimeout(() => {
+          start();
+          if (typeof ga === "function") ga("tour_started", { trigger: "auto" });
+        }, 900);
+      }
+    })();
+  </script>
+
 </body>
 
 </html>
