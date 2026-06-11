@@ -27,8 +27,8 @@ steps:
       - --allow-unauthenticated
       - --service-account=waypoint-runner@$PROJECT_ID.iam.gserviceaccount.com
       - --add-cloudsql-instances=${_CLOUDSQL_PROJECT}:${_REGION}:${_CLOUDSQL_INSTANCE}
-      - --set-secrets=DATABASE_URL=waypoint-db-url:latest,GOOGLE_API_KEY=google-api-key:latest
-      - --set-env-vars=GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_GENAI_USE_VERTEXAI=FALSE,MODEL_NAME=gemini-3.1-flash-live-preview
+      - --set-secrets=DATABASE_URL=waypoint-db-url:latest
+      - --set-env-vars=GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_GENAI_USE_VERTEXAI=TRUE,GOOGLE_CLOUD_LOCATION=us-central1,MODEL_NAME=gemini-live-2.5-flash-native-audio
       - --memory=1Gi
       - --concurrency=10
       - --max-instances=2

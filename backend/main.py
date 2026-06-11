@@ -32,7 +32,7 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 
 load_dotenv()
-os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "FALSE")
+os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "TRUE")
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
