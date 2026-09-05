@@ -155,7 +155,16 @@ def get_course_detail(course_name: str) -> dict:
     for k, v in dict(row).items():
         course[k] = float(v) if isinstance(v, Decimal) else v
 
-    log.info("get_course_detail found '%s' (similarity=%.3f)", course["name"], course["similarity"])
+    # get_course_detail always returns the nearest vector match, even for a course
+    # that doesn't exist. Empirically, an exact-name lookup scores ~0.70+ while a
+    # fabricated name tops out ~0.55 — overlapping with real abbreviations, so this
+    # flag only marks HIGH-confidence exact matches. The model compares
+    # requested_course vs name to judge the ambiguous middle band (see agent.py).
+    confident_match = course["similarity"] >= 0.65
+    log.info(
+        "get_course_detail requested='%s' matched='%s' similarity=%.3f confident=%s",
+        course_name, course["name"], course["similarity"], confident_match,
+    )
 
     if _display_callbacks:
         payload = {
@@ -168,6 +177,8 @@ def get_course_detail(course_name: str) -> dict:
             asyncio.run_coroutine_threadsafe(callback(payload), loop)
 
     return {
+        "requested_course": course_name,
+        "confident_match": confident_match,
         "name": course["name"],
         "faculty": course["faculty"],
         "level": course["level"],
@@ -490,14 +501,74 @@ def book_campus_tour(
     if tour_date < date.today():
         return {"success": False, "error": f"The date {preferred_date} is in the past. Campus tours must be booked for a future date."}
 
-    sql = """
-        INSERT INTO tour_bookings (student_name, email, preferred_date, party_size)
-        VALUES (%s, %s, %s, %s)
-        RETURNING id, created_at
-    """
+    # Validate against the actual tour schedule: a campus tour can only be booked
+    # on a date when a CampusTour event is scheduled and still has spots left.
     with _get_conn() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-            cur.execute(sql, (student_name, email, tour_date, party_size))
+            cur.execute(
+                """
+                SELECT id, title, start_at, spots_left
+                FROM events
+                WHERE event_type = 'CampusTour'
+                  AND start_at::date = %s::date
+                ORDER BY start_at
+                LIMIT 1
+                """,
+                (tour_date,),
+            )
+            _t = cur.fetchone()
+            tour = dict(_t) if _t else None
+
+            # Next available, not-sold-out tour dates to offer if the request fails.
+            cur.execute(
+                """
+                SELECT start_at::date AS tour_date, title, spots_left
+                FROM events
+                WHERE event_type = 'CampusTour'
+                  AND start_at::date >= CURRENT_DATE
+                  AND (spots_left IS NULL OR spots_left > 0)
+                ORDER BY start_at
+                LIMIT 5
+                """
+            )
+            available = [
+                {"date": dict(r)["tour_date"].isoformat(), "title": dict(r)["title"]}
+                for r in cur.fetchall()
+            ]
+
+            if tour is None:
+                log.info("book_campus_tour rejected: no CampusTour scheduled on %s", preferred_date)
+                return {
+                    "success": False,
+                    "error": f"No campus tour is scheduled on {preferred_date}.",
+                    "available_dates": available,
+                }
+            if tour["spots_left"] is not None and tour["spots_left"] <= 0:
+                log.info("book_campus_tour rejected: tour on %s is sold out", preferred_date)
+                return {
+                    "success": False,
+                    "error": f"The campus tour on {preferred_date} is fully booked.",
+                    "available_dates": available,
+                }
+            if tour["spots_left"] is not None and party_size > tour["spots_left"]:
+                log.info(
+                    "book_campus_tour rejected: party_size %d > spots_left %d on %s",
+                    party_size, tour["spots_left"], preferred_date,
+                )
+                return {
+                    "success": False,
+                    "error": f"Only {tour['spots_left']} spot(s) remain on the {preferred_date} tour, fewer than the {party_size} requested.",
+                    "available_dates": available,
+                }
+
+            cur.execute(
+                """
+                INSERT INTO tour_bookings (student_name, email, preferred_date, party_size)
+                VALUES (%s, %s, %s, %s)
+                RETURNING id, created_at
+                """,
+                (student_name, email, tour_date, party_size),
+            )
             row = dict(cur.fetchone())
 
     data = {
