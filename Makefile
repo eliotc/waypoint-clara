@@ -1,11 +1,17 @@
 # Override these via environment variables or a local .env.local file.
 # Example:
 #   PROJECT=my-gcp-project INSTANCE=my-gcp-project:us-central1:waypoint-db make deploy
-PROJECT    ?= your-gcp-project
+PROJECT    ?= waypoint-hackathon
 REGION     ?= us-central1
 INSTANCE   ?= $(PROJECT):$(REGION):waypoint-db
 DB_NAME    ?= waypoint
 PROXY_PORT ?= 5433
+
+# Local dev connects to Cloud SQL through the Auth Proxy on localhost:$(PROXY_PORT).
+# These point at the live instance the app's DATABASE_URL (in .env) expects — note
+# this is a DIFFERENT instance from $(INSTANCE) above, which is only for deploy.
+PROXY_INSTANCE   ?= universal-cs-assistant-agent:us-central1:customer-assistant-vectordb
+CREDENTIALS_FILE ?= /home/eliotc/.config/waypoint-local-dev.json
 
 # ── Local dev ────────────────────────────────────────────────────────────────
 
@@ -14,9 +20,11 @@ run:
 
 # ── Cloud SQL ────────────────────────────────────────────────────────────────
 
-# Start the Auth Proxy (run in a separate terminal — required before seed-prod or psql-prod)
+# Start the Auth Proxy (run in a SEPARATE terminal, leave it running).
+# Required before `make run`, seed-prod, or psql-prod — without it the app's
+# startup fails with "ConnectionRefusedError: [Errno 111] Connection refused".
 proxy:
-	cloud-sql-proxy $(INSTANCE) --port=$(PROXY_PORT)
+	cloud-sql-proxy $(PROXY_INSTANCE) --port=$(PROXY_PORT) --credentials-file=$(CREDENTIALS_FILE)
 
 # Reseed Cloud SQL via Auth Proxy (requires proxy running in another terminal)
 seed-prod:
@@ -57,9 +65,10 @@ help:
 	@echo ""
 	@echo "  Local dev"
 	@echo "    make run          Start backend locally (uvicorn --reload)"
+	@echo "                      NOTE: run 'make proxy' in another terminal first"
 	@echo ""
 	@echo "  Cloud SQL"
-	@echo "    make proxy        Start Auth Proxy on port $(PROXY_PORT) (run in a separate terminal)"
+	@echo "    make proxy        Start Auth Proxy on port $(PROXY_PORT) (separate terminal; required before 'make run')"
 	@echo "    make seed-prod    Reseed Cloud SQL via Auth Proxy (proxy must be running)"
 	@echo "    make psql-prod    Open psql shell to Cloud SQL (proxy must be running)"
 	@echo ""

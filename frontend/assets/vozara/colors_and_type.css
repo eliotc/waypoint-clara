@@ -1,0 +1,280 @@
+/* ============================================================
+   VoZara Design System — Colors & Type
+   ------------------------------------------------------------
+   Voice-first, multimodal AI agents for business. Built on
+   Google Cloud / Vertex AI. Trust-forward, clean, airy, modern.
+
+   SOURCE OF TRUTH: the live marketing site (uploads/index.html).
+   Every token below is derived from that file's real values —
+   nothing here is invented.
+
+   FONT SUBSTITUTION (flagged): the live site uses "Google Sans
+   Flex" / "Google Sans", which are Google-proprietary and not
+   distributable. This system substitutes **Plus Jakarta Sans**
+   (a warm geometric-humanist sans) as the nearest free match.
+   Swap the @import + --font-sans if the real font is licensed.
+
+   ICONS: Google "Material Symbols" (Rounded) via Google Fonts.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+:root {
+  /* ========================================================
+     1. PRIMITIVE COLOR SCALES
+     ======================================================== */
+
+  /* Ink — the near-black brand neutral. The site is built on a
+     warm-cool charcoal (rgb 18,19,23) over white. */
+  --ink-950: #121317;   /* primary text / dark surfaces  rgb(18,19,23) */
+  --ink-800: #212226;   /* borders base hue */
+  --ink-700: #2B2D33;
+  --ink-600: #45474D;   /* secondary text  rgb(69,71,77) */
+  --ink-500: #6A6A71;   /* tertiary text   rgb(106,106,113) */
+  --ink-400: #8A8B92;
+  --ink-300: #B0B1B8;
+  --ink-200: #D4D6DC;
+  --ink-100: #E8EAEE;
+  --ink-50:  #F4F5F7;
+  --white:   #FFFFFF;
+
+  /* Teal — the single brand accent (CTAs, links, focus, voice).
+     Anchored on the site's action color #0D9488. The logo mark
+     sits a touch greener; teal-500 is the canonical action hue. */
+  --teal-50:  #E6F4F2;
+  --teal-100: #C5E6E2;
+  --teal-200: #8FD0C9;
+  --teal-300: #4FB3A9;
+  --teal-400: #1A9D90;
+  --teal-500: #0D9488;   /* PRIMARY accent (accent-teal) */
+  --teal-600: #0B7C72;   /* hover (accent-teal-hover) */
+  --teal-700: #0F766E;
+  --teal-800: #0A5F58;
+
+  /* Cyan — "live" voice signal. Pairs with teal in the voice
+     gradient (avatar, waveforms, active mic states). */
+  --cyan-400: #22D3EE;
+  --cyan-500: #06B6D4;   /* voice-gradient end */
+  --cyan-600: #0891B2;
+
+  /* Periwinkle haze — the faint blue-gray the site tints
+     surfaces & icon chips with: rgba(183,191,217,*). */
+  --haze:      183, 191, 217;
+
+  /* Semantic hues (from the site: iOS-flavored) */
+  --green-500: #34C759;  --green-50: #E9FBEE;
+  --amber-500: #F59E0B;  --amber-50: #FEF6E7;
+  --red-500:   #EF4444;  --red-50:   #FEECEC;
+
+  /* ========================================================
+     2. SEMANTIC TOKENS — LIGHT SURFACE (default)
+     ======================================================== */
+
+  /* Backgrounds */
+  --bg:            var(--white);
+  --bg-2:          rgba(var(--haze), 0.10);   /* faint blue-gray section tint */
+  --bg-3:          rgba(var(--haze), 0.05);
+  --bg-icon:       rgba(var(--haze), 0.09);   /* icon chips */
+  --bg-dark:       var(--ink-950);            /* inverted sections */
+  --surface:       var(--white);              /* cards */
+
+  /* Foreground / text — legacy site names + clean aliases */
+  --color-primary:   var(--ink-950);   --fg:        var(--ink-950);
+  --color-secondary: var(--ink-600);   --fg-muted:  var(--ink-600);
+  --color-tertiary:  var(--ink-500);   --fg-subtle: var(--ink-500);
+  --fg-on-dark:      var(--white);
+  --fg-on-brand:     var(--white);
+
+  /* Brand / action */
+  --accent-teal:        var(--teal-500);
+  --accent-teal-hover:  var(--teal-600);
+  --accent-teal-light:  rgba(13, 148, 136, 0.06);
+  --primary:            var(--teal-500);
+  --primary-hover:      var(--teal-600);
+  --primary-fg:         var(--white);
+  --voice-gradient:     linear-gradient(135deg, var(--teal-500), var(--cyan-500));
+
+  /* Borders */
+  --border:        rgba(33, 34, 38, 0.06);   /* hairline (border-primary) */
+  --border-strong: rgba(33, 34, 38, 0.10);   /* border-secondary */
+  --border-dark:   rgba(230, 234, 240, 0.06);
+
+  /* Focus ring */
+  --ring:          rgba(13, 148, 136, 0.10);
+
+  /* Status */
+  --success: var(--green-500); --success-soft: var(--green-50);
+  --warning: var(--amber-500); --warning-soft: var(--amber-50);
+  --danger:  var(--red-500);   --danger-soft:  var(--red-50);
+
+  /* ========================================================
+     3. TYPOGRAPHY
+     ======================================================== */
+  --font-sans:    'Plus Jakarta Sans', 'Google Sans Flex', 'Google Sans',
+                  -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: var(--font-sans);   /* one type family, varied weight */
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-symbols: 'Material Symbols Rounded';
+
+  /* Type scale (px) — mirrors the live site's airy ramp.
+     Headings run LIGHT (450–500), never heavy. */
+  --text-9xl:  148px;
+  --text-8xl:  124px;
+  --text-7xl:  98px;
+  --text-6xl:  72px;
+  --text-5xl:  54px;
+  --text-4xl:  42px;
+  --text-3xl:  32px;
+  --text-2xl:  28px;
+  --text-xl:   24px;
+  --text-lg:   22px;
+  --text-md:   20px;
+  --text-base: 17.5px;
+  --text-sm:   14.5px;
+  --text-xs:   12.5px;
+
+  /* Weights — note the signature light 450 for display text */
+  --fw-regular:  400;
+  --fw-text:     450;   /* body-emphasis & headings (Google-Sans-Flex feel) */
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+  --fw-extra:    800;
+
+  /* Leading & tracking */
+  --lh-tight:   1.1;
+  --lh-snug:    1.25;
+  --lh-base:    1.45;
+  --lh-relaxed: 1.6;
+  --ls-display: -1.6px;   /* big hero */
+  --ls-head:    -0.02em;  /* section heads */
+  --ls-body:    0.18px;   /* the site's subtle positive body tracking */
+  --ls-over:    0.05em;   /* overline / labels */
+
+  /* ========================================================
+     4. RADII — generous, "Antigravity"-style rounding
+     ======================================================== */
+  --r-xs:   4px;
+  --r-sm:   8px;
+  --r-md:   24px;    /* small cards, inputs */
+  --r-lg:   32px;    /* cards, panels */
+  --r-xl:   48px;    /* large feature cards */
+  --r-2xl:  56px;    /* hero containers */
+  --r-full: 9999px;  /* pills, avatars */
+
+  /* ========================================================
+     5. SHADOWS / ELEVATION — soft, low-contrast
+     ======================================================== */
+  --shadow-sm:      0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md:      0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-lg:      0 16px 48px rgba(0, 0, 0, 0.08);
+  --shadow-premium: 0 24px 64px rgba(0, 0, 0, 0.10);
+  /* Brand-tinted glows for live / hover states */
+  --glow-teal:  0 8px 24px rgba(13, 148, 136, 0.30);
+  --glow-voice: 0 0 0 3px rgba(13, 148, 136, 0.25);
+
+  /* ========================================================
+     6. GLASSMORPHISM
+     ======================================================== */
+  --glass-bg:     rgba(255, 255, 255, 0.70);
+  --glass-border: rgba(255, 255, 255, 0.40);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --glass-blur:   blur(12px);
+
+  /* ========================================================
+     7. MOTION
+     ======================================================== */
+  --ease-out-quint:    cubic-bezier(.23, 1, .32, 1);   /* default */
+  --ease-out-expo:     cubic-bezier(.19, 1, .22, 1);
+  --ease-in-out-cubic: cubic-bezier(.455, .03, .515, .955);
+  --dur-fast:   0.2s;
+  --dur-base:   0.3s;
+  --dur-slow:   0.5s;
+
+  /* ========================================================
+     8. SPACING (4px base)
+     ======================================================== */
+  --space-xs:  4px;   --space-sm:  8px;   --space-md:  16px;
+  --space-lg:  24px;  --space-xl:  36px;  --space-2xl: 48px;
+  --space-3xl: 60px;  --space-4xl: 80px;  --space-5xl: 88px;
+  --space-6xl: 120px; --space-7xl: 180px;
+
+  /* Layout */
+  --container-max:     1744px;
+  --container:         1200px;
+  --container-narrow:  880px;
+  --container-padding: 72px;
+  --nav-height:        52px;
+}
+
+/* ============================================================
+   DARK SURFACE TOKENS
+   The site flips to ink-950 backgrounds for "stakes" sections
+   and the immersive voice experience.
+   ============================================================ */
+[data-theme="dark"], .vz-dark {
+  --bg:            var(--ink-950);
+  --bg-2:          rgba(255, 255, 255, 0.04);
+  --bg-3:          rgba(255, 255, 255, 0.02);
+  --bg-icon:       rgba(255, 255, 255, 0.06);
+  --surface:       #1A1B21;
+  --color-primary:   #F4F5F7;  --fg:        #F4F5F7;
+  --color-secondary: rgba(255,255,255,0.72); --fg-muted:  rgba(255,255,255,0.72);
+  --color-tertiary:  rgba(255,255,255,0.50); --fg-subtle: rgba(255,255,255,0.50);
+  --border:        rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --accent-teal-light: rgba(13, 148, 136, 0.16);
+}
+
+/* ============================================================
+   9. BASE TYPE STYLES (apply to bare elements)
+   ============================================================ */
+.vz-type, .vz-type * { font-family: var(--font-sans); }
+
+.vz-display {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 7vw, 80px);
+  line-height: 1.1;
+  letter-spacing: var(--ls-display);
+  font-weight: var(--fw-text);
+  color: var(--color-primary);
+}
+.vz-h1 { font-family: var(--font-display); font-size: var(--text-5xl); line-height: 1.15; letter-spacing: -0.95px; font-weight: var(--fw-text); color: var(--color-primary); }
+.vz-h2 { font-family: var(--font-display); font-size: var(--text-4xl); line-height: 1.1;  letter-spacing: var(--ls-head); font-weight: var(--fw-text); color: var(--color-primary); }
+.vz-h3 { font-family: var(--font-display); font-size: var(--text-3xl); line-height: 1.2;  letter-spacing: var(--ls-head); font-weight: var(--fw-medium); color: var(--color-primary); }
+.vz-h4 { font-family: var(--font-sans);    font-size: var(--text-xl); line-height: 1.3;  letter-spacing: -0.01em; font-weight: var(--fw-semibold); color: var(--color-primary); }
+
+.vz-lead { font-family: var(--font-sans); font-size: var(--text-md); line-height: var(--lh-relaxed); font-weight: var(--fw-regular); color: var(--color-secondary); }
+.vz-body { font-family: var(--font-sans); font-size: var(--text-base); line-height: var(--lh-base); letter-spacing: var(--ls-body); font-weight: var(--fw-regular); color: var(--color-secondary); }
+.vz-sm   { font-family: var(--font-sans); font-size: var(--text-sm); line-height: 1.5; font-weight: var(--fw-regular); color: var(--color-secondary); }
+.vz-xs   { font-family: var(--font-sans); font-size: var(--text-xs); line-height: 1.45; font-weight: var(--fw-medium); color: var(--color-tertiary); }
+
+/* Overline / section label — uppercase, tracked, teal */
+.vz-overline {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  line-height: 1.2;
+  letter-spacing: var(--ls-over);
+  text-transform: uppercase;
+  font-weight: var(--fw-semibold);
+  color: var(--accent-teal);
+}
+.vz-mono { font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1.5; color: var(--color-primary); }
+
+/* ============================================================
+   10. ICON HELPER
+   ============================================================ */
+.material-symbols-rounded, .vz-icon {
+  font-family: var(--font-symbols) !important;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  -webkit-font-smoothing: antialiased;
+}

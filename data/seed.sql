@@ -72,6 +72,21 @@ INSERT INTO courses (code, name, faculty, level, study_mode, duration_years, ata
  'A three-year studio-based degree integrating fine art, painting, sculpture, printmaking, drawing, and emerging digital art practices. Students develop a personal creative voice across multiple disciplines before choosing a specialisation in Year 2: Fine Art, Illustration, or Contemporary Craft. The program is structured around studio critiques, visiting artist lectures, and collaborative projects with cultural institutions including the National Gallery of Victoria and Melbourne''s Heide Museum of Modern Art. A dedicated gallery space on campus — the Kingsford Studio Gallery — hosts an annual graduate exhibition open to the public and attended by commercial galleries, collectors, and arts funding bodies. Students also complete a professional practice unit covering grant writing, artist statements, exhibition proposals, and self-employment in the arts.',
  'Graduates work as practising artists, illustrators, art educators, gallery assistants, community arts facilitators, and arts administrators. Many establish independent studio practices supported by Australia Council for the Arts grants and state arts funding. Median starting salary in arts-adjacent roles is $58,000, with experienced working artists earning $70,000–$90,000 through commissions, exhibitions, and residencies. Several Kingsford alumni have been selected for the Archibald Prize and the Venice Biennale Australia Pavilion. The degree also provides direct entry into the Master of Fine Arts (MFA) for students wishing to pursue research-led studio practice.');
 
+-- ── Online courses (added to address thin online catalogue) ──────────────────
+INSERT INTO courses (code, name, faculty, level, study_mode, duration_years, atar_cutoff, annual_fee_aud, description, career_outcomes) VALUES
+
+('PS102', 'Bachelor of Psychology (Online)', 'Arts & Humanities', 'Undergraduate', 'Online', 3.0, 65, 11500,
+ 'A fully online three-year psychology degree covering the same core theory as our on-campus program: developmental psychology, social psychology, cognitive neuroscience, research methods, and statistics. Delivered through weekly live webinars, asynchronous video lectures, and virtual case-study workshops — making it ideal for students in regional areas or those balancing work or family commitments. This degree does not include the supervised clinical placements of the on-campus program, and is designed as a pathway into human services, HR, community work, or further postgraduate study. Students who complete this degree with a strong GPA may apply for the on-campus Honours year to continue toward registration.',
+ 'Graduates work in human resources, community services, youth work, welfare coordination, market research, and mental health support roles. Median starting salary is $60,000–$68,000. Common employers include NGOs, local government, community health services, disability providers, and corporate HR teams. This degree provides a strong foundation for those who later wish to pursue postgraduate registration pathways.'),
+
+('DA401', 'Graduate Certificate in Data Analytics', 'Engineering & Technology', 'Postgraduate', 'Online', 0.5, NULL, 9000,
+ 'A six-month fully online program for graduates from any discipline who want to build practical data analysis skills. Units cover data wrangling with Python and SQL, statistical analysis and visualisation, business intelligence tools (Power BI, Tableau), and an introduction to machine learning for analysts. All assessments are project-based, using real-world datasets from business, health, and government contexts. The program is delivered asynchronously, with optional weekly live Q&A sessions. Completion grants credit toward the Master of Data Science for students who continue.',
+ 'Graduates move into data analyst, business analyst, and reporting analyst roles across all industries. Typical salary uplift for upskilling graduates is $10,000–$20,000. Employers include financial services firms, healthcare organisations, retail analytics teams, and government data units. The certificate is particularly valued by non-technical professionals in marketing, finance, and operations looking to transition into data-driven roles.'),
+
+('BA102', 'Bachelor of Business Administration (Online)', 'Business & Commerce', 'Undergraduate', 'Online', 3.0, 65, 12000,
+ 'A fully online three-year business degree covering management, marketing, finance, and entrepreneurship — the same core curriculum as our on-campus BBA (BA101) delivered flexibly for students who cannot attend campus full-time. Weekly live webinars replace in-person lectures, with all workshops, assessments, and group projects conducted through our online learning platform. Students choose a major in Year 2: Management, Digital Marketing, or Entrepreneurship. The online format includes a remote consulting project with a real business client in the final year. No campus attendance is required, making this accessible from anywhere in Australia.',
+ 'Graduates take on roles as business analysts, marketing coordinators, operations managers, and entrepreneurs — the same career pathways as the on-campus BBA. Median starting salary is $65,000. Employers include retail, finance, technology companies, and local government. Digital Marketing major graduates are in particular demand, with several securing roles at Melbourne-based digital agencies before completing their degree.');
+
 -- ── Events ────────────────────────────────────────────────────────────────────
 INSERT INTO events (title, event_type, start_at, end_at, location, description, max_capacity, spots_left) VALUES
 
@@ -143,7 +158,201 @@ INSERT INTO events (title, event_type, start_at, end_at, location, description, 
  '2026-08-05 10:00+10', '2026-08-05 12:00+10',
  'International Centre, Ground Floor',
  'Dedicated session for prospective international students covering visa pathways, English language requirements, on-campus housing, and student support services.',
- 150, 88);
+ 150, 88),
+
+('Mid-Year Admissions Webinar',
+ 'Webinar',
+ '2026-05-20 18:00+10', '2026-05-20 19:00+10',
+ 'Online (Zoom)',
+ 'Information session on mid-year applications, credit transfers, and key deadlines for domestic and international students.',
+ 500, 142),
+
+('May Campus Tour',
+ 'CampusTour',
+ '2026-05-23 11:00+10', '2026-05-23 12:30+10',
+ 'Main Campus Welcome Centre',
+ 'Guided tour of the Main Campus, including library, student common areas, and sports facilities.',
+ 30, 4),
+
+('Nursing Simulation Lab Tour',
+ 'CampusTour',
+ '2026-05-28 14:00+10', '2026-05-28 15:30+10',
+ 'Health Sciences Building, Room H102',
+ 'Take a guided walk through our modern nursing simulation labs, ICU setups, and clinical skills rooms.',
+ 15, 0),
+
+('Careers & Industry Networking Night',
+ 'InfoSession',
+ '2026-05-31 17:00+10', '2026-05-31 19:00+10',
+ 'Business School Atrium',
+ 'Meet our industry partners, hear from alumni, and learn about career placement opportunities.',
+ 100, 37),
+
+-- ── June 2026 ─────────────────────────────────────────────────────────────────
+('June Campus Tour',
+ 'CampusTour',
+ '2026-06-06 10:00+10', '2026-06-06 11:30+10',
+ 'Main Campus Welcome Centre',
+ 'Guided tour of the main campus: library, student hub, sports facilities, and key academic buildings. No registration required.',
+ 30, 22),
+
+('Online Programs Information Evening',
+ 'Webinar',
+ '2026-06-11 18:00+10', '2026-06-11 19:00+10',
+ 'Online (Zoom)',
+ 'Explore our fully online degrees: Bachelor of Psychology Online, BBA Online, Graduate Certificate in Cloud Computing, and Graduate Certificate in Data Analytics. Ideal for students in regional areas or those balancing work and study. Q&A with program coordinators.',
+ 500, 312),
+
+('Health Sciences Info Session',
+ 'InfoSession',
+ '2026-06-17 17:30+10', '2026-06-17 19:00+10',
+ 'Health Sciences Building, Room H201',
+ 'Overview of Nursing, Public Health, and Occupational Therapy programs. Hear from clinical placement coordinators and recent graduates about career outcomes in Melbourne''s health sector.',
+ 80, 41),
+
+('June Campus Tour',
+ 'CampusTour',
+ '2026-06-20 10:00+10', '2026-06-20 11:30+10',
+ 'Main Campus Welcome Centre',
+ 'Guided tour of the main campus: library, student hub, sports facilities, and key academic buildings. No registration required.',
+ 30, 18),
+
+('Mid-Year Enrolment Webinar',
+ 'Webinar',
+ '2026-06-25 12:00+10', '2026-06-25 13:00+10',
+ 'Online (Zoom)',
+ 'Everything you need to know about mid-year entry for Semester 2, 2026 — available programs, credit transfer applications, VTAC timelines, and how to submit a direct application for postgraduate courses.',
+ 500, 267),
+
+-- ── September 2026 ────────────────────────────────────────────────────────────
+('September Campus Tour',
+ 'CampusTour',
+ '2026-09-05 10:00+10', '2026-09-05 11:30+10',
+ 'Main Campus Welcome Centre',
+ 'Guided campus tour covering all key buildings, student facilities, and accommodation options. No registration required.',
+ 30, 24),
+
+('VTAC Application Workshop',
+ 'Webinar',
+ '2026-09-09 17:30+10', '2026-09-09 18:30+10',
+ 'Online (Zoom)',
+ 'Step-by-step walkthrough of the VTAC application process for 2027 entry. Covers course selection, preference order, special entry access schemes, and the timely application deadline of 30 September.',
+ 1000, 589),
+
+('Scholarship Application Info Night',
+ 'InfoSession',
+ '2026-09-16 18:00+10', '2026-09-16 19:30+10',
+ 'Business School Atrium',
+ 'Meet the Financial Aid team and learn how to submit a strong scholarship application before the October deadlines. Covers merit, equity, faculty, and international scholarships.',
+ 120, 73),
+
+('International Student Info Session',
+ 'InfoSession',
+ '2026-09-23 10:00+10', '2026-09-23 12:00+10',
+ 'International Centre, Ground Floor',
+ 'For prospective international students considering 2027 entry. Covers visa requirements, English language pathways, tuition fees, scholarships, and on-campus housing. Presented in English with Mandarin and Hindi support available.',
+ 150, 102),
+
+('September Campus Tour',
+ 'CampusTour',
+ '2026-09-19 10:00+10', '2026-09-19 11:30+10',
+ 'Main Campus Welcome Centre',
+ 'Guided campus tour covering all key buildings, student facilities, and accommodation options. No registration required.',
+ 30, 19),
+
+-- ── October 2026 ──────────────────────────────────────────────────────────────
+('October Campus Tour',
+ 'CampusTour',
+ '2026-10-03 10:00+11', '2026-10-03 11:30+11',
+ 'Main Campus Welcome Centre',
+ 'Guided campus tour covering all key buildings, student facilities, and accommodation options. No registration required.',
+ 30, 21),
+
+('Cybersecurity & Tech Careers Night',
+ 'InfoSession',
+ '2026-10-07 18:00+11', '2026-10-07 19:30+11',
+ 'Engineering Precinct, Cyber Range (Room E105)',
+ 'Live demonstrations in the Kingsford Cyber Range, panel with industry employers from KPMG and Telstra Security, and an overview of CS, Software Engineering, and Cybersecurity programs and graduate outcomes.',
+ 80, 38),
+
+('Psychology & Allied Health Info Evening',
+ 'InfoSession',
+ '2026-10-14 17:30+11', '2026-10-14 19:00+11',
+ 'Health Sciences Building, Room H201',
+ 'Deep dive into Psychology (on-campus and online), Public Health, and Occupational Therapy. Includes a Q&A with postgraduate students and a tour of the simulation labs.',
+ 80, 45),
+
+('October Campus Tour',
+ 'CampusTour',
+ '2026-10-17 10:00+11', '2026-10-17 11:30+11',
+ 'Main Campus Welcome Centre',
+ 'Guided campus tour covering all key buildings, student facilities, and accommodation options. No registration required.',
+ 30, 17),
+
+('Late VTAC Applications Closing — Info Webinar',
+ 'Webinar',
+ '2026-10-28 12:00+11', '2026-10-28 13:00+11',
+ 'Online (Zoom)',
+ 'Final information session before the VTAC late application deadline of 4 November. Covers last-chance preference changes, direct postgraduate applications, and what to expect at Round 1 offers in January 2027.',
+ 1000, 441),
+
+-- ── November 2026 ─────────────────────────────────────────────────────────────
+('November Campus Tour',
+ 'CampusTour',
+ '2026-11-07 10:00+11', '2026-11-07 11:30+11',
+ 'Main Campus Welcome Centre',
+ 'Guided campus tour covering all key buildings, student facilities, and accommodation options. No registration required.',
+ 30, 25),
+
+('Year-End Info Evening — What Happens Next',
+ 'InfoSession',
+ '2026-11-11 18:00+11', '2026-11-11 19:30+11',
+ 'Online (Zoom)',
+ 'For Year 12 students finishing exams: what to expect after the ATAR release, how to read your offer letter, enrolment steps, orientation, and how to prepare for university life at Kingsford.',
+ 500, 284),
+
+('November Campus Tour',
+ 'CampusTour',
+ '2026-11-21 10:00+11', '2026-11-21 11:30+11',
+ 'Main Campus Welcome Centre',
+ 'Guided campus tour covering all key buildings, student facilities, and accommodation options. No registration required.',
+ 30, 20),
+
+('Creative Arts Graduate Showcase',
+ 'InfoSession',
+ '2026-11-25 14:00+11', '2026-11-25 17:00+11',
+ 'Kingsford Studio Gallery, Arts Building',
+ 'The annual public exhibition of graduating Creative Arts and Digital Media student work. Open to all — a great opportunity for prospective students to see the standard of work and meet current students and staff.',
+ 300, 156),
+
+-- ── December 2026 ─────────────────────────────────────────────────────────────
+('Pre-Offer Information Session',
+ 'InfoSession',
+ '2026-12-03 17:30+11', '2026-12-03 19:00+11',
+ 'Online (Zoom)',
+ 'Preparing for Round 1 VTAC offers in January. Covers what to do when you receive an offer, how to accept, enrolment steps, HECS-HELP setup, and Orientation Week dates.',
+ 500, 301),
+
+('December Campus Tour',
+ 'CampusTour',
+ '2026-12-05 10:00+11', '2026-12-05 11:30+11',
+ 'Main Campus Welcome Centre',
+ 'Final campus tour of 2026. Guided walk of the main campus for students and families considering 2027 entry.',
+ 30, 23),
+
+('International Pre-Departure Orientation',
+ 'InfoSession',
+ '2026-12-09 10:00+11', '2026-12-09 12:00+11',
+ 'International Centre, Ground Floor',
+ 'For international students who have accepted a 2027 Semester 1 offer. Covers what to bring, arrival procedures, temporary housing, bank account setup, SIM cards, and connecting with the Kingsford Peer Mentor program before you land.',
+ 150, 89),
+
+('Summer School Info Webinar',
+ 'Webinar',
+ '2026-12-16 12:00+11', '2026-12-16 13:00+11',
+ 'Online (Zoom)',
+ 'Overview of Kingsford Summer School 2027 (January–February). Accelerate your degree, make up units, or get a head start on first-year subjects. Open to incoming and continuing students.',
+ 500, 312);
 
 -- ── Scholarships ───────────────────────────────────────────────────────────────
 INSERT INTO scholarships (name, type, faculty, annual_value_aud, duration_years, eligibility, description, application_deadline) VALUES
@@ -194,4 +403,24 @@ INSERT INTO scholarships (name, type, faculty, annual_value_aud, duration_years,
  'Merit', 'Engineering & Technology', 5000, 3,
  'Female or non-binary student enrolling in CS, Software Engineering, Data Science, or Cybersecurity; ATAR 80+.',
  'Encouraging diversity in technology. Provides $5,000 per year plus a mentoring relationship with a senior woman in tech from our industry network. Open to domestic and international students.',
- '2026-10-31');
+ '2026-10-31'),
+
+('International Student Emergency Welfare Grant',
+ 'International', NULL, 1000, 1,
+ 'International student (student visa) experiencing sudden, unforeseen financial hardship (e.g. medical emergency, natural disaster in home country, or sudden loss of financial support). Not available for tuition fee payments.',
+ 'A one-off crisis grant of up to $1,000 for international students facing sudden financial emergencies. Applications are assessed confidentially by the Student Welfare team at the International Centre. An interest-free loan of up to $1,500 for study-related costs (textbooks, equipment, essential living costs) is also available and must be repaid within the same semester. Apply in person or by email to the International Centre: international@kingsford.edu.au.',
+ NULL);
+
+-- Backfill postgraduate entry requirements
+UPDATE courses SET entry_requirements = 'Bachelor degree in quantitative field with credit average (GPA 5.0/7.0) or above' WHERE code = 'DS301';
+UPDATE courses SET entry_requirements = 'Bachelor degree in IT/quantitative field, or 2+ years of professional IT experience' WHERE code = 'IT501';
+UPDATE courses SET entry_requirements = 'Bachelor degree in any discipline + minimum 3 years of professional work experience' WHERE code = 'MB301';
+UPDATE courses SET entry_requirements = 'Approved 4-year teaching qualification, or degree + teaching postgrad, plus current teacher registration' WHERE code = 'EN301';
+UPDATE courses SET entry_requirements = 'Relevant bachelor degree (completed within 10 years, GPA 5.0+), personal statement, and interview' WHERE code = 'OT301';
+
+-- Backfill event registration URLs
+UPDATE events SET registration_url = 'https://events.kingsford.edu.au/register/open-day-2026' WHERE title = 'Kingsford Open Day 2026';
+UPDATE events SET registration_url = 'https://events.kingsford.edu.au/register/eng-tech-info' WHERE title = 'Engineering & Tech Info Session';
+UPDATE events SET registration_url = 'https://events.kingsford.edu.au/register/postgrad-info' WHERE title = 'Postgrad Open Evening';
+UPDATE events SET registration_url = 'https://events.kingsford.edu.au/register/health-tour' WHERE title = 'Health Sciences Campus Tour';
+UPDATE events SET registration_url = 'https://events.kingsford.edu.au/register/business-info' WHERE title = 'Business & Commerce Info Night';

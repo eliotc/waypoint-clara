@@ -9,6 +9,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Google Analytics (production only — skipped on localhost) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-V65KVWNQTZ';
+      document.head.appendChild(s);
+      gtag('js', new Date());
+      gtag('config', 'G-V65KVWNQTZ');
+    }
+  </script>
   <style>
     *,
     *::before,
@@ -50,6 +63,7 @@
       display: flex;
       flex-direction: row;
       height: 100vh;
+      height: 100dvh;   /* dvh tracks the visible viewport so the input bar isn't hidden behind mobile browser chrome */
       overflow: hidden;
       background: rgba(240, 244, 248, 0.6);
       /* Frosty overlay */
@@ -145,6 +159,14 @@
         flex: 1;
         min-height: 160px;
       }
+
+      /* Tighten the header so the status row doesn't overflow on phones */
+      .via-header { padding: 16px 14px 12px; gap: 10px; }
+      .via-status { gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+      #statusLabel { display: none; }            /* the dot already conveys state */
+      .via-hood-toggle #hoodToggleLabel { display: none; }  /* icon-only on mobile */
+      .via-hood-toggle { padding: 5px 7px; }
+      .via-disconnect { padding: 5px 9px; font-size: 12px; }
     }
 
     /* Header */
@@ -744,8 +766,43 @@
       color: #7c3aed;
     }
 
+    .card-type-bar.comparison {
+      background: rgba(59, 130, 246, 0.05);
+      color: #3b82f6;
+    }
+
     .card-body {
       padding: 16px;
+    }
+
+    .card-cta {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: var(--accent-teal);
+      color: white !important;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      text-align: center;
+      transition: background 0.2s ease;
+    }
+
+    .card-cta:hover {
+      background: var(--accent-teal-hover);
+      text-decoration: none;
+    }
+
+    .card-cta-disabled {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: var(--border-color);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
     }
 
     .card-title {
@@ -948,6 +1005,8 @@
       line-height: 1.6;
       margin-top: 8px;
       word-break: break-word;
+      max-height: 480px;
+      overflow-y: auto;
     }
 
     .card-info-md h1,
@@ -1147,6 +1206,266 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
+    /* ── Under-the-hood toggle ──────────────────────────────────────────────── */
+    .via-hood-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 8px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-tertiary);
+      background: transparent;
+      border: 1px solid var(--border-secondary);
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .via-hood-toggle:hover {
+      border-color: var(--accent-teal);
+      color: var(--accent-teal);
+    }
+
+    .via-hood-toggle.on {
+      background: rgba(13, 148, 136, 0.1);
+      border-color: var(--accent-teal);
+      color: var(--accent-teal);
+    }
+
+    .via-hood-toggle svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+    }
+
+    /* ── Under-the-hood toggle toast ────────────────────────────────────────── */
+    .hood-toast {
+      position: absolute;
+      bottom: 88px;
+      left: 50%;
+      transform: translate(-50%, 10px);
+      z-index: 40;
+      max-width: 86%;
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 11px 15px;
+      border-radius: 14px;
+      background: rgba(18, 19, 23, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #f4f5f7;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+      font-size: 12.5px;
+      line-height: 1.45;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s var(--ease-out-quint);
+    }
+
+    .hood-toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .hood-toast svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: var(--accent-teal);
+    }
+
+    .hood-toast b { font-weight: 600; color: #fff; }
+
+    /* ── Tool-call trace blocks (inline in transcript) ──────────────────────── */
+    .via-trace {
+      margin: 6px 0;
+      border: 1px solid var(--border-secondary);
+      border-radius: 10px;
+      background: #0f1115;
+      overflow: hidden;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 12px;
+      animation: viaTraceIn 0.25s ease;
+      flex-shrink: 0;  /* never let the flex column crush the trace to a line */
+    }
+
+    /* Hidden unless the hood toggle is on (set on .via-panel) */
+    .via-panel:not(.hood-on) .via-trace { display: none; }
+
+    @keyframes viaTraceIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .via-trace-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      cursor: pointer;
+      user-select: none;
+      color: #e6edf3;
+    }
+
+    .via-trace-head:hover { background: rgba(255, 255, 255, 0.03); }
+
+    .via-trace-bolt {
+      color: var(--accent-teal);
+      flex-shrink: 0;
+      display: flex;
+    }
+
+    .via-trace-name {
+      font-weight: 600;
+      color: #9ecbff;
+    }
+
+    .via-trace-name::after {
+      content: "()";
+      color: #6e7681;
+      font-weight: 400;
+    }
+
+    .via-trace-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      color: #8b949e;
+    }
+
+    .via-trace-latency {
+      color: #6e7681;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .via-trace-spinner {
+      width: 11px;
+      height: 11px;
+      border: 2px solid rgba(158, 203, 255, 0.25);
+      border-top-color: #9ecbff;
+      border-radius: 50%;
+      animation: viaTraceSpin 0.7s linear infinite;
+    }
+
+    @keyframes viaTraceSpin { to { transform: rotate(360deg); } }
+
+    .via-trace-check { color: #3fb950; display: flex; }
+
+    .via-trace-caret {
+      color: #6e7681;
+      transition: transform 0.18s ease;
+      display: flex;
+    }
+
+    .via-trace.collapsed .via-trace-caret { transform: rotate(-90deg); }
+    .via-trace.collapsed .via-trace-body { display: none; }
+
+    .via-trace-body {
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 9px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .via-trace-io-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6e7681;
+      margin-bottom: 3px;
+    }
+
+    .via-trace-io-label.out { color: var(--accent-teal); }
+
+    .via-trace-pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #c9d1d9;
+      line-height: 1.5;
+    }
+
+    .via-trace-pre .k { color: #79c0ff; }
+    .via-trace-pre .s { color: #a5d6ff; }
+    .via-trace-pre .n { color: #d2a8ff; }
+    .via-trace-pre .b { color: #ffa657; }
+
+    /* ── First-run guided tour (coachmarks) ─────────────────────────────────── */
+    #tourRoot { position: fixed; inset: 0; z-index: 9990; display: none; }
+    #tourRoot.active { display: block; }
+
+    /* Spotlight: a positioned box whose huge box-shadow dims everything else. */
+    .tour-spotlight {
+      position: fixed;
+      border-radius: 14px;
+      box-shadow: 0 0 0 9999px rgba(18, 19, 23, 0.62);
+      pointer-events: none;
+      transition: top 0.35s var(--ease-out-quint), left 0.35s var(--ease-out-quint),
+                  width 0.35s var(--ease-out-quint), height 0.35s var(--ease-out-quint);
+      outline: 2px solid rgba(13, 148, 136, 0.9);
+      outline-offset: 2px;
+    }
+
+    .tour-tooltip {
+      position: fixed;
+      width: min(320px, 88vw);
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+      padding: 18px 18px 14px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s var(--ease-out-quint);
+    }
+    .tour-tooltip.show { opacity: 1; transform: translateY(0); }
+
+    .tour-eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--accent-teal); margin-bottom: 8px;
+    }
+    .tour-title { font-size: 16px; font-weight: 600; color: var(--color-primary); margin-bottom: 6px; }
+    .tour-body { font-size: 13.5px; line-height: 1.5; color: var(--color-secondary); }
+
+    .tour-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 16px; gap: 10px;
+    }
+    .tour-dots { display: flex; gap: 6px; }
+    .tour-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-secondary); transition: background 0.2s, width 0.2s; }
+    .tour-dot.on { background: var(--accent-teal); width: 16px; border-radius: 3px; }
+    .tour-actions { display: flex; align-items: center; gap: 8px; }
+    .tour-skip {
+      background: none; border: none; cursor: pointer; font-family: inherit;
+      font-size: 12.5px; color: var(--color-tertiary); padding: 6px 4px;
+    }
+    .tour-skip:hover { color: var(--color-secondary); }
+    .tour-next {
+      background: var(--accent-teal); color: #fff; border: none; cursor: pointer;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      padding: 8px 16px; border-radius: 9999px; transition: background 0.2s;
+    }
+    .tour-next:hover { background: var(--accent-teal-hover); }
+
+    /* Header "?" replay button */
+    .via-help-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 1px solid var(--border-secondary); background: transparent;
+      color: var(--color-tertiary); cursor: pointer; font-family: inherit;
+      font-size: 12px; font-weight: 700; line-height: 1; padding: 0;
+      transition: all 0.18s ease;
+    }
+    .via-help-btn:hover { border-color: var(--accent-teal); color: var(--accent-teal); }
   </style>
 </head>
 
@@ -1169,12 +1488,21 @@
         <div class="via-status">
           <div class="via-status-dot" id="statusDot"></div>
           <span id="statusLabel">Connecting…</span>
+          <button class="via-help-btn" id="tourBtn" type="button" title="Show me around">?</button>
+          <button class="via-hood-toggle" id="hoodToggle" type="button"
+            title="Show the tool calls Clara makes under the hood">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span id="hoodToggleLabel">Under the hood</span>
+          </button>
           <button class="via-disconnect" id="disconnectBtn" style="display:none"
             title="End session and close connection">End Session</button>
           <button class="via-disconnect" id="newSessionBtn" style="display:none"
             title="Start a fresh conversation">New Session</button>
         </div>
       </div>
+
+      <!-- Under-the-hood toggle toast (transient explainer) -->
+      <div id="hoodToast" class="hood-toast" role="status" aria-live="polite"></div>
 
       <!-- Floating Screen Share Indicator -->
       <div id="screen-share-status" class="screen-share-status" style="display:none">
@@ -1236,7 +1564,7 @@
         </button>
       </div>
 
-      <div class="via-powered"><strong>Waypoint</strong> · Powered by Google ADK</div>
+      <div class="via-powered"><strong>Waypoint</strong> · Powered by Google ADK · <a href="/byo" style="color:var(--accent-teal);text-decoration:none;font-weight:600;">For Universities →</a></div>
     </div>
 
     <!-- Resize handle -->
@@ -1267,8 +1595,19 @@
   </div>
 
   <script>
+    // ── Analytics ─────────────────────────────────────────────────────────────────
+    function ga(name, params) {
+      if (typeof gtag === 'function') gtag('event', name, params);
+    }
+
     // ── Config ────────────────────────────────────────────────────────────────────
-    const getWsUrl = () => `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${crypto.randomUUID()}`;
+    // A /demo/<id> path selects a Build-Your-Own counsellor instance; forward the
+    // id to the backend as a ?demo=<id> query param on the WebSocket.
+    const DEMO_ID = (location.pathname.match(/^\/demo\/([A-Za-z0-9_-]+)/) || [])[1] || null;
+    const getWsUrl = () => {
+      const base = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws/${crypto.randomUUID()}`;
+      return DEMO_ID ? `${base}?demo=${encodeURIComponent(DEMO_ID)}` : base;
+    };
     let WS_URL = getWsUrl();
     const INPUT_RATE = 16000;
     const OUTPUT_RATE = 24000;
@@ -1309,6 +1648,65 @@
     const voiceBar = document.getElementById("viaVoiceBar");
     const wave = document.getElementById("viaWave");
     const voiceLabel = document.getElementById("viaVoiceLabel");
+
+    // ── Under-the-hood toggle ───────────────────────────────────────────────────
+    const hoodToggle = document.getElementById("hoodToggle");
+    const hoodPanel = document.querySelector(".via-panel");
+    function applyHood(on) {
+      hoodPanel.classList.toggle("hood-on", on);
+      hoodToggle.classList.toggle("on", on);
+      hoodToggle.setAttribute("aria-pressed", String(on));
+    }
+    applyHood(localStorage.getItem("waypointHood") === "1");
+
+    const hoodToast = document.getElementById("hoodToast");
+    let hoodToastTimer = null;
+    const _boltSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>`;
+    function showHoodToast(on) {
+      const agentName = document.querySelector(".via-name")?.textContent?.trim() || "the agent";
+      hoodToast.innerHTML = on
+        ? `${_boltSvg}<span><b>Under the hood is on.</b> You'll now see each tool ${esc(agentName)} calls — its inputs and the data it gets back — inline as you chat.</span>`
+        : `${_boltSvg}<span><b>Under the hood is off.</b> Tool calls are hidden. Toggle it anytime to peek at what the agent is doing.</span>`;
+      hoodToast.classList.add("show");
+      clearTimeout(hoodToastTimer);
+      hoodToastTimer = setTimeout(() => hoodToast.classList.remove("show"), 5000);
+    }
+
+    hoodToggle.addEventListener("click", () => {
+      const on = !hoodPanel.classList.contains("hood-on");
+      localStorage.setItem("waypointHood", on ? "1" : "0");
+      applyHood(on);
+      showHoodToast(on);
+      ga('hood_toggled', { enabled: on });
+    });
+
+    // ── BYO instance branding ───────────────────────────────────────────────────
+    // On a /demo/<id> page, relabel the header to the configured counsellor.
+    if (DEMO_ID) {
+      fetch(`/api/byo/${encodeURIComponent(DEMO_ID)}`)
+        .then(r => r.json())
+        .then(cfg => {
+          if (!cfg || !cfg.ok) return;
+          if (cfg.agentName) {
+            document.querySelector(".via-name").textContent = cfg.agentName;
+            document.title = `${cfg.agentName} · ${cfg.instName || "Waypoint"}`;
+            // Replace Clara's photo with a lettered avatar for this instance.
+            const img = avatar.querySelector("img");
+            if (img) img.remove();
+            if (!avatar.querySelector(".via-avatar-letter")) {
+              const letter = document.createElement("span");
+              letter.className = "via-avatar-letter";
+              letter.style.cssText = "display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:var(--accent-teal);color:#fff;";
+              letter.textContent = (cfg.agentName.trim()[0] || "A").toUpperCase();
+              avatar.appendChild(letter);
+            }
+          }
+          if (cfg.instName) {
+            document.getElementById("viaSubtitle").textContent = `${cfg.instName} · Powered by Waypoint`;
+          }
+        })
+        .catch(() => {});
+    }
 
     // ── WebSocket ─────────────────────────────────────────────────────────────────
     function connect() {
@@ -1381,11 +1779,89 @@
         case "card":
           renderCard(msg);
           break;
+        case "tool_call":
+          renderToolCall(msg);
+          break;
+        case "tool_result":
+          renderToolResult(msg);
+          break;
         case "error":
           const errorIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
           appendMsg("ai", `${errorIcon} ${msg.message}`, true);
           break;
       }
+    }
+
+    // ── Tool-call traces ("under the hood") ─────────────────────────────────────
+    const traceEls = {};  // id → trace element
+
+    // Minimal JSON syntax highlighter for the trace output.
+    function highlightJson(obj) {
+      const json = JSON.stringify(obj, null, 2);
+      return esc(json).replace(
+        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g,
+        (m) => {
+          let cls = "n";
+          if (/^"/.test(m)) cls = /:$/.test(m) ? "k" : "s";
+          else if (/true|false|null/.test(m)) cls = "b";
+          return `<span class="${cls}">${m}</span>`;
+        }
+      );
+    }
+
+    function renderToolCall(msg) {
+      if (msg.id && traceEls[msg.id]) return;  // already rendered this call
+      removeEmptyMsg();
+      // NOTE: do not flushUser() here. The user's voice transcript can finalize
+      // *after* the tool_call arrives; flushing nulls userMsgEl, so that trailing
+      // transcript would spawn a second (duplicate) user bubble below the trace.
+      // Leaving the bubble open lets the trailing delta update it in place (above
+      // the trace), and turn_complete flushes it normally.
+      const el = document.createElement("div");
+      el.className = "via-trace";
+      el.dataset.start = String(performance.now());
+      el.innerHTML = `
+        <div class="via-trace-head">
+          <span class="via-trace-bolt"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></span>
+          <span class="via-trace-name">${esc(msg.name)}</span>
+          <span class="via-trace-status">
+            <span class="via-trace-spinner"></span>
+            <span class="via-trace-caret"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+          </span>
+        </div>
+        <div class="via-trace-body">
+          <div>
+            <div class="via-trace-io-label">Input</div>
+            <pre class="via-trace-pre">${highlightJson(msg.args || {})}</pre>
+          </div>
+        </div>`;
+      el.querySelector(".via-trace-head").addEventListener("click", () => {
+        el.classList.toggle("collapsed");
+      });
+      messages.appendChild(el);
+      if (msg.id) traceEls[msg.id] = el;
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function renderToolResult(msg) {
+      const el = (msg.id && traceEls[msg.id]) || null;
+      if (!el) return;  // no matching call (shouldn't happen) — skip silently
+      const start = parseFloat(el.dataset.start || "0");
+      const secs = start ? ((performance.now() - start) / 1000).toFixed(2) : null;
+
+      const status = el.querySelector(".via-trace-status");
+      status.querySelector(".via-trace-spinner")?.remove();
+      const latency = secs ? `<span class="via-trace-latency">${secs}s</span>` : "";
+      status.insertAdjacentHTML("afterbegin",
+        `${latency}<span class="via-trace-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>`);
+
+      const body = el.querySelector(".via-trace-body");
+      const out = document.createElement("div");
+      out.innerHTML = `<div class="via-trace-io-label out">Output → model</div>
+        <pre class="via-trace-pre">${highlightJson(msg.response)}</pre>`;
+      body.appendChild(out);
+      if (msg.id) delete traceEls[msg.id];
+      messages.scrollTop = messages.scrollHeight;
     }
 
     // ── Messages ──────────────────────────────────────────────────────────────────
@@ -1573,11 +2049,19 @@
         count = 1;
         group.appendChild(makeBookingCard(data));
         label = "Booking";
+      } else if (card_type === "event_registration") {
+        count = 1;
+        group.appendChild(makeEventRegistrationCard(data));
+        label = "Registration";
       } else if (card_type === "scholarships") {
         const items = data.scholarships || [];
         count = items.length;
         items.forEach(s => group.appendChild(makeScholarshipCard(s)));
         label = "Scholarships";
+      } else if (card_type === "comparison") {
+        count = 1;
+        group.appendChild(makeComparisonCard(data));
+        label = "Comparison";
       } else if (card_type === "info") {
         const chunks = data.chunks || [];
         count = chunks.length || 1;
@@ -1615,6 +2099,8 @@
         Booking: `<svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
         Info: `<svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
         Scholarships: `<svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+        Comparison: `<svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M12 5v14"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>`,
+        Registration: `<svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
       };
       const time = new Date().toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit" });
       const pill = document.createElement("button");
@@ -1663,6 +2149,7 @@
         <div class="card-detail-item"><span class="card-detail-label">Entry</span><span class="card-detail-val">${atar}</span></div>
         <div class="card-detail-item"><span class="card-detail-label">Code</span><span class="card-detail-val">${esc(c.code || "")}</span></div>
       </div>
+      ${c.entry_requirements ? `<div class="card-section-label">Entry Requirements</div><div class="card-detail">${esc(c.entry_requirements)}</div>` : ""}
       ${c.description ? `<div class="card-section-label">About</div><div class="card-detail">${esc(c.description)}</div>` : ""}
       ${c.career_outcomes ? `<div class="card-section-label">Career Outcomes</div><div class="card-detail">${esc(c.career_outcomes)}</div>` : ""}
     </div>`;
@@ -1683,6 +2170,7 @@
         <span class="tag">${esc(c.level)}</span>
         <span class="tag">${esc(c.study_mode)}</span>${match}
       </div>
+      ${c.entry_requirements ? `<div class="card-detail"><strong>Entry:</strong> ${esc(c.entry_requirements)}</div>` : ""}
       <div class="card-detail">${esc(c.career_outcomes || "")}</div>
       <div class="card-fee">$${(c.annual_fee_aud || 0).toLocaleString()}/yr · ${atar} · ${c.duration_years} yrs</div>
     </div>`;
@@ -1701,8 +2189,22 @@
       <div class="card-detail">${dt}</div>
       <div class="card-detail"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${esc(e.location || "")}</div>
       ${e.spots_left != null ? `<div class="card-spots ${spotsClass}">${e.spots_left} spots left</div>` : ""}
+      ${e.spots_left === 0
+        ? `<span class="card-cta-disabled">Fully Booked</span>`
+        : `<button class="card-cta register-event-btn" data-title="${esc(e.title)}">Register with Clara</button>`}
     </div>`;
+      card.querySelector(".register-event-btn")?.addEventListener("click", () => {
+        registerForEvent(e.title);
+      });
       return card;
+    }
+
+    function registerForEvent(eventTitle) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) return;
+      const msg = `I'd like to register for ${eventTitle}`;
+      appendMsg("user", msg);
+      ws.send(JSON.stringify({ type: "text", content: msg }));
+      ga('event_registration_clicked', { event_title: eventTitle });
     }
 
     function makeBookingCard(d) {
@@ -1718,14 +2220,29 @@
       return card;
     }
 
+    function makeEventRegistrationCard(d) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+    <div class="card-type-bar booking">Event Registration</div>
+    <div class="card-body">
+      <div class="booking-ref">${esc(d.confirmation_ref || "")}</div>
+      <div class="card-title" style="margin-top:8px;">${esc(d.event_title || "")}</div>
+      <div class="card-detail-grid" style="margin-top:10px;">
+        <div class="card-detail-item"><span class="card-detail-label">Name</span><span class="card-detail-val">${esc(d.student_name || "")}</span></div>
+        <div class="card-detail-item"><span class="card-detail-label">Email</span><span class="card-detail-val">${esc(d.email || "")}</span></div>
+        ${d.event_date ? `<div class="card-detail-item"><span class="card-detail-label">Date</span><span class="card-detail-val">${esc(d.event_date)}</span></div>` : ""}
+        ${d.location ? `<div class="card-detail-item"><span class="card-detail-label">Location</span><span class="card-detail-val">${esc(d.location)}</span></div>` : ""}
+      </div>
+    </div>`;
+      return card;
+    }
+
     function makeInfoCard(chunk) {
       const card = document.createElement("div");
       card.className = "card";
       // Strip the leading ## heading line from content (it's already in the title)
       const rawContent = (chunk.content || "").replace(/^##[^\n]*\n/, "").trim();
-      // Truncate long content for the card — user can see the full answer via Clara's voice
-      const MAX = 400;
-      const preview = rawContent.length > MAX ? rawContent.slice(0, MAX).trimEnd() + "…" : rawContent;
       const topicLabel = (chunk.topic || "").replace(/-/g, " ");
       card.innerHTML = `
     <div class="card-type-bar info">
@@ -1735,7 +2252,7 @@
     <div class="card-body">
       ${topicLabel ? `<div class="card-topic-tag">${esc(topicLabel)}</div>` : ""}
       <div class="card-title">${esc(chunk.title || "Information")}</div>
-      <div class="card-info-content card-info-md">${marked.parse(preview)}</div>
+      <div class="card-info-content card-info-md">${marked.parse(rawContent)}</div>
     </div>`;
       return card;
     }
@@ -1764,6 +2281,116 @@
       <div class="card-detail">${esc(s.eligibility || "")}</div>
       ${deadline}
     </div>`;
+      return card;
+    }
+
+    function makeComparisonCard(data) {
+      const card = document.createElement("div");
+      card.className = "card card-comparison-view";
+      const courses = data.courses || [];
+      if (courses.length < 2) {
+        card.innerHTML = `
+          <div class="card-type-bar comparison">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M12 5v14"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>
+            Comparison
+          </div>
+          <div class="card-body">
+            <div class="card-title">Course Comparison</div>
+            <div class="card-detail">Need two courses to compare.</div>
+          </div>`;
+        return card;
+      }
+
+      const c1 = courses[0];
+      const c2 = courses[1];
+
+      const fee1 = `$${(c1.annual_fee_aud || 0).toLocaleString()}/yr`;
+      const fee2 = `$${(c2.annual_fee_aud || 0).toLocaleString()}/yr`;
+      const entry1 = c1.atar_cutoff ? `ATAR ${c1.atar_cutoff}+` : "No ATAR required";
+      const entry2 = c2.atar_cutoff ? `ATAR ${c2.atar_cutoff}+` : "No ATAR required";
+
+      card.innerHTML = `
+        <div class="card-type-bar comparison">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M12 5v14"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>
+          Course Comparison
+        </div>
+        <div class="card-body" style="padding: 12px;">
+          <div class="comparison-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div class="comparison-column" style="border-right: 1px solid var(--border-color); padding-right: 12px;">
+              <div class="card-title" style="font-size: 14px; min-height: 40px; margin-bottom: 8px;">${esc(c1.name)}</div>
+              <div class="card-tag" style="font-size: 11px; font-weight: 600; color: var(--accent-blue); text-transform: uppercase; margin-bottom: 12px;">${esc(c1.code)}</div>
+            </div>
+            <div class="comparison-column" style="padding-left: 4px;">
+              <div class="card-title" style="font-size: 14px; min-height: 40px; margin-bottom: 8px;">${esc(c2.name)}</div>
+              <div class="card-tag" style="font-size: 11px; font-weight: 600; color: var(--accent-blue); text-transform: uppercase; margin-bottom: 12px;">${esc(c2.code)}</div>
+            </div>
+          </div>
+
+          <div class="comparison-rows" style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">Faculty</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px;">
+                <div style="border-right: 1px solid var(--border-color); padding-right: 12px;">${esc(c1.faculty)}</div>
+                <div style="padding-left: 4px;">${esc(c2.faculty)}</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">Level</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px;">
+                <div style="border-right: 1px solid var(--border-color); padding-right: 12px;">${esc(c1.level)}</div>
+                <div style="padding-left: 4px;">${esc(c2.level)}</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">Study Mode</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px;">
+                <div style="border-right: 1px solid var(--border-color); padding-right: 12px;">${esc(c1.study_mode)}</div>
+                <div style="padding-left: 4px;">${esc(c2.study_mode)}</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">Duration</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px;">
+                <div style="border-right: 1px solid var(--border-color); padding-right: 12px;">${c1.duration_years} years</div>
+                <div style="padding-left: 4px;">${c2.duration_years} years</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">Annual Fee</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px; font-weight: 600;">
+                <div style="border-right: 1px solid var(--border-color); padding-right: 12px; color: var(--text-primary);">${fee1}</div>
+                <div style="padding-left: 4px; color: var(--text-primary);">${fee2}</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">Entry Requirements / ATAR</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px;">
+                <div style="border-right: 1px solid var(--border-color); padding-right: 12px;">
+                  <div><strong>${entry1}</strong></div>
+                  ${c1.entry_requirements ? `<div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">${esc(c1.entry_requirements)}</div>` : ""}
+                </div>
+                <div style="padding-left: 4px;">
+                  <div><strong>${entry2}</strong></div>
+                  ${c2.entry_requirements ? `<div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">${esc(c2.entry_requirements)}</div>` : ""}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 2px;">Career Outcomes</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+                <div style="border-right: 1px solid var(--border-color); padding-right: 12px;">${esc(c1.career_outcomes || "N/A")}</div>
+                <div style="padding-left: 4px;">${esc(c2.career_outcomes || "N/A")}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
       return card;
     }
 
@@ -1843,6 +2470,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
         voiceBtn.title = "Mute microphone";
         setUserListening(true);
         drawWave();
+        ga('voice_started');
       } catch (err) {
         console.error("Mic error:", err);
         voiceLabel.textContent = `Mic error: ${err.name}`;
@@ -1905,6 +2533,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
 
     function toggleMute() {
       muted = !muted;
+      ga(muted ? 'voice_muted' : 'voice_unmuted');
       voiceBtn.classList.toggle("via-muted", muted);
 
       if (muted) {
@@ -1984,6 +2613,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
     mediaBtn.onclick = (e) => {
       e.stopPropagation();
       mediaMenu.classList.toggle("show");
+      ga('media_menu_opened');
     };
 
     optUpload.onclick = () => {
@@ -2004,6 +2634,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
     });
 
     disconnectBtn.addEventListener("click", () => {
+      ga('session_ended');
       userInitiatedDisconnect = true;
       stopAgentAudio();
       ws?.close();
@@ -2011,12 +2642,14 @@ registerProcessor("uni-audio-processor", AudioProcessor);
     });
 
     newSessionBtn.addEventListener("click", () => {
+      ga('new_session');
       newSessionBtn.style.display = "none";
       userInitiatedDisconnect = false;
       // Clear conversation
       messages.innerHTML = '';
       messages.appendChild(emptyMsg);
       agentMsgEl = null; userMsgEl = null;
+      for (const k in traceEls) delete traceEls[k];
       // Clear cards
       sidebarScroll.querySelectorAll('.card-group').forEach(g => g.remove());
       cardGroups = []; activeGroupId = null;
@@ -2037,6 +2670,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
       appendMsg("user", text);
       textInput.value = "";
       ws.send(JSON.stringify({ type: "text", content: text }));
+      ga('message_sent', { method: 'text', message_length: text.length });
     }
 
     function setStatus(cls, label) {
@@ -2075,6 +2709,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
         messages.scrollTop = messages.scrollHeight;
 
         ws.send(JSON.stringify({ type: "image", data: b64, mime_type }));
+        ga('image_uploaded', { mime_type });
       };
       reader.readAsDataURL(file);
     });
@@ -2146,6 +2781,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
         isSharingScreen = true;
         screenFrameSentThisTurn = false;
         screenShareStatus.style.display = "flex";
+        ga('screen_share_started');
 
         // Chat indicator
         removeEmptyMsg();
@@ -2196,6 +2832,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
       isSharingScreen = false;
       screenFrameSentThisTurn = false;
       screenShareStatus.style.display = "none";
+      ga('screen_share_stopped');
       screenStream?.getTracks().forEach(t => t.stop());
       screenStream = null; screenCanvas = null; screenCtx = null; screenVideo = null;
 
@@ -2214,6 +2851,180 @@ registerProcessor("uni-audio-processor", AudioProcessor);
     // ── Boot ──────────────────────────────────────────────────────────────────────
     connect();
   </script>
+  <!-- First-run guided tour -->
+  <div id="tourRoot" aria-hidden="true">
+    <div class="tour-spotlight" id="tourSpotlight"></div>
+    <div class="tour-tooltip" id="tourTooltip" role="dialog" aria-modal="true">
+      <div class="tour-eyebrow">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        <span id="tourStepLabel">Tour</span>
+      </div>
+      <div class="tour-title" id="tourTitle"></div>
+      <div class="tour-body" id="tourBody"></div>
+      <div class="tour-foot">
+        <div class="tour-dots" id="tourDots"></div>
+        <div class="tour-actions">
+          <button class="tour-skip" id="tourSkip" type="button">Skip</button>
+          <button class="tour-next" id="tourNext" type="button">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── First-run guided tour (coachmarks) ──────────────────────────────────────
+    (function () {
+      const STEPS = [
+        { sel: null, title: "Welcome to Waypoint", body: "Meet {agent} — your real-time voice AI course counsellor. Here's a quick 20-second tour.", place: "center" },
+        { sel: "#voiceBtn", title: "Voice is on — just start talking", body: "{agent} greets you and starts listening the moment you arrive, like a phone call. Tap the mic to mute and switch to text-only mode; tap again to unmute and return to voice.", place: "top",
+          titleMobile: "Tap the mic to talk", bodyMobile: "Tap the mic to start the conversation — {agent} listens and replies out loud. Tap it again to mute and switch to text-only mode." },
+        { sel: "#textInput", title: "Or just type", body: "Prefer to type? Ask your question here and {agent} answers the same way.", place: "top" },
+        { sel: "#mediaBtn", title: "Show, don't just tell", body: "Share a photo — like a school report — or your screen, and {agent} can see it and respond.", place: "top" },
+        { sel: "#hoodToggle", title: "Peek under the hood", body: "Turn this on to watch the exact tools {agent} calls, with their inputs and results, as you chat.", place: "bottom" },
+        { sel: ".sidebar", title: "Your research panel", body: "Courses, scholarships, events and booking confirmations appear here as the conversation unfolds.", place: "left" },
+      ];
+      const SEEN_KEY = "waypointTourSeen";
+
+      const root = document.getElementById("tourRoot");
+      const spot = document.getElementById("tourSpotlight");
+      const tip = document.getElementById("tourTooltip");
+      const elTitle = document.getElementById("tourTitle");
+      const elBody = document.getElementById("tourBody");
+      const elLabel = document.getElementById("tourStepLabel");
+      const elDots = document.getElementById("tourDots");
+      const btnNext = document.getElementById("tourNext");
+      const btnSkip = document.getElementById("tourSkip");
+      let i = 0;
+
+      function visible(el) {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+      }
+
+      function ensureInView(el) {
+        const r = el.getBoundingClientRect();
+        if (r.top < 0 || r.bottom > window.innerHeight || r.left < 0 || r.right > window.innerWidth) {
+          el.scrollIntoView({ block: "center", inline: "center" });
+        }
+      }
+
+      function place(step) {
+        const target = step.sel ? document.querySelector(step.sel) : null;
+        const pad = 8;
+
+        if (target && visible(target)) {
+          ensureInView(target);
+          const r = target.getBoundingClientRect();
+          spot.style.display = "block";
+          spot.style.top = (r.top - pad) + "px";
+          spot.style.left = (r.left - pad) + "px";
+          spot.style.width = (r.width + pad * 2) + "px";
+          spot.style.height = (r.height + pad * 2) + "px";
+          positionTip(step.place || "bottom", r);
+        } else {
+          // Centered step (welcome) — collapse spotlight to dim the whole screen.
+          spot.style.display = "block";
+          spot.style.top = "50%"; spot.style.left = "50%";
+          spot.style.width = "0px"; spot.style.height = "0px";
+          centerTip();
+        }
+      }
+
+      function centerTip() {
+        tip.style.top = "50%"; tip.style.left = "50%";
+        tip.style.transform = "translate(-50%, -50%)";
+        requestAnimationFrame(() => { tip.classList.add("show"); tip.style.transform = "translate(-50%, -50%)"; });
+      }
+
+      function positionTip(where, r) {
+        const tw = tip.offsetWidth || 320;
+        const th = tip.offsetHeight || 160;
+        const gap = 14, vw = window.innerWidth, vh = window.innerHeight, m = 12;
+        let top, left;
+
+        let pos = where;
+        if (pos === "top" && r.top - th - gap < m) pos = "bottom";
+        if (pos === "bottom" && r.bottom + th + gap > vh - m) pos = "top";
+        if (pos === "left" && r.left - tw - gap < m) pos = "bottom";
+
+        if (pos === "top")       { top = r.top - th - gap;  left = r.left + r.width / 2 - tw / 2; }
+        else if (pos === "left") { top = r.top + r.height / 2 - th / 2; left = r.left - tw - gap; }
+        else                     { top = r.bottom + gap;    left = r.left + r.width / 2 - tw / 2; }
+
+        left = Math.max(m, Math.min(left, vw - tw - m));
+        top = Math.max(m, Math.min(top, vh - th - m));
+        tip.style.left = left + "px";
+        tip.style.top = top + "px";
+        tip.style.transform = "none";
+        requestAnimationFrame(() => tip.classList.add("show"));
+      }
+
+      const coarse = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+
+      function render() {
+        const step = STEPS[i];
+        const agent = document.querySelector(".via-name")?.textContent?.trim() || "Clara";
+        const title = (coarse && step.titleMobile) || step.title;
+        const body = (coarse && step.bodyMobile) || step.body;
+        tip.classList.remove("show");
+        elLabel.textContent = step.sel ? `Step ${i} of ${STEPS.length - 1}` : "Tour";
+        elTitle.textContent = title.replace(/\{agent\}/g, agent);
+        elBody.textContent = body.replace(/\{agent\}/g, agent);
+        btnNext.textContent = (i === STEPS.length - 1) ? "Got it" : "Next";
+        elDots.innerHTML = STEPS.map((_, k) => `<span class="tour-dot${k === i ? " on" : ""}"></span>`).join("");
+        // let layout settle so offsetWidth/Height are correct
+        requestAnimationFrame(() => place(step));
+      }
+
+      function start() {
+        i = 0;
+        root.classList.add("active");
+        root.setAttribute("aria-hidden", "false");
+        render();
+      }
+      function end() {
+        root.classList.remove("active");
+        root.setAttribute("aria-hidden", "true");
+        tip.classList.remove("show");
+        try { localStorage.setItem(SEEN_KEY, "1"); } catch (e) {}
+        window.removeEventListener("resize", onResize);
+        if (typeof ga === "function") ga("tour_finished", { step: i });
+      }
+      function next() { if (i < STEPS.length - 1) { i++; render(); } else end(); }
+      function onResize() { if (root.classList.contains("active")) place(STEPS[i]); }
+
+      btnNext.addEventListener("click", next);
+      btnSkip.addEventListener("click", end);
+      // Tapping the dimmed backdrop advances (familiar Tips-style behaviour).
+      root.addEventListener("click", (e) => { if (e.target === root || e.target === spot) next(); });
+      document.addEventListener("keydown", (e) => {
+        if (!root.classList.contains("active")) return;
+        if (e.key === "Escape") end();
+        else if (e.key === "ArrowRight" || e.key === "Enter") next();
+        else if (e.key === "ArrowLeft" && i > 0) { i--; render(); }
+      });
+      window.addEventListener("resize", onResize);
+
+      // Replay button (always available)
+      document.getElementById("tourBtn")?.addEventListener("click", () => {
+        window.addEventListener("resize", onResize);
+        start();
+        if (typeof ga === "function") ga("tour_started", { trigger: "manual" });
+      });
+
+      // Auto-run on first visit, after the page settles.
+      let seen = false;
+      try { seen = localStorage.getItem(SEEN_KEY) === "1"; } catch (e) {}
+      if (!seen) {
+        setTimeout(() => {
+          start();
+          if (typeof ga === "function") ga("tour_started", { trigger: "auto" });
+        }, 900);
+      }
+    })();
+  </script>
+
 </body>
 
 </html>

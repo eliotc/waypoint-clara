@@ -135,7 +135,7 @@ def get_course_detail(course_name: str) -> dict:
     emb = _emb_str(_embed(course_name))
     sql = """
         SELECT code, name, faculty, level, study_mode,
-               duration_years, atar_cutoff, annual_fee_aud,
+               duration_years, atar_cutoff, entry_requirements, annual_fee_aud,
                description, career_outcomes,
                1 - (embedding <=> %s::vector) AS similarity
         FROM courses
@@ -155,7 +155,16 @@ def get_course_detail(course_name: str) -> dict:
     for k, v in dict(row).items():
         course[k] = float(v) if isinstance(v, Decimal) else v
 
-    log.info("get_course_detail found '%s' (similarity=%.3f)", course["name"], course["similarity"])
+    # get_course_detail always returns the nearest vector match, even for a course
+    # that doesn't exist. Empirically, an exact-name lookup scores ~0.70+ while a
+    # fabricated name tops out ~0.55 — overlapping with real abbreviations, so this
+    # flag only marks HIGH-confidence exact matches. The model compares
+    # requested_course vs name to judge the ambiguous middle band (see agent.py).
+    confident_match = course["similarity"] >= 0.65
+    log.info(
+        "get_course_detail requested='%s' matched='%s' similarity=%.3f confident=%s",
+        course_name, course["name"], course["similarity"], confident_match,
+    )
 
     if _display_callbacks:
         payload = {
@@ -168,42 +177,140 @@ def get_course_detail(course_name: str) -> dict:
             asyncio.run_coroutine_threadsafe(callback(payload), loop)
 
     return {
+        "requested_course": course_name,
+        "confident_match": confident_match,
         "name": course["name"],
         "faculty": course["faculty"],
         "level": course["level"],
         "study_mode": course["study_mode"],
         "duration_years": course["duration_years"],
         "atar_cutoff": course["atar_cutoff"],
+        "entry_requirements": course.get("entry_requirements"),
         "annual_fee_aud": course["annual_fee_aud"],
         "career_outcomes": course["career_outcomes"],
     }
 
 
+# ── Tool 1b: compare_courses ──────────────────────────────────────────────────
+
+def compare_courses(course_name_a: str, course_name_b: str) -> dict:
+    """
+    Compare two specific Kingsford University courses side by side.
+    Call this when a student wants to weigh two named courses against each other
+    (e.g. 'how does Computer Science compare to Software Engineering?').
+    Renders a side-by-side comparison card covering faculty, level, study mode,
+    duration, annual fee, entry requirements, and career outcomes for both courses.
+    """
+    log.debug("compare_courses a='%s' b='%s'", course_name_a, course_name_b)
+    sql = """
+        SELECT code, name, faculty, level, study_mode,
+               duration_years, atar_cutoff, entry_requirements, annual_fee_aud,
+               description, career_outcomes
+        FROM courses
+        ORDER BY embedding <=> %s::vector
+        LIMIT 1
+    """
+    courses = []
+    with _get_conn() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            for name in (course_name_a, course_name_b):
+                cur.execute(sql, (_emb_str(_embed(name)),))
+                row = cur.fetchone()
+                if row:
+                    courses.append(_to_json_safe(dict(row)))
+
+    if len(courses) < 2:
+        return {
+            "found": False,
+            "message": "I couldn't find two courses to compare. Please name both courses clearly.",
+        }
+
+    if courses[0]["code"] == courses[1]["code"]:
+        return {
+            "found": False,
+            "message": (
+                f"Both names matched the same course ({courses[0]['name']}). "
+                "Please name two different courses to compare."
+            ),
+        }
+
+    log.info("compare_courses comparing '%s' vs '%s'", courses[0]["name"], courses[1]["name"])
+
+    if _display_callbacks:
+        payload = {
+            "type": "card",
+            "card_type": "comparison",
+            "data": {"courses": courses},
+            "spoken_summary": (
+                f"Here's how {courses[0]['name']} and {courses[1]['name']} compare."
+            ),
+        }
+        for loop, callback in _display_callbacks.values():
+            asyncio.run_coroutine_threadsafe(callback(payload), loop)
+
+    # Compact, structured summary for the model — full data is already on the card.
+    return {
+        "comparing": [c["name"] for c in courses],
+        "courses": [
+            {
+                "name": c["name"],
+                "faculty": c["faculty"],
+                "level": c["level"],
+                "study_mode": c["study_mode"],
+                "duration_years": c["duration_years"],
+                "atar_cutoff": c["atar_cutoff"],
+                "entry_requirements": c.get("entry_requirements"),
+                "annual_fee_aud": c["annual_fee_aud"],
+            }
+            for c in courses
+        ],
+    }
+
+
 # ── Tool 2: search_courses ────────────────────────────────────────────────────
 
-def search_courses(query: str, faculty: Optional[str] = None) -> dict:
+def search_courses(
+    query: str,
+    faculty: Optional[str] = None,
+    student_atar: Optional[int] = None,
+) -> dict:
     """
     Search Kingsford University courses by a natural-language query.
     Optionally filter by faculty (e.g. 'Engineering & Technology', 'Business & Commerce',
     'Arts & Humanities', 'Health Sciences').
+    Optionally filter by a student's ATAR cutoff to exclude courses above their score.
     Returns up to 5 matching courses with key details.
     """
-    log.debug("search_courses query='%s' faculty=%s", query, faculty)
+    log.debug("search_courses query='%s' faculty=%s student_atar=%s", query, faculty, student_atar)
     emb = _emb_str(_embed(query))
     log.debug("Embedding generated, executing SQL...")
-    sql = """
+
+    atar_filter = ""
+    params = [emb, faculty, f"%{faculty}%" if faculty else None]
+
+    if student_atar is not None:
+        try:
+            atar_val = int(student_atar)
+            atar_filter = "AND (atar_cutoff IS NULL OR atar_cutoff <= %s)"
+            params.append(atar_val)
+        except (ValueError, TypeError):
+            pass
+
+    params.append(emb)
+
+    sql = f"""
         SELECT code, name, faculty, level, study_mode,
-               duration_years, atar_cutoff, annual_fee_aud,
+               duration_years, atar_cutoff, entry_requirements, annual_fee_aud,
                career_outcomes,
                1 - (embedding <=> %s::vector) AS similarity
         FROM courses
-        WHERE (%s::text IS NULL OR faculty ILIKE %s)
+        WHERE (%s::text IS NULL OR faculty ILIKE %s) {atar_filter}
         ORDER BY embedding <=> %s::vector
         LIMIT 5
     """
     with _get_conn() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-            cur.execute(sql, (emb, faculty, f"%{faculty}%" if faculty else None, emb))
+            cur.execute(sql, params)
             rows = cur.fetchall()
     courses = [_to_json_safe(dict(r)) for r in rows]
     log.info("search_courses found %d results for '%s'", len(courses), query)
@@ -284,12 +391,27 @@ def search_events(event_type: Optional[str] = None, date_range: Optional[str] = 
     return {"count": len(events), "events": summary}
 
 
+# ── Similarity Scaling Helper ──────────────────────────────────────────────────
+
+def _scale_similarity(similarity: float) -> int:
+    """
+    Scale realistic 0.30 - 0.65 cosine similarity band to user-friendly 60% - 99% range.
+    Ensures that reasonably strong matches don't display discouraged low numbers.
+    """
+    if similarity < 0.30:
+        val = 50 + (similarity / 0.30) * 10
+    else:
+        val = 60 + ((similarity - 0.30) / (0.65 - 0.30)) * 40
+    return min(100, max(0, round(val)))
+
+
 # ── Tool 3: recommend_courses ─────────────────────────────────────────────────
 
 def recommend_courses(
     interests: str,
     strengths: str,
     study_mode_preference: Optional[str] = None,
+    student_atar: Optional[int] = None,
 ) -> dict:
     """
     Recommend Kingsford University courses tailored to a student's interests,
@@ -297,25 +419,36 @@ def recommend_courses(
     interests: free-text description of what the student enjoys (e.g. 'maths, problem solving').
     strengths: free-text description of their academic strengths (e.g. 'sciences, writing').
     study_mode_preference: 'Full-time', 'Part-time', 'Online', or None for any.
+    student_atar: optionally filter by student's ATAR score to exclude courses requiring higher scores.
     Returns up to 4 recommended courses with a match score and brief rationale.
     """
     query = f"student interested in {interests} with strengths in {strengths}"
     emb = _emb_str(_embed(query))
 
     mode_filter = ""
+    atar_filter = ""
     params: list[Any] = [emb]
     if study_mode_preference:
         mode_filter = "AND study_mode ILIKE %s"
         params.append(f"%{study_mode_preference}%")
+
+    if student_atar is not None:
+        try:
+            atar_val = int(student_atar)
+            atar_filter = "AND (atar_cutoff IS NULL OR atar_cutoff <= %s)"
+            params.append(atar_val)
+        except (ValueError, TypeError):
+            pass
+
     params.append(emb)
 
     sql = f"""
         SELECT code, name, faculty, level, study_mode,
-               duration_years, atar_cutoff, annual_fee_aud,
+               duration_years, atar_cutoff, entry_requirements, annual_fee_aud,
                career_outcomes,
                1 - (embedding <=> %s::vector) AS similarity
         FROM courses
-        WHERE 1=1 {mode_filter}
+        WHERE 1=1 {mode_filter} {atar_filter}
         ORDER BY embedding <=> %s::vector
         LIMIT 4
     """
@@ -327,7 +460,7 @@ def recommend_courses(
     results = []
     for r in rows:
         d = _to_json_safe(dict(r))
-        d["match_pct"] = round(float(d["similarity"]) * 100)
+        d["match_pct"] = _scale_similarity(float(d["similarity"]))
         results.append(d)
     log.info("recommend_courses found %d results for '%s'", len(results), query)
 
@@ -365,14 +498,77 @@ def book_campus_tour(
     except ValueError:
         return {"success": False, "error": f"Invalid date format: {preferred_date}. Use YYYY-MM-DD."}
 
-    sql = """
-        INSERT INTO tour_bookings (student_name, email, preferred_date, party_size)
-        VALUES (%s, %s, %s, %s)
-        RETURNING id, created_at
-    """
+    if tour_date < date.today():
+        return {"success": False, "error": f"The date {preferred_date} is in the past. Campus tours must be booked for a future date."}
+
+    # Validate against the actual tour schedule: a campus tour can only be booked
+    # on a date when a CampusTour event is scheduled and still has spots left.
     with _get_conn() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-            cur.execute(sql, (student_name, email, tour_date, party_size))
+            cur.execute(
+                """
+                SELECT id, title, start_at, spots_left
+                FROM events
+                WHERE event_type = 'CampusTour'
+                  AND start_at::date = %s::date
+                ORDER BY start_at
+                LIMIT 1
+                """,
+                (tour_date,),
+            )
+            _t = cur.fetchone()
+            tour = dict(_t) if _t else None
+
+            # Next available, not-sold-out tour dates to offer if the request fails.
+            cur.execute(
+                """
+                SELECT start_at::date AS tour_date, title, spots_left
+                FROM events
+                WHERE event_type = 'CampusTour'
+                  AND start_at::date >= CURRENT_DATE
+                  AND (spots_left IS NULL OR spots_left > 0)
+                ORDER BY start_at
+                LIMIT 5
+                """
+            )
+            available = [
+                {"date": dict(r)["tour_date"].isoformat(), "title": dict(r)["title"]}
+                for r in cur.fetchall()
+            ]
+
+            if tour is None:
+                log.info("book_campus_tour rejected: no CampusTour scheduled on %s", preferred_date)
+                return {
+                    "success": False,
+                    "error": f"No campus tour is scheduled on {preferred_date}.",
+                    "available_dates": available,
+                }
+            if tour["spots_left"] is not None and tour["spots_left"] <= 0:
+                log.info("book_campus_tour rejected: tour on %s is sold out", preferred_date)
+                return {
+                    "success": False,
+                    "error": f"The campus tour on {preferred_date} is fully booked.",
+                    "available_dates": available,
+                }
+            if tour["spots_left"] is not None and party_size > tour["spots_left"]:
+                log.info(
+                    "book_campus_tour rejected: party_size %d > spots_left %d on %s",
+                    party_size, tour["spots_left"], preferred_date,
+                )
+                return {
+                    "success": False,
+                    "error": f"Only {tour['spots_left']} spot(s) remain on the {preferred_date} tour, fewer than the {party_size} requested.",
+                    "available_dates": available,
+                }
+
+            cur.execute(
+                """
+                INSERT INTO tour_bookings (student_name, email, preferred_date, party_size)
+                VALUES (%s, %s, %s, %s)
+                RETURNING id, created_at
+                """,
+                (student_name, email, tour_date, party_size),
+            )
             row = dict(cur.fetchone())
 
     data = {
@@ -392,33 +588,131 @@ def book_campus_tour(
         payload = {"type": "card", "card_type": "booking", "data": data, "spoken_summary": "Your tour is booked!"}
         for loop, callback in _display_callbacks.values():
             asyncio.run_coroutine_threadsafe(callback(payload), loop)
-            
+
     return data
+
+
+# ── Tool 4b: register_for_event ──────────────────────────────────────────────
+
+def register_for_event(event_title: str, student_name: str, email: str) -> dict:
+    """
+    Register a student for a specific Kingsford University event.
+    Call this when a student wants to attend an event AND has provided their
+    full name and email address. Do NOT call this tool until you have both.
+    event_title: the name of the event (matched by partial title search).
+    student_name: the student's full name.
+    email: the student's email address.
+    Returns a confirmation reference in EV-XXXXX format.
+    """
+    log.debug("register_for_event event='%s' name='%s'", event_title, student_name)
+
+    with _get_conn() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT id, title, event_type, start_at, location, spots_left
+                FROM events
+                WHERE title ILIKE %s
+                ORDER BY ABS(EXTRACT(EPOCH FROM (start_at - NOW()))) ASC
+                LIMIT 1
+            """, (f"%{event_title}%",))
+            event = cur.fetchone()
+
+            if not event:
+                return {
+                    "success": False,
+                    "error": f"I couldn't find an event matching '{event_title}'. Please check the event name.",
+                }
+
+            if event["spots_left"] is not None and event["spots_left"] <= 0:
+                return {
+                    "success": False,
+                    "error": f"Sorry, {event['title']} is fully booked. Would you like me to find other upcoming events?",
+                }
+
+            cur.execute("""
+                INSERT INTO event_registrations (event_id, student_name, email)
+                VALUES (%s, %s, %s)
+                RETURNING id
+            """, (event["id"], student_name, email))
+            reg_id = cur.fetchone()["id"]
+            ref = f"EV-{reg_id:05d}"
+
+            if event["spots_left"] is not None:
+                cur.execute(
+                    "UPDATE events SET spots_left = GREATEST(0, spots_left - 1) WHERE id = %s",
+                    (event["id"],)
+                )
+            conn.commit()
+
+    event_date = ""
+    if event.get("start_at"):
+        dt = event["start_at"]
+        if hasattr(dt, "strftime"):
+            event_date = dt.strftime("%-d %B %Y, %-I:%M %p")
+
+    log.info("register_for_event confirmed %s for '%s'", ref, event["title"])
+
+    if _display_callbacks:
+        payload = {
+            "type": "card",
+            "card_type": "event_registration",
+            "data": {
+                "confirmation_ref": ref,
+                "event_title": event["title"],
+                "event_type": event.get("event_type", ""),
+                "event_date": event_date,
+                "location": event.get("location", ""),
+                "student_name": student_name,
+                "email": email,
+            },
+            "spoken_summary": f"You're registered! Your confirmation reference is {ref}.",
+        }
+        for loop, callback in _display_callbacks.values():
+            asyncio.run_coroutine_threadsafe(callback(payload), loop)
+
+    return {
+        "success": True,
+        "confirmation_ref": ref,
+        "event": event["title"],
+        "student_name": student_name,
+        "email": email,
+    }
 
 
 # ── Tool 5: search_knowledge ─────────────────────────────────────────────────
 
-def search_knowledge(query: str) -> dict:
+def search_knowledge(query: str, faculty: Optional[str] = None) -> dict:
     """
     Search Kingsford University's general knowledge base for information about
     admissions, fees, HECS-HELP, scholarships, campus life, facilities,
     international students, visa requirements, career outcomes, and more.
     Call this whenever a student asks a general question not covered by
     search_courses, search_events, or search_scholarships.
+    faculty: optionally scope the search to a faculty (e.g. 'Engineering & Technology',
+    'Business & Commerce', 'Health Sciences', 'Arts & Humanities'). Pass this for
+    faculty-specific questions like career outcomes so results aren't dominated by
+    another faculty's content.
     Returns the most relevant information chunks from the knowledge base.
     """
-    log.debug("search_knowledge query='%s'", query)
-    emb = _emb_str(_embed(query))
+    log.debug("search_knowledge query='%s' faculty=%s", query, faculty)
+    # Bias the embedding toward the faculty when one is supplied, so faculty-specific
+    # questions (e.g. career outcomes) rank that faculty's content higher.
+    emb = _emb_str(_embed(f"{query} (faculty: {faculty})" if faculty else query))
+    # When a faculty is given, prefer chunks that explicitly mention it before falling
+    # back to pure vector similarity. This keeps e.g. "Business careers" from surfacing
+    # the Engineering career chunk just because its embedding is marginally closer.
     sql = """
         SELECT topic, title, content,
                1 - (embedding <=> %s::vector) AS similarity
         FROM knowledge_docs
-        ORDER BY embedding <=> %s::vector
+        ORDER BY
+            CASE WHEN %s::text IS NOT NULL AND content ILIKE %s THEN 0 ELSE 1 END,
+            embedding <=> %s::vector
         LIMIT 3
     """
     with _get_conn() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-            cur.execute(sql, (emb, emb))
+            cur.execute(sql, (emb, faculty, f"%{faculty}%" if faculty else None, emb))
             rows = cur.fetchall()
 
     chunks = [dict(r) for r in rows]
