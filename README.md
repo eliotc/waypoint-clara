@@ -50,7 +50,7 @@ FastAPI WebSocket  (/ws/{client_id})   ← Cloud Run
 ADK Runner  (InMemorySessionService — fresh session per connection)
   │  LiveRequestQueue — bidirectional audio + vision
   ▼
-Gemini Live API  (gemini-3.1-flash-live-preview · Google Developer API)
+Gemini Live API  (gemini-3.8-live · Google Developer API)
   │  function_call → tool result
   ▼
 7 ADK Tools  →  Cloud SQL PostgreSQL + pgvector  (semantic search)
@@ -66,7 +66,7 @@ Gemini Live API  (gemini-3.1-flash-live-preview · Google Developer API)
 | Layer | Choice |
 |-------|--------|
 | Agent framework | `google-adk` |
-| Model | `gemini-3.1-flash-live-preview` via Google Developer API |
+| Model | `gemini-3.8-live` via Google Developer API |
 | Backend | FastAPI + Uvicorn |
 | Database | Cloud SQL PostgreSQL 16 + pgvector |
 | Embeddings | `gemini-embedding-001` (1536-dim, Matryoshka) |
@@ -152,7 +152,7 @@ GOOGLE_GENAI_USE_VERTEXAI=FALSE                   # Required when using AI Studi
 # Database (Neon for local dev)
 DATABASE_URL=postgresql://user:pass@...neon.tech/neondb?sslmode=require
 
-MODEL_NAME=gemini-3.1-flash-live-preview
+MODEL_NAME=gemini-3.8-live
 ```
 
 ### 3. Seed the database
