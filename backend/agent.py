@@ -16,7 +16,7 @@ from tools import (
     search_scholarships,
 )
 
-MODEL = os.getenv("MODEL_NAME", "gemini-3.1-flash-live-preview")
+MODEL = os.getenv("MODEL_NAME", "gemini-3.8-live")
 
 INSTRUCTION = """
 You are Clara, the friendly AI course counsellor for Kingsford University in Melbourne, Australia.
