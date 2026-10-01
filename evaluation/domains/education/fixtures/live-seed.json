@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "clara-local-seed-v1",
+  "provenance": "Actual contents are read from a marked disposable database and preserved in each trace. Created from data/schema.sql and data/seed.sql; event dates rebased on the recorded database clock. This descriptor is not a database export.",
+  "clock": "2026-09-06T00:00:00Z",
+  "data": {
+    "clock_policy": "Descriptor creation date above; actual runtime uses database UTC wall clock and records clock_anchor.",
+    "embedding_policy": "Events and conversational cases need no embeddings. Provision with --with-embeddings before retrieval-quality cases."
+  }
+}

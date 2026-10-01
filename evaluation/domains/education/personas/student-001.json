@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "persona_id": "student-001",
+  "name": "Mia (synthetic)",
+  "provenance": {
+    "kind": "synthetic",
+    "source": "Owner discussion: computing interests, ATAR 82, online-only constraint. No real participant.",
+    "limitations": "Tests a plausible situation; does not represent the student population."
+  },
+  "facts": {
+    "student_atar": 82,
+    "interests": "computing and problem solving",
+    "strengths": "maths",
+    "study_mode_preference": "Online"
+  },
+  "goals": [
+    "Find an accessible computing course",
+    "Understand unresolved eligibility before deciding"
+  ],
+  "disclosure_policy": "Use only supplied personal facts. Reveal constraints when relevant. Do not read evaluator checks or database truth. Reset memory for each independent run."
+}

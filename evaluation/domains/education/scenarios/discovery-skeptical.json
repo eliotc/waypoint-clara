@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "discovery-skeptical",
+  "persona": "../personas/discovery-skeptical.json",
+  "task": "Replay the five saved user messages from EXP-SIM-002 to probe accepted defects. Clara replies are newly generated; this is not an adaptive continuation.",
+  "user_turns": [
+    "G'day Clara. I'm thinking about studying again, but I'm a bit skeptical about all the AI hype. I've been working in IT support for three years, and I'm interested in cloud computing. I need to study part-time because I'm still working. I'm here to find out if there's a qualification that makes sense for me and if my experience counts for anything.",
+    "Thanks, Clara. I'd like to understand more about how my three years in IT support could apply. I completed secondary school, but I don't have a bachelor's degree. I'm keen to know if my work experience can help with entry requirements, especially for cloud computing qualifications, while studying part-time.",
+    "That's good to hear, Clara. So, my three years in IT support could potentially get me into a postgraduate course like a Graduate Certificate in Cloud Computing, even without a bachelor's degree? That's what I'm looking for. What are the specific details or requirements for that postgraduate option?",
+    "Yes, that's exactly the kind of detail I was looking for. So, the Graduate Certificate in Cloud Computing seems to be a good fit for my situation, especially with the part-time study and my IT experience. What are the next steps if I wanted to pursue this?",
+    "Before we finish, please give me a recap of what we have established and what I can do next."
+  ],
+  "checks": [
+    {
+      "id": "audio",
+      "criterion": "live-transport",
+      "severity": "high",
+      "pointer": "/observations/audio_received",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "no-write",
+      "criterion": "isolation",
+      "severity": "critical",
+      "pointer": "/observations/database_unchanged",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "discovery-fidelity",
+      "criterion": "decision-support",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Correct the student assumption that Online means part-time explicitly in turn4 or earlier and preserve unconfirmed part-time availability in recap. No full-time employment claim: only working is disclosed. Preserve no bachelor degree and three IT years. Work-experience route is supported; do not claim verified admission. Inspect all turns, tool arguments/results and authoritative snapshot. Missing evidence is not a pass. No-match without an action is allowed under decision0007."
+    }
+  ]
+}

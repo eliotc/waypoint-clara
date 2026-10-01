@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "persona_id": "cq-04a",
+  "name": "CQ-04A synthetic fixed-input profile",
+  "provenance": {
+    "kind": "synthetic",
+    "source": "Independently invented education conversation-quality case; owner accepted the matrix.",
+    "limitations": "No real participant or population representation. Only supplied user turns establish disclosed facts."
+  },
+  "facts": {
+    "disclosed_messages": [
+      "I am interested in undergraduate cybersecurity. I can only study online because I cannot attend campus.",
+      "Please recap my study constraints. I still cannot attend campus."
+    ],
+    "variant": "Stable constraint"
+  },
+  "goals": [
+    "Understand the course information requested in the scripted messages."
+  ],
+  "disclosure_policy": "Fixed inputs only. No generative persona; do not infer additional personal facts."
+}

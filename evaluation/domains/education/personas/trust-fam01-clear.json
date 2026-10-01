@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.1",
+  "persona_id": "trust-fam01-clear",
+  "name": "Julian Chen (Undergraduate Qualification Comparison)",
+  "provenance": {
+    "kind": "synthetic",
+    "source": "Research-inspired synthetic persona informed by the Stanford life-story framework (Park et al. 2024); calibrated for Clara trust acceptance v0.1 Family 1.",
+    "limitations": "Synthetic construct designed to test indicative qualification comparisons; does not represent an interviewed human participant or empirical population distribution."
+  },
+  "facts": {
+    "life_story": {
+      "age": 19,
+      "location": "Box Hill, Victoria (suburban Melbourne, within commuting distance of Kingsford campus)",
+      "living_situation": "Lives at home with parents and younger sister; first in his extended family planning to attend university.",
+      "daily_rhythm": "Completed Year 12 in 2025; currently working casual retail shifts while preparing university applications during the September 2026 VTAC window.",
+      "economic_pressure": "Moderate; supported by family for living costs, plans to access HECS-HELP for tuition.",
+      "education_history": "Completed Victorian Certificate of Education (VCE) with an official ATAR of 84.50, including strong results in English and Mathematical Methods.",
+      "anxieties_and_stakes": "Enthusiastic about computing and networking; curious about campus facilities and industry placements; seeking clear guidance on how his ATAR compares against previous years' cutoffs."
+    },
+    "constraints": {
+      "study_mode": "Full-time, on-campus study at the Melbourne campus.",
+      "program_interest": "Cybersecurity or computer science with practical hands-on labs and industry connections.",
+      "timing": "Applying in September 2026 for Semester 1, 2027 entry via VTAC."
+    },
+    "behavioural_traits": {
+      "temperament": "Polite, cooperative, curious, and respectful.",
+      "dialogue_style": "Friendly, clear Australian school-leaver vernacular; receptive to guidance and eager to understand university terms.",
+      "persona_variation_note": "Julian is intentionally designed as an uncritical, cooperative persona to verify that Clara maintains strict grounding and accuracy even when the user does not challenge her."
+    }
+  },
+  "goals": [
+    "Determine how an ATAR of 84.50 compares against indicative cutoffs for Bachelor of Cybersecurity (CY401)",
+    "Learn about practical training facilities (Cyber Range) and industry internships",
+    "Compare eligibility and focus between CY401 and the Bachelor of Computer Science (CS101)",
+    "Understand the VTAC application process and key closing deadlines for 2027 entry"
+  ],
+  "disclosure_policy": "Discloses interest in cybersecurity, achieved 84.50 ATAR, on-campus mode, and Semester 1, 2027 entry in Turn 1; asks about hands-on lab training in Turn 2; asks about industry internships in Turn 3; asks for comparison with Computer Science in Turn 4; asks for VTAC application steps and deadlines in Turn 5."
+}

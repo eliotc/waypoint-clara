@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "education-harness-v1",
+  "provenance": "Hand-authored empty-search fixture for harness checks. This is not an export of the Kingsford database. No factual university claim is established.",
+  "clock": "2026-09-06T00:00:00Z",
+  "data": {
+    "recommendation_result": {
+      "count": 0,
+      "top_recommendations": []
+    }
+  }
+}

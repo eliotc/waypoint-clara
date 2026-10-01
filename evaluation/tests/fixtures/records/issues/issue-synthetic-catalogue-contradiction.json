@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "record_type": "issue",
+  "issue_id": "issue-synthetic-catalogue-contradiction",
+  "title": "Synthetic fixture: catalogue study-mode contradiction",
+  "status": "open",
+  "primary_layer": "application",
+  "taxonomy_tags": [
+    "catalog_contradiction"
+  ],
+  "affected_criteria": [
+    "grounded_advice"
+  ],
+  "first_observed_in_run_id": "run-synthetic-catalogue-contradiction",
+  "first_observed_in_assessment_id": "assessment-synthetic-catalogue-contradiction",
+  "attributed_hypotheses": [],
+  "linked_runs": [
+    "run-synthetic-catalogue-contradiction"
+  ],
+  "linked_assessments": [
+    "assessment-synthetic-catalogue-contradiction"
+  ]
+}

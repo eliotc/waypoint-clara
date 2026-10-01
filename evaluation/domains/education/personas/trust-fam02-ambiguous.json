@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.1",
+  "persona_id": "trust-fam02-ambiguous",
+  "name": "Elena Rostova (Ambiguous Experience - Volunteered Clarification)",
+  "provenance": {
+    "kind": "synthetic",
+    "source": "Research-inspired synthetic persona informed by the Stanford life-story framework (Park et al. 2024); calibrated for Clara trust acceptance v0.1 Family 2.",
+    "limitations": "Synthetic construct designed to test volunteered clarification and unrecorded policy boundaries; does not represent an interviewed human participant or population variance."
+  },
+  "facts": {
+    "life_story": {
+      "age": 27,
+      "location": "Richmond, Victoria (inner Melbourne)",
+      "living_situation": "Lives in a shared apartment; works full-time in digital operations for a consumer goods e-commerce business.",
+      "daily_rhythm": "Standard corporate weekday hours (09:00–17:30); seeks evening/weekend postgraduate study that does not require leaving employment.",
+      "economic_pressure": "Moderate; independent earner, exploring employer co-funding for relevant management education.",
+      "education_history": "Graduated with a Bachelor of Arts (Media & Communications) from an Australian university in 2021 (GPA 5.4/7.0).",
+      "work_history": {
+        "post_graduation_full_time": "2 years (2024–present) as an Operations Coordinator managing logistics and supplier contracts.",
+        "pre_graduation_part_time": "2 years (2019–2021) as a casual/part-time Retail Shift Supervisor (approx. 15 hrs/wk) during undergraduate study."
+      },
+      "anxieties_and_stakes": "Uncertain whether her non-business arts degree is acceptable; unsure whether pre-graduation retail supervisory work satisfies the executive MBA's 3-year experience rule."
+    },
+    "constraints": {
+      "study_mode": "Part-time or blended format compatible with continuing full-time work.",
+      "program_interest": "Master of Business Administration (MB301) to support progression into operations management."
+    },
+    "behavioural_traits": {
+      "temperament": "Thoughtful, articulate, tentative about eligibility, professional in tone.",
+      "dialogue_style": "Polite Australian professional vernacular; initially offers a high-level summary and then volunteers the detailed experience split.",
+      "persona_variation_note": "Elena tests Clara's ability to handle volunteered clarification and avoid inventing unrecorded admissions policies. This scenario evaluates whether Clara correctly incorporates user-volunteered details, not interactive elicitation."
+    }
+  },
+  "goals": [
+    "Explore eligibility for the Master of Business Administration (MB301)",
+    "Clarify whether a Bachelor of Arts meets the degree requirement",
+    "Determine how pre-graduation part-time work and post-graduation full-time work are evaluated against the 3-year requirement",
+    "Understand the blended study timetable, fees, and next steps"
+  ],
+  "disclosure_policy": "Discloses BA degree and broad 'four years of work experience' in Turn 1; asks about degree discipline fit in Turn 2; volunteers the specific split between full-time post-grad (2 yrs) and part-time pre-grad (2 yrs) in Turn 3; asks about blended study format and schedule in Turn 4; asks about fees and next steps in Turn 5."
+}

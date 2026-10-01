@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.1",
+  "persona_id": "trust-fam03-online",
+  "name": "Chloe Vance (Online-Only Carer)",
+  "provenance": {
+    "kind": "synthetic",
+    "source": "Research-inspired synthetic persona informed by the Stanford/Bernstein (Park et al. 2024) life-story framework; calibrated for Clara trust acceptance v0.1 Family 3.",
+    "limitations": "Synthetic construct designed to test specific constraints; does not represent an interviewed human participant or empirical population distribution."
+  },
+  "facts": {
+    "life_story": {
+      "age": 32,
+      "location": "Port Augusta, South Australia (regional setting; Chloe notes she is roughly four hours from Adelaide)",
+      "living_situation": "Lives in rental housing with her 68-year-old mother who has severe mobility limitations from a stroke.",
+      "daily_rhythm": "Full-time rostered hours (08:00–16:30) as a patient records administrator at a regional community health clinic; evenings and weekends dedicated to domestic caregiving and meal prep.",
+      "economic_pressure": "Sole household earner; cannot take unpaid leave or incur metropolitan travel/accommodation costs.",
+      "education_history": "Completed Year 12 in 2012 (Chloe believes her historical ATAR 68.40 is no longer active for school-leaver admission); completed Certificate IV in Business Administration via TAFE SA in 2017.",
+      "anxieties_and_stakes": "Anxious about academic research writing and university-level statistics after years out of study; motivated by promotion opportunities into community mental health intake."
+    },
+    "constraints": {
+      "attendance_constraint": "Requires 100% online delivery. Cannot attend on-campus lectures or metropolitan supervised placements.",
+      "study_pace": "Requires part-time study to balance employment and caregiving duties.",
+      "program_interest": "Psychology or behavioural science related to community mental health."
+    },
+    "behavioural_traits": {
+      "temperament": "Pragmatic, direct, polite but assertive.",
+      "dialogue_style": "Terse spoken Australian vernacular; uses colloquial regional markers ('out in the country', 'can't just pop down the highway').",
+      "persona_variation_note": "This skeptical, assertively probing profile is a deliberate design variation for Chloe; other benchmark families will feature cooperative, hesitant, or naive profiles.",
+      "skepticism_triggers": [
+        "Recommending on-campus programs or blended formats",
+        "Assuming access to metropolitan facilities or daily commute",
+        "Vague assurances like 'it's mostly online except for a few workshops'"
+      ]
+    }
+  },
+  "goals": [
+    "Identify fully accredited undergraduate psychology study with verified 100% online delivery",
+    "Rule out courses with mandatory on-campus components or residency requirements",
+    "Understand mature-age entry pathways without an active ATAR",
+    "Confirm application steps and deadlines without taking on premature admissions commitments"
+  ],
+  "disclosure_policy": "Discloses regional caregiver status, 100% online requirement, and part-time study pace in Turn 1; probes attendance and exam details in Turn 2; discloses prior TAFE study in Turn 3; probes on-campus lecture recording loophole in Turn 4; requests application process and deadlines in Turn 5."
+}

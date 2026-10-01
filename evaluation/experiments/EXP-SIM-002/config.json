@@ -1,0 +1,17 @@
+{
+  "protocol_version": 2,
+  "experiment_id": "EXP-SIM-002",
+  "evidence_kind": "adaptive_persona_live_text",
+  "model": "gemini-2.5-flash",
+  "target": {
+    "endpoint": "http://127.0.0.1:8765",
+    "model": "gemini-3.1-flash-live-preview",
+    "require_embeddings": true,
+    "turn_timeout_seconds": 90
+  },
+  "dataset_id": "clara-local-seed-v2",
+  "personas": "../../domains/education/personas/discovery-synthetic-v1.json",
+  "adaptive_turns": 4,
+  "recap_request": "Before we finish, please give me a recap of what we have established and what I can do next.",
+  "limits": "Four invented personas, one fresh session each, four adaptive text turns plus an experiment-elicited recap. Simulator sees transcripts only, not cards, UI guidance, audio, tool traces, database facts or grading rules. No browser/ASR, natural recap-demand, consistency, human comprehension or adoption claim."
+}

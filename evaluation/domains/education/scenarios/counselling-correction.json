@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "counselling-correction",
+  "persona": "../personas/counselling-correction.json",
+  "task": "Read-only counselling journey with scripted student turns.",
+  "user_turns": [
+    "I'm a school leaver with an ATAR of 82, interested in cybersecurity and good at maths and problem solving. I have no degree or IT work experience. I can study full-time on campus. What would suit me?",
+    "Actually, I got that wrong: I can't attend campus. I need fully online study. Cybersecurity is still my goal and my ATAR is still 82. What does that change?"
+  ],
+  "checks": [
+    {
+      "id": "audio-received",
+      "criterion": "live-transport",
+      "severity": "high",
+      "pointer": "/observations/audio_received",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "no-db-write",
+      "criterion": "isolation",
+      "severity": "critical",
+      "pointer": "/observations/database_unchanged",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "counselling-quality",
+      "criterion": "decision-support",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "On turn 2 honor corrected online-only mode while retaining ATAR82, cybersecurity goal and school-leaver eligibility. Reassess prior advice; do not continue treating on-campus Cybersecurity as meeting the current constraint. Retrieve current options or explain previously grounded limitations with appropriate uncertainty. Do not invent changed interests/qualifications or repeat already answered questions. Check both calls/cards and spoken qualification of alternatives. Verify against server_before.snapshot, retrieved tool results, cards and full conversation. Separate model errors, retrieval limitations, missing data and insufficient evidence. Audio reception does not establish intelligibility."
+    }
+  ]
+}

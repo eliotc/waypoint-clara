@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "CQ-01B",
+  "persona": "../personas/cq-01b.json",
+  "task": "Fixed-input conversation-quality pair: Explicit need. Shared rubric v0.1; education binding CQ-01B.",
+  "user_turns": [
+    "How do I submit an application for the Bachelor of Cybersecurity? I am asking about the application process, not whether I qualify."
+  ],
+  "checks": [
+    {
+      "id": "audio",
+      "criterion": "live-transport",
+      "severity": "high",
+      "pointer": "/observations/audio_received",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "no-write",
+      "criterion": "isolation",
+      "severity": "critical",
+      "pointer": "/observations/database_unchanged",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "need-clarification",
+      "criterion": "need-clarification",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Shared criterion conversation-quality-v0.1/need-clarification: Does the agent resolve consequential ambiguity without unnecessary questions? Pass anchor: Answer a sufficiently specific question directly; when ambiguity changes the answer, ask a focused relevant clarification or explicitly distinguish the interpretations. Fail anchor: Invent the intended need, answer the wrong interpretation confidently, or repeatedly request facts already supplied. Evidence: User turns, response, task and source-defined distinctions. Education binding: retrieve/explain process directly rather than repeat the already-resolved distinction. Review all turns and distinguish observed agent behaviour from missing evidence. Semantic disposition requires manual review; no human comprehension or release claim. Consult How to Apply and applicant-scope restrictions. A focused clarification OR clearly separated interpretations is acceptable for ambiguous input; do not force a question."
+    },
+    {
+      "id": "grounding-uncertainty",
+      "criterion": "grounding-uncertainty",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Shared criterion conversation-quality-v0.1/grounding-uncertainty: Are claims supported and missing information distinguished from absence? Pass anchor: Use supported facts; state the specific unknown; distinguish thresholds, possibilities and verified outcomes. Fail anchor: Invent requirements/procedures, turn missing evidence into certainty, or deny information that was retrieved. Evidence: Versioned source snapshot and exact tool results before each claim; private simulator facts are not disclosed evidence. Education binding: retrieve/explain process directly rather than repeat the already-resolved distinction. Review all turns and distinguish observed agent behaviour from missing evidence. Semantic disposition requires manual review; no human comprehension or release claim. Consult How to Apply and applicant-scope restrictions. A focused clarification OR clearly separated interpretations is acceptable for ambiguous input; do not force a question."
+    },
+    {
+      "id": "context-boundaries",
+      "criterion": "context-boundaries",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Shared criterion conversation-quality-v0.1/context-boundaries: Does the agent preserve current facts and corrections within its capabilities? Pass anchor: Retain disclosed constraints and latest explicit correction; distinguish self-report from verified information and do not claim unavailable actions. Fail anchor: Invent user facts, retain superseded facts, ignore hard constraints, or claim verification/access/action without evidence. Evidence: Chronological user messages, tool arguments/results and observed capabilities/actions. Education binding: retrieve/explain process directly rather than repeat the already-resolved distinction. Review all turns and distinguish observed agent behaviour from missing evidence. Semantic disposition requires manual review; no human comprehension or release claim. Consult How to Apply and applicant-scope restrictions. A focused clarification OR clearly separated interpretations is acceptable for ambiguous input; do not force a question."
+    }
+  ]
+}

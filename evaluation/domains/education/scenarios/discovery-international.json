@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "discovery-international",
+  "persona": "../personas/discovery-international.json",
+  "task": "Replay the five saved user messages from EXP-SIM-002 to probe accepted defects. Clara replies are newly generated; this is not an adaptive continuation.",
+  "user_turns": [
+    "Hi Clara! I'm interested in studying computing at Kingsford University. I've completed my secondary qualification overseas and I'm trying to figure out what my options are for undergraduate courses as an international student. I'm not familiar with the Australian system.",
+    "Thanks, Clara. I'm not familiar with the names of these degrees. Could you tell me more about the differences between Computer Science and Cybersecurity? I'm trying to understand which one might be a better fit for me.",
+    "It helps a little, but I don't know what an ATAR is. Since I completed my schooling overseas, how does my qualification fit into the entry requirements? Is there a way to know if I meet the entry requirements for either of these courses?",
+    "Thanks, Clara. I'm trying to understand how my overseas qualification is assessed. Is there a specific minimum ATAR equivalent I should be aiming for, or a range? I don't know what my qualification converts to, so I'm not sure if I'd even be close.",
+    "Before we finish, please give me a recap of what we have established and what I can do next."
+  ],
+  "checks": [
+    {
+      "id": "audio",
+      "criterion": "live-transport",
+      "severity": "high",
+      "pointer": "/observations/audio_received",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "no-write",
+      "criterion": "isolation",
+      "severity": "critical",
+      "pointer": "/observations/database_unchanged",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "discovery-fidelity",
+      "criterion": "decision-support",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Do not infer no bachelor degree from secondary schooling in tool arguments. Explain comparison using retrieved description. Do not invent overseas qualification conversion processes or formulas; assess every procedural claim against actual returned sections. Keep unresolved assessment explicit; no unnecessary scholarship diversion. Inspect all turns, tool arguments/results and authoritative snapshot. Missing evidence is not a pass. No-match without an action is allowed under decision0007."
+    }
+  ]
+}

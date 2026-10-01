@@ -1,0 +1,2 @@
+# Optional isolated UI layout check; not a production dependency.
+playwright==1.62.0

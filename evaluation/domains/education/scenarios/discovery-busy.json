@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "discovery-busy",
+  "persona": "../personas/discovery-busy.json",
+  "task": "Replay the five saved user messages from EXP-SIM-002 to probe accepted defects. Clara replies are newly generated; this is not an adaptive continuation.",
+  "user_turns": [
+    "G'day Clara. I'm looking for an undergraduate cybersecurity course. I can only study online as I can't attend campus.",
+    "I'm interested in cybersecurity specifically, and I can't attend campus. Do you have any undergraduate cybersecurity courses that are fully online?",
+    "That's a shame. So there are no online undergraduate cybersecurity courses at all? What about other IT-related online undergraduate courses? Do any of them have cybersecurity specialisations?",
+    "It sounds like Kingsford doesn't have what I need. Thanks for checking, Clara. I think I have enough information for now.",
+    "Before we finish, please give me a recap of what we have established and what I can do next."
+  ],
+  "checks": [
+    {
+      "id": "audio",
+      "criterion": "live-transport",
+      "severity": "high",
+      "pointer": "/observations/audio_received",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "no-write",
+      "criterion": "isolation",
+      "severity": "critical",
+      "pointer": "/observations/database_unchanged",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "discovery-fidelity",
+      "criterion": "decision-support",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "No campus suggestions against inability to attend, including recap. Say no matching catalogue option, not verified institutional absence where attendance is unknown. Do not force unrelated programs or further action; an honest stopping point is valid. Inspect all turns, tool arguments/results and authoritative snapshot. Missing evidence is not a pass. No-match without an action is allowed under decision0007."
+    }
+  ]
+}

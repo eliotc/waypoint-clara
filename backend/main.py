@@ -50,7 +50,9 @@ from google.adk.agents.live_request_queue import LiveRequestQueue
 
 from agent import clara, MODEL, build_agent, build_greeting
 from db import init_pool, close_pool
-from tools import register_display_callback, unregister_display_callback
+from tools import register_display_callback, unregister_display_callback, bind_display_session, reset_display_session, record_student_message
+from scenarios import get_public_scenario
+from showcase_runner import ShowcaseSession
 
 # ── Gemini ADK Monkey-Patching ───────────────────────────────────────────────
 # ADK's send_content uses the deprecated send() method which fails to correctly
@@ -201,6 +203,71 @@ async def health():
 async def byo_page():
     return FileResponse(STATIC_DIR / "byo.html")
 
+@app.get("/showcase")
+async def showcase_page():
+    return FileResponse(STATIC_DIR / "showcase.html")
+
+@app.get("/api/showcase/scenario/{scenario_id}")
+async def get_showcase_scenario(scenario_id: str):
+    scenario = get_public_scenario(scenario_id)
+    if not scenario:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    return scenario
+
+@app.websocket("/ws/showcase/live")
+async def showcase_live_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    client_ip = websocket.client.host if websocket.client else "unknown"
+    session = None
+    try:
+        while True:
+            raw = await websocket.receive_text()
+            if len(raw) > 2048:
+                await websocket.close(code=1008)
+                break
+            try:
+                data = json.loads(raw)
+            except ValueError:
+                data = None
+            if not isinstance(data, dict):
+                await websocket.send_json({'type': 'error', 'message': 'Invalid example command.'})
+                continue
+            action = data.get('action')
+            if action == 'start' and set(data) == {'action','scenario_id'}:
+                if session is not None:
+                    await websocket.send_json({'type':'error','message':'Use a new connection for a new example.'})
+                    continue
+                if data['scenario_id'] != 'returning-to-study':
+                    await websocket.send_json({'type':'error','message':'Unknown example.'})
+                    continue
+                # Give personal conversations priority when this worker is busy.
+                # This is local admission control, not a reservation of provider quota.
+                if sum(_ip_active.values()) >= 3:
+                    await websocket.send_json({'type':'error','message':'Live examples are busy while visitors talk to Clara. Please try later.'})
+                    continue
+                session = ShowcaseSession(websocket, client_ip, data['scenario_id'])
+                try:
+                    session.start()
+                except RuntimeError as exc:
+                    await websocket.send_json({'type':'error','message':str(exc)})
+                    await websocket.close(code=1008)
+                    break
+            elif action == 'stop' and set(data) == {'action'}:
+                if session:
+                    await session.stop()
+                await websocket.close(code=1000)
+                break
+            elif action == 'playback_ack' and set(data) == {'action','run_id','turn_id'} and session:
+                session.acknowledge(data['run_id'], data['turn_id'])
+            else:
+                await websocket.send_json({'type':'error','message':'Unsupported example command.'})
+    except WebSocketDisconnect:
+        pass
+    finally:
+        if session:
+            await session.stop()
+
 @app.post("/api/byo")
 async def create_byo(config: dict):
     """Store a BYO counsellor config and return a shareable demo URL."""
@@ -283,7 +350,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
         except Exception:
             pass
 
-    register_display_callback(client_id, loop, send_card)
+
 
     # Resolve agent: a `?demo=<id>` query param selects a Build-Your-Own instance
     # (per-connection Runner with a customised agent); otherwise use the default
@@ -336,6 +403,11 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
         context_window_compression=None,
     )
 
+    # Route by an internal connection identity, never a caller-supplied client ID.
+    display_id = secrets.token_hex(16)
+    register_display_callback(display_id, loop, send_card)
+    display_token = bind_display_session(display_id)
+
     try:
         async def receive_from_browser():
             try:
@@ -353,6 +425,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                     elif "text" in message and message["text"]:
                         msg = json.loads(message["text"])
                         if msg.get("type") == "text":
+                            record_student_message(msg["content"], "typed")
                             log.info("Text input: %s", msg["content"][:60])
                             live_request_queue.send_content(
                                 types.Content(parts=[types.Part(text=msg["content"])])
@@ -394,6 +467,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             for attempt in range(1, max_attempts + 1):
                 try:
                     if attempt > 1:
+                        await websocket.send_text(json.dumps({"type": "session_retry", "attempt": attempt}))
                         log.info("Retry attempt %d/%d after session interruption...", attempt, max_attempts)
                         await asyncio.sleep(2)
 
@@ -512,6 +586,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                                     continue
                                 dt = time.time() - turn_start_at
                                 if finished:
+                                    record_student_message(display_text, "transcribed")
                                     log.info("User [+%.2fs]: %s", dt, display_text)
                                 await websocket.send_text(json.dumps({
                                     "type": "transcript",
@@ -554,8 +629,9 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             log.info("Starting ADK run_live for session %s (history: %d)", 
                      session.id, len(session.events))
             try:
-                # Initial hidden greeting trigger — ONLY on fresh sessions
-                if not session.events:
+                # Initial hidden greeting trigger — ONLY on fresh sessions and when greeting is not suppressed
+                should_greet = websocket.query_params.get("greet", "1") != "0"
+                if not session.events and should_greet:
                     log.info("Fresh session: sending proactive greeting trigger")
                     live_request_queue.send_content(
                         types.Content(parts=[types.Part(text=greeting_prompt)])
@@ -580,10 +656,12 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
         )
         for task in pending:
             task.cancel()
+        await asyncio.gather(*pending, return_exceptions=True)
 
     except Exception as e:
         log.error("WS session error: %s", e)
     finally:
-        unregister_display_callback(client_id)
+        unregister_display_callback(display_id)
+        reset_display_session(display_token)
         _ip_active[client_ip] = max(0, _ip_active[client_ip] - 1)
         log.info("WS disconnected: %s (ip=%s active=%d)", client_id, client_ip, _ip_active[client_ip])

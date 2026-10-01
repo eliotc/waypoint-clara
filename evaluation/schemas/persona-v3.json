@@ -1,0 +1,145 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol_version",
+    "experiment_id",
+    "evidence_kind",
+    "target",
+    "dataset_id",
+    "personas",
+    "adaptive_turns",
+    "recap_request",
+    "limits",
+    "models"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": 3
+    },
+    "experiment_id": {
+      "const": "EXP-SIM-003"
+    },
+    "evidence_kind": {
+      "const": "adaptive_persona_live_text"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpoint",
+        "model",
+        "require_embeddings",
+        "turn_timeout_seconds"
+      ],
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "require_embeddings": {
+          "const": true
+        },
+        "turn_timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120
+        }
+      }
+    },
+    "dataset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "personas": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adaptive_turns": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4
+    },
+    "recap_request": {
+      "type": "string",
+      "minLength": 1
+    },
+    "limits": {
+      "type": "string",
+      "minLength": 1
+    },
+    "models": {
+      "const": [
+        "gemini-2.5-flash",
+        "gemini-3.8-flash"
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "profiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provenance",
+        "disclosure",
+        "personas"
+      ],
+      "properties": {
+        "provenance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disclosure": {
+          "type": "string",
+          "minLength": 1
+        },
+        "personas": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "facts",
+              "style",
+              "goal"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[a-z][a-z0-9-]+$"
+              },
+              "facts": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean"
+                  ]
+                }
+              },
+              "style": {
+                "type": "string",
+                "minLength": 1
+              },
+              "goal": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.0",
+  "id": "returning-to-study",
+  "title": "Returning to study",
+  "summary": "Work experience, no bachelor's degree",
+  "student_goal": "Explore cloud study while keeping eligibility uncertain.",
+  "model_id": "gemini-3.1-flash-live-preview",
+  "captured_at_utc": "2026-09-17T12:17:41.575855+00:00",
+  "application_revision": "ecf401bd968608275f7dce7dc2da31850038fc3f",
+  "application_source_sha256": "debbc6161c950b2979e75d44ff79f07ac4b073c757a21f0f476e6b7bbfbe8894",
+  "environment_label": "Local read-only evaluation with fictional catalogue",
+  "source_run_id": "20260917T121741575855Z-20a985af",
+  "source_trace_sha256": "a57106ffee3e408304ca623f8a46f4a02cae8f97e3d064b77f974bc9b86d87a0",
+  "input_kind": "scripted_text",
+  "audio_kind": "captured_model_output",
+  "criteria": [
+    {
+      "id": "disclosed_facts",
+      "description": "Retain student's disclosed facts (three years IT support experience, no bachelor's degree) without unverified assumptions."
+    },
+    {
+      "id": "grounded_advice",
+      "description": "Retrieve catalogue course options (Graduate Certificate in Cloud Computing) and accurately report mode and alternative entry requirements."
+    },
+    {
+      "id": "honest_uncertainty",
+      "description": "Distinguish alternative entry alignment from confirmed admission eligibility, and accurately identify that application steps have not yet been checked."
+    }
+  ],
+  "turns": [
+    {
+      "id": "1",
+      "student_text": "I'm interested in the Graduate Certificate in Cloud Computing. I have no bachelor's degree, but I worked in IT support for three years. What options do I have?",
+      "clara_text": "Thanks for sharing that. Based on your three years of IT support experience, it looks like you may meet the entry requirements for the Graduate Certificate in Cloud Computing, even without a bachelor's degree. That one's offered online. We also have a Graduate Certificate in Data Analytics, although I'd need to confirm its admission rules. Would you like to know more about either of those?",
+      "audio_url": "turn-1.wav",
+      "duration_seconds": 20.2
+    },
+    {
+      "id": "2",
+      "student_text": "Please recap what you know about my experience and what remains uncertain.",
+      "clara_text": "No worries. You've disclosed that you're interested in Cloud Computing, have no bachelor's degree, and have worked in IT support for three years. I retrieved a couple of postgraduate possibilities online. What still remains uncertain is your specific eligibility for entry, as we haven't checked specific prerequisites or application steps yet. Is that a fair recap of where we're at?",
+      "audio_url": "turn-2.wav",
+      "duration_seconds": 21.0
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "tool_name": "search_courses",
+      "turn_id": "1",
+      "label": "Catalogue entry requirements for Graduate Certificate in Cloud Computing",
+      "excerpt": "Bachelor degree in IT/quantitative field, or 2+ years of professional IT experience"
+    },
+    {
+      "id": "ev-2",
+      "tool_name": "search_courses",
+      "turn_id": "1",
+      "label": "Tool effective parameters for degree and IT experience",
+      "excerpt": "effective_has_bachelor_degree: false, effective_professional_it_years: 3.0"
+    },
+    {
+      "id": "ev-3",
+      "tool_name": "get_discovery_context",
+      "turn_id": "2",
+      "label": "Discovery context conversation state",
+      "excerpt": "available: true, history_complete: true"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-1",
+      "criterion_id": "disclosed_facts",
+      "disposition": "supported",
+      "explanation": "Clara preserved both the negative degree status and the positive three-year IT support disclosure in tool arguments and spoken recap without inferring unmentioned facts.",
+      "turn_ids": [
+        "1",
+        "2"
+      ],
+      "quote_references": [
+        "three years of IT support experience",
+        "even without a bachelor's degree",
+        "have no bachelor's degree, and have worked in IT support for three years"
+      ],
+      "evidence_ids": [
+        "ev-2"
+      ],
+      "review_id": "rev-hermes-self-1"
+    },
+    {
+      "id": "f-2",
+      "criterion_id": "grounded_advice",
+      "disposition": "supported",
+      "explanation": "Clara retrieved and accurately cited the Graduate Certificate in Cloud Computing, noted its online delivery mode, and cited the alternative entry pathway.",
+      "turn_ids": [
+        "1"
+      ],
+      "quote_references": [
+        "Graduate Certificate in Cloud Computing",
+        "That one's offered online"
+      ],
+      "evidence_ids": [
+        "ev-1"
+      ],
+      "review_id": "rev-hermes-self-1"
+    },
+    {
+      "id": "f-3",
+      "criterion_id": "honest_uncertainty",
+      "disposition": "supported",
+      "explanation": "Clara explicitly clarified that admission eligibility remains unverified and correctly stated that application steps haven't been checked yet, avoiding ungrounded claims of non-existent next steps.",
+      "turn_ids": [
+        "1",
+        "2"
+      ],
+      "quote_references": [
+        "it looks like you may meet the entry requirements",
+        "What still remains uncertain is your specific eligibility for entry",
+        "as we haven't checked specific prerequisites or application steps yet"
+      ],
+      "evidence_ids": [
+        "ev-1",
+        "ev-3"
+      ],
+      "review_id": "rev-hermes-self-1"
+    }
+  ],
+  "review": {
+    "id": "rev-hermes-self-1",
+    "author": "Hermes",
+    "role": "implementer_self_review",
+    "reviewed_at": "2026-09-17T12:30:00Z",
+    "basis": "transcript_and_tool_evidence"
+  },
+  "judge": null,
+  "limitations": [
+    "Fixed scripted text messages; does not test real user speech recognition or microphone variance.",
+    "Synthetic student persona based on fictional Kingsford University catalog data.",
+    "Single recorded sample from Gemini 3.1 Flash Live Preview; does not establish statistical consistency across non-deterministic model runs.",
+    "Exploratory course counselling only; does not constitute confirmed university admission or credit transfer assessment."
+  ]
+}

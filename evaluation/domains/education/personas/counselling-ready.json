@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "persona_id": "counselling-ready",
+  "name": "Alex (synthetic)",
+  "provenance": {
+    "kind": "synthetic",
+    "source": "Synthetic scenario designed from owner-approved counselling journeys; no real participant.",
+    "limitations": "Tests a plausible situation; does not represent the student population."
+  },
+  "facts": {
+    "student_atar": 82,
+    "interests": "cybersecurity and protecting computer systems",
+    "strengths": "maths and problem solving",
+    "study_mode_preference": "Full-time",
+    "education": "just completed Year 12; no degree or professional IT experience"
+  },
+  "goals": [
+    "Find a suitable undergraduate course or a grounded next step"
+  ],
+  "disclosure_policy": "Use only supplied personal facts. Reveal constraints when relevant. Do not read evaluator checks or database truth. Reset memory for each independent run."
+}

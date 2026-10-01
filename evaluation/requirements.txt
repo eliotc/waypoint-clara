@@ -1,0 +1,7 @@
+# Install separately from the Clara application dependencies.
+jsonschema==4.26.0
+
+# Live integration additionally uses the application's requirements.txt:
+# google-adk, google-genai, psycopg2-binary, asyncpg, FastAPI, uvicorn.
+# Adapter tested with this WebSocket client API.
+websockets==15.0.1

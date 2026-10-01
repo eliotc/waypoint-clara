@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "record_type": "verification_event",
+  "event_id": "event-synthetic-scope-adjudication",
+  "event_type": "adjudication",
+  "timestamp": "2026-01-01T00:20:00Z",
+  "actor": "example-owner",
+  "actor_role": "owner",
+  "target_issue_id": "issue-synthetic-scoped-negative",
+  "disposition_change": {
+    "previous_status": "open",
+    "new_status": "rejected_not_a_defect",
+    "rationale": "Synthetic fixture: owner accepts the scoped conclusion as supported in context."
+  },
+  "verification_run_id": null,
+  "verification_assessment_id": "assessment-synthetic-scope-adjudicated",
+  "superseded_assessment_ids": [
+    "assessment-synthetic-scope-provisional"
+  ]
+}

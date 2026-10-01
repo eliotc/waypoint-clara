@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0",
+  "record_type": "assessment",
+  "assessment_id": "assessment-synthetic-catalogue-contradiction",
+  "run_id": "run-synthetic-catalogue-contradiction",
+  "assessed_at": "2026-01-01T00:05:00Z",
+  "evaluator": {
+    "kind": "model",
+    "reviewer_role": "automated_judge",
+    "model_id": "example-judge-model",
+    "rubric_version": "example-judge-rubric-v1",
+    "configuration_hash": "1c885cb745cc83ce43b966d4ae1027733406be708d096b4de9118b212925c1a9"
+  },
+  "supersedes_assessment_id": null,
+  "denominators": {
+    "total_opportunities": 4,
+    "passes": 3,
+    "issues": 1,
+    "incomplete": 0,
+    "execution_errors": 0
+  },
+  "results": [
+    {
+      "result_id": "res-syn-cat-1",
+      "criterion_id": "grounded_advice",
+      "outcome": "issue_observed",
+      "severity": "major",
+      "summary": "Synthetic fixture: the response contradicts the catalogue study mode.",
+      "evidence_refs": [
+        {
+          "artifact_id": "synthetic/traces/example-trace.json",
+          "artifact_sha256": "dd1bbae80e1a40347918e258c05ba6afcfcd22acd47c3400bdb80628ac3eb7c2",
+          "location": {
+            "turn_id": 3,
+            "speaker": "Clara"
+          },
+          "citation_path": "/turns/2/speech_content",
+          "excerpt": "Synthetic example: the catalogue lists this course as Full-time, not Online."
+        },
+        {
+          "artifact_id": "synthetic/traces/example-trace.json",
+          "artifact_sha256": "dd1bbae80e1a40347918e258c05ba6afcfcd22acd47c3400bdb80628ac3eb7c2",
+          "location": {
+            "turn_id": 1,
+            "speaker": "tool"
+          },
+          "citation_path": "/tools/0/result/courses/0/study_mode",
+          "excerpt": "study_mode: Online"
+        }
+      ],
+      "tags": [
+        "catalog_contradiction",
+        "ungrounded_fact"
+      ],
+      "issue_id": "issue-synthetic-catalogue-contradiction"
+    },
+    {
+      "result_id": "res-syn-cat-2",
+      "criterion_id": "preserved_facts",
+      "outcome": "pass",
+      "severity": "none",
+      "summary": "Synthetic fixture: preserved_facts supported.",
+      "evidence_refs": [
+        {
+          "artifact_id": "synthetic/traces/example-trace.json",
+          "artifact_sha256": "dd1bbae80e1a40347918e258c05ba6afcfcd22acd47c3400bdb80628ac3eb7c2",
+          "location": {
+            "turn_id": 2,
+            "speaker": "Clara"
+          },
+          "citation_path": "/turns/1/speech_content",
+          "excerpt": "Synthetic example response."
+        }
+      ],
+      "tags": [],
+      "issue_id": null
+    },
+    {
+      "result_id": "res-syn-cat-3",
+      "criterion_id": "honest_uncertainty",
+      "outcome": "pass",
+      "severity": "none",
+      "summary": "Synthetic fixture: honest_uncertainty supported.",
+      "evidence_refs": [
+        {
+          "artifact_id": "synthetic/traces/example-trace.json",
+          "artifact_sha256": "dd1bbae80e1a40347918e258c05ba6afcfcd22acd47c3400bdb80628ac3eb7c2",
+          "location": {
+            "turn_id": 2,
+            "speaker": "Clara"
+          },
+          "citation_path": "/turns/1/speech_content",
+          "excerpt": "Synthetic example response."
+        }
+      ],
+      "tags": [],
+      "issue_id": null
+    },
+    {
+      "result_id": "res-syn-cat-4",
+      "criterion_id": "conversation_quality",
+      "outcome": "pass",
+      "severity": "none",
+      "summary": "Synthetic fixture: conversation_quality supported.",
+      "evidence_refs": [
+        {
+          "artifact_id": "synthetic/traces/example-trace.json",
+          "artifact_sha256": "dd1bbae80e1a40347918e258c05ba6afcfcd22acd47c3400bdb80628ac3eb7c2",
+          "location": {
+            "turn_id": 2,
+            "speaker": "Clara"
+          },
+          "citation_path": "/turns/1/speech_content",
+          "excerpt": "Synthetic example response."
+        }
+      ],
+      "tags": [],
+      "issue_id": null
+    }
+  ]
+}

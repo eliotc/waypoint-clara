@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "constraints-001",
+  "persona": "../personas/student-001.json",
+  "task": "Find a computing option while respecting ATAR and online-only constraints.",
+  "user_turns": [
+    "I like computing and problem solving, I am strong in maths, my ATAR is 82, and I can only study online. What would suit me?"
+  ],
+  "checks": [
+    {
+      "id": "atar-forwarded",
+      "criterion": "constraint-handling",
+      "severity": "high",
+      "pointer": "/turns/0/tools/0/arguments/student_atar",
+      "operator": "equals",
+      "expected": 82
+    },
+    {
+      "id": "mode-forwarded",
+      "criterion": "constraint-handling",
+      "severity": "high",
+      "pointer": "/turns/0/tools/0/arguments/study_mode_preference",
+      "operator": "equals",
+      "expected": "Online"
+    },
+    {
+      "id": "empty-results",
+      "criterion": "tool-evidence",
+      "severity": "medium",
+      "pointer": "/turns/0/tools/0/result",
+      "operator": "equals",
+      "expected": {
+        "count": 0,
+        "top_recommendations": []
+      }
+    },
+    {
+      "id": "empty-card",
+      "criterion": "card-evidence",
+      "severity": "medium",
+      "pointer": "/turns/0/cards/0/data/count",
+      "operator": "equals",
+      "expected": 0
+    },
+    {
+      "id": "helpful-next-step",
+      "criterion": "decision-support",
+      "severity": "medium",
+      "pointer": "/turns/0/assistant",
+      "operator": "manual",
+      "instruction": "Does the response explain the lack of matches, avoid implying admission eligibility, and offer a next step that respects online-only study? Review against the persona and evidence; do not grade wording preference."
+    }
+  ]
+}

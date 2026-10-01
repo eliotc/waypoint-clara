@@ -409,6 +409,212 @@
       white-space: nowrap;
     }
 
+    .discovery-guidance {
+      flex: 0 0 auto;
+      margin: 0 16px 8px;
+      padding: 10px 12px;
+      border: 1px solid #a7c9ca;
+      border-radius: 10px;
+      background: #f0f8f7;
+      color: #234846;
+      font-size: 12px;
+      line-height: 1.45;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    @media (max-width: 768px) {
+      .via-panel { min-height: min(420px, 78dvh); }
+      .discovery-guidance { max-height: 130px; }
+    }
+    .discovery-guidance p { margin: 4px 0; }
+    .discovery-guidance summary { cursor: pointer; font-weight: 600; }
+    .discovery-guidance summary:focus-visible { outline: 2px solid #176b65; outline-offset: 2px; }
+
+    /* Welcome landing state */
+    .welcome-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 32px 28px;
+      gap: 24px;
+      max-width: 680px;
+      margin: 0 auto;
+      width: 100%;
+      animation: viaMsgIn 0.3s var(--ease-out-quint);
+    }
+    .welcome-header {
+      text-align: left;
+    }
+    .welcome-title {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--color-primary);
+      margin: 0 0 10px 0;
+      letter-spacing: -0.01em;
+    }
+    .welcome-subtitle {
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--color-secondary);
+      margin: 0;
+    }
+    .welcome-choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 640px) {
+      .welcome-choices {
+        grid-template-columns: 1fr;
+      }
+      .welcome-container {
+        padding: 20px 16px;
+        gap: 18px;
+      }
+      .welcome-title {
+        font-size: 20px;
+      }
+    }
+    .welcome-choice-card {
+      background: var(--bg-primary);
+      border: 1.5px solid var(--border-primary);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .welcome-choice-card:hover {
+      border-color: var(--accent-teal);
+      box-shadow: 0 4px 14px rgba(13, 148, 136, 0.1);
+    }
+    .welcome-choice-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin: 0 0 6px 0;
+    }
+    .welcome-choice-desc {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--color-secondary);
+      margin: 0;
+      flex: 1;
+    }
+    .welcome-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .welcome-btn-primary {
+      background: var(--accent-teal);
+      color: white;
+      border: none;
+    }
+    .welcome-btn-primary:hover {
+      background: #0f766e;
+    }
+    .welcome-btn-secondary {
+      background: white;
+      color: var(--accent-teal);
+      border: 1.5px solid var(--accent-teal);
+    }
+    .welcome-btn-secondary:hover {
+      background: var(--accent-teal-light);
+    }
+    .welcome-disclaimer {
+      font-size: 12px;
+      color: var(--color-tertiary);
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    /* Onboarding guidance & starter chips */
+    .onboarding-guidance {
+      background: #f8fafc;
+      border: 1px solid var(--border-primary);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      animation: viaMsgIn 0.25s var(--ease-out-quint);
+    }
+    .onboarding-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin: 0 0 4px 0;
+    }
+    .onboarding-subtitle {
+      font-size: 13px;
+      color: var(--color-secondary);
+      margin: 0 0 12px 0;
+    }
+    .starter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .starter-chip {
+      background: white;
+      border: 1px solid var(--border-secondary);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--color-primary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .starter-chip:hover {
+      border-color: var(--accent-teal);
+      background: var(--accent-teal-light);
+      color: var(--accent-teal);
+    }
+
+    /* Talk to Clara button styling */
+    .via-talk-btn {
+      width: auto !important;
+      padding: 0 14px !important;
+      border-radius: 9999px !important;
+      gap: 6px !important;
+    }
+    .via-talk-text {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .via-input-guidance {
+      font-size: 12px;
+      color: var(--color-tertiary);
+      white-space: nowrap;
+    }
+    @media (max-width: 640px) {
+      .via-input-guidance {
+        display: none;
+      }
+      .via-talk-text {
+        display: none;
+      }
+      .via-talk-btn {
+        width: 40px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+      }
+    }
+
     /* Messages */
     .via-messages {
       flex: 1;
@@ -581,6 +787,7 @@
     }
 
     .via-input {
+      min-width: 0;
       flex: 1;
       padding: 10px 16px;
       border: 1.5px solid var(--border-secondary);
@@ -710,6 +917,7 @@
       font-size: 14px;
       line-height: 1.5;
       max-width: 240px;
+      margin: 0 auto;
     }
 
     /* Cards */
@@ -1466,6 +1674,52 @@
       transition: all 0.18s ease;
     }
     .via-help-btn:hover { border-color: var(--accent-teal); color: var(--accent-teal); }
+
+    /* Showcase exit confirmation modal */
+    .exit-modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10000;
+    }
+    .exit-modal-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(33, 34, 38, 0.12);
+    }
+    .exit-btn-cancel {
+      padding: 8px 16px;
+      border-radius: 9999px;
+      border: 1px solid rgba(33, 34, 38, 0.18);
+      background: transparent;
+      color: var(--color-secondary);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      min-height: 40px;
+      transition: background 0.15s;
+    }
+    .exit-btn-cancel:hover { background: rgba(0,0,0,0.04); }
+    .exit-btn-confirm {
+      padding: 8px 18px;
+      border-radius: 9999px;
+      border: none;
+      background: var(--accent-teal);
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 40px;
+      transition: background 0.15s;
+    }
+    .exit-btn-confirm:hover { background: var(--accent-teal-hover); }
   </style>
 </head>
 
@@ -1482,7 +1736,7 @@
         </div>
         <div class="via-header-info">
           <h3 class="via-name">Clara</h3>
-          <p class="via-subtitle" id="viaSubtitle">Waypoint Assistant</p>
+          <p class="via-subtitle" id="viaSubtitle">AI course discovery</p>
         </div>
 
         <div class="via-status">
@@ -1499,6 +1753,36 @@
           <button class="via-disconnect" id="newSessionBtn" style="display:none"
             title="Start a fresh conversation">New Session</button>
         </div>
+      </div>
+
+      <!-- Welcome Landing State (Kingsford landing /) -->
+      <div id="welcomeContainer" class="welcome-container" style="display:none;">
+        <div class="welcome-header">
+          <h1 class="welcome-title">Unsure which course fits your circumstances?</h1>
+          <p class="welcome-subtitle">See how Clara helps you explore study options and understand what remains uncertain.</p>
+        </div>
+
+        <div class="welcome-choices">
+          <div class="welcome-choice-card">
+            <h2 class="welcome-choice-title">Watch a live example</h2>
+            <p class="welcome-choice-desc">Follow a scripted student's questions and hear Clara respond live. See automated checks of this conversation afterwards.</p>
+            <a href="/showcase" class="welcome-btn welcome-btn-secondary" id="btnWatchExample">
+              <span>Watch live example</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </div>
+
+          <div class="welcome-choice-card">
+            <h2 class="welcome-choice-title">Ask Clara yourself</h2>
+            <p class="welcome-choice-desc">Talk or type about your interests, experience and study needs.</p>
+            <button class="welcome-btn welcome-btn-primary" id="btnAskClara" type="button">
+              <span>Ask Clara yourself</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <p class="welcome-disclaimer">Demonstration using a fictional university and sample course information.</p>
       </div>
 
       <!-- Under-the-hood toggle toast (transient explainer) -->
@@ -1519,19 +1803,33 @@
       </div>
 
       <div class="via-messages" id="viaMessages">
+        <!-- Personal conversation onboarding guidance (shown when Ask Clara yourself is chosen) -->
+        <div id="onboardingGuidance" class="onboarding-guidance" style="display:none;">
+          <div class="onboarding-prompt">
+            <h2 class="onboarding-title">What would you like help with?</h2>
+            <p class="onboarding-subtitle">Tell Clara what you want to study, or what needs to fit around your life.</p>
+          </div>
+          <div class="starter-chips" id="starterChips">
+            <button type="button" class="starter-chip" data-prompt="I’m not sure what to study.">I’m not sure what to study.</button>
+            <button type="button" class="starter-chip" data-prompt="I need an online course.">I need an online course.</button>
+            <button type="button" class="starter-chip" data-prompt="Could my work experience help me get in?">Could my work experience help me get in?</button>
+          </div>
+        </div>
         <div class="via-msg via-msg-ai" id="emptyMsg">
           <div class="via-msg-bubble">Connecting to Clara…</div>
         </div>
       </div>
 
       <div class="via-input-bar">
-        <button class="via-mode-btn" id="voiceBtn" disabled title="Enable microphone">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <button class="via-mode-btn via-talk-btn" id="voiceBtn" title="Talk to Clara" type="button">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
             <path
               d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
           </svg>
+          <span class="via-talk-text">Talk to Clara</span>
         </button>
+        <span class="via-input-guidance">or type a message</span>
         <div class="via-media-wrap">
           <button class="via-mode-btn" id="mediaBtn" disabled title="Share media">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1556,15 +1854,20 @@
           </div>
         </div>
         <input type="file" id="imageInput" accept="image/*" style="display:none" />
-        <input class="via-input" id="textInput" type="text" placeholder="Type a message…" disabled autocomplete="off" />
-        <button class="via-send" id="sendBtn" disabled>
+        <input class="via-input" id="textInput" type="text" placeholder="For example: I work full-time and need an online course." autocomplete="off" />
+        <button class="via-send" id="sendBtn" aria-label="Send message">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
           </svg>
         </button>
       </div>
 
-      <div class="via-powered"><strong>Waypoint</strong> · Powered by Google ADK · <a href="/byo" style="color:var(--accent-teal);text-decoration:none;font-weight:600;">For Universities →</a></div>
+      <div class="via-powered">
+        <strong>Waypoint</strong> · Powered by Google ADK ·
+        <a href="/byo" style="color:var(--accent-teal);text-decoration:none;font-weight:600;">For Universities →</a>
+        <span id="showcaseFooterSep"> · </span>
+        <a href="/showcase" id="showcaseFooterLink" style="color:var(--color-secondary);text-decoration:none;font-weight:500;">Watch a live example</a>
+      </div>
     </div>
 
     <!-- Resize handle -->
@@ -1709,8 +2012,21 @@
     }
 
     // ── WebSocket ─────────────────────────────────────────────────────────────────
-    function connect() {
-      ws = new WebSocket(WS_URL);
+    let pendingMessages = [];
+    let autoStartVoiceOnOpen = false;
+
+    function connect(opts = {}) {
+      if (ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) {
+        return;
+      }
+      const greetParam = (opts.greet !== undefined) ? (opts.greet ? "1" : "0") : "1";
+      autoStartVoiceOnOpen = !!opts.startVoice;
+      if (opts.pendingMessage) {
+        pendingMessages.push(opts.pendingMessage);
+      }
+      const sep = WS_URL.includes("?") ? "&" : "?";
+      const urlWithGreet = `${WS_URL}${sep}greet=${greetParam}`;
+      ws = new WebSocket(urlWithGreet);
       ws.binaryType = "arraybuffer";
 
       ws.onopen = () => {
@@ -1721,11 +2037,19 @@
         sendBtn.disabled = false;
         disconnectBtn.style.display = "block";
 
-        // Auto-start recording if possible
-        startRecording().catch(err => {
-          console.warn("Auto-start mic blocked by browser policy, waiting for user interaction.");
-          appendMsg("ai", "I'm ready! Click the microphone button in the input bar to enable voice.", true);
-        });
+        while (pendingMessages.length > 0) {
+          const msg = pendingMessages.shift();
+          ws.send(JSON.stringify({ type: "text", content: msg }));
+          ga('message_sent', { method: 'text', message_length: msg.length });
+        }
+
+        if (autoStartVoiceOnOpen) {
+          autoStartVoiceOnOpen = false;
+          startRecording().catch(err => {
+            console.warn("Auto-start mic blocked by browser policy, waiting for user interaction.");
+            appendMsg("ai", "I'm ready! Click the microphone button in the input bar to enable voice.", true);
+          });
+        }
       };
 
       ws.onclose = (ev) => {
@@ -2159,8 +2483,9 @@
     function makeCourseCard(c) {
       const card = document.createElement("div");
       card.className = "card";
-      const atar = c.atar_cutoff ? `ATAR ${c.atar_cutoff}+` : "No ATAR req.";
-      const match = c.match_pct ? `<span class="tag">${c.match_pct}% match</span>` : "";
+      const atar = c.atar_cutoff != null ? `ATAR ${c.atar_cutoff}+` : "ATAR not recorded";
+      const match = ""; // Retrieval similarity is not an eligibility or admission probability.
+      const suitability = c.suitability ? `<div class="card-detail"><strong>Eligibility:</strong> ${c.suitability.status === "met" ? "Recorded requirements appear met; admissions must confirm." : "Not verified. Check the requirements below."}</div>${(c.suitability.checks || []).filter(check => check.status !== "met").map(check => `<div class="card-detail">${esc(check.reason)}</div>`).join("")}` : "";
       card.innerHTML = `
     <div class="card-type-bar course">Course</div>
     <div class="card-body">
@@ -2170,6 +2495,7 @@
         <span class="tag">${esc(c.level)}</span>
         <span class="tag">${esc(c.study_mode)}</span>${match}
       </div>
+      ${suitability}
       ${c.entry_requirements ? `<div class="card-detail"><strong>Entry:</strong> ${esc(c.entry_requirements)}</div>` : ""}
       <div class="card-detail">${esc(c.career_outcomes || "")}</div>
       <div class="card-fee">$${(c.annual_fee_aud || 0).toLocaleString()}/yr · ${atar} · ${c.duration_years} yrs</div>
@@ -2605,8 +2931,21 @@ registerProcessor("uni-audio-processor", AudioProcessor);
 
     // ── Controls ──────────────────────────────────────────────────────────────────
     voiceBtn.addEventListener("click", () => {
-      if (!recording) startRecording();
-      else toggleMute();
+      const onboarding = document.getElementById("onboardingGuidance");
+      if (onboarding) onboarding.style.display = "none";
+      messages.style.display = "flex";
+      const welcome = document.getElementById("welcomeContainer");
+      if (welcome) welcome.style.display = "none";
+
+      if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
+        connect({ startVoice: true, greet: 1 });
+      } else if (ws.readyState === WebSocket.CONNECTING) {
+        autoStartVoiceOnOpen = true;
+      } else if (!recording) {
+        startRecording();
+      } else {
+        toggleMute();
+      }
     });
 
     // ── Media Menu ──────────────────────────────────────────────────────────────
@@ -2646,8 +2985,13 @@ registerProcessor("uni-audio-processor", AudioProcessor);
       newSessionBtn.style.display = "none";
       userInitiatedDisconnect = false;
       // Clear conversation
-      messages.innerHTML = '';
+      const onboarding = document.getElementById("onboardingGuidance");
+      messages.replaceChildren();
+      if (onboarding) messages.appendChild(onboarding);
       messages.appendChild(emptyMsg);
+      pendingMessages = [];
+      autoStartVoiceOnOpen = false;
+      textInput.value = "";
       agentMsgEl = null; userMsgEl = null;
       for (const k in traceEls) delete traceEls[k];
       // Clear cards
@@ -2655,10 +2999,64 @@ registerProcessor("uni-audio-processor", AudioProcessor);
       cardGroups = []; activeGroupId = null;
       cardNav.innerHTML = '';
       cardNav.classList.remove("has-groups");
-      noCards.style.display = "block";
+      noCards.style.display = "flex";
       // Fresh session URL
       WS_URL = getWsUrl();
-      connect();
+      if (DEMO_ID) {
+        connect({ startVoice: true, greet: 1 });
+      } else {
+        initWelcomeState();
+      }
+    });
+
+    // ── Welcome & Onboarding State ────────────────────────────────────────────────
+    function initWelcomeState() {
+      pendingMessages = [];
+      autoStartVoiceOnOpen = false;
+      textInput.value = "";
+      voiceBtn.disabled = false;
+      textInput.disabled = false;
+      sendBtn.disabled = false;
+      mediaBtn.disabled = true;
+      setStatus("", "Ready");
+      const welcome = document.getElementById("welcomeContainer");
+      const onboarding = document.getElementById("onboardingGuidance");
+      if (welcome) welcome.style.display = "flex";
+      if (messages) messages.style.display = "none";
+      if (onboarding) onboarding.style.display = "none";
+      if (emptyMsg) emptyMsg.style.display = "none";
+      if (noCards) {
+        const p = noCards.querySelector("p");
+        if (p) p.textContent = "Course information will appear here when you talk to Clara.";
+        noCards.style.display = "flex";
+      }
+    }
+
+    const btnAskClara = document.getElementById("btnAskClara");
+    if (btnAskClara) {
+      btnAskClara.addEventListener("click", () => {
+        const welcome = document.getElementById("welcomeContainer");
+        const onboarding = document.getElementById("onboardingGuidance");
+        if (welcome) welcome.style.display = "none";
+        messages.style.display = "flex";
+        if (onboarding) onboarding.style.display = "block";
+        if (emptyMsg) emptyMsg.style.display = "none";
+        voiceBtn.disabled = false;
+        textInput.disabled = false;
+        sendBtn.disabled = false;
+        textInput.focus();
+        ga('welcome_choice', { choice: 'ask_clara' });
+      });
+    }
+
+    const starterChips = document.querySelectorAll(".starter-chip");
+    starterChips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        const promptText = chip.getAttribute("data-prompt") || chip.textContent.trim();
+        textInput.value = promptText;
+        textInput.focus();
+        ga('starter_chip_clicked', { prompt: promptText });
+      });
     });
 
     sendBtn.addEventListener("click", sendText);
@@ -2666,11 +3064,25 @@ registerProcessor("uni-audio-processor", AudioProcessor);
 
     function sendText() {
       const text = textInput.value.trim();
-      if (!text || ws?.readyState !== WebSocket.OPEN) return;
-      appendMsg("user", text);
+      if (!text) return;
+      const onboarding = document.getElementById("onboardingGuidance");
+      if (onboarding) onboarding.style.display = "none";
+      messages.style.display = "flex";
+      const welcome = document.getElementById("welcomeContainer");
+      if (welcome) welcome.style.display = "none";
+
       textInput.value = "";
-      ws.send(JSON.stringify({ type: "text", content: text }));
-      ga('message_sent', { method: 'text', message_length: text.length });
+      appendMsg("user", text);
+
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        pendingMessages.push(text);
+        if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
+          connect({ startVoice: false, greet: 0 });
+        }
+      } else {
+        ws.send(JSON.stringify({ type: "text", content: text }));
+        ga('message_sent', { method: 'text', message_length: text.length });
+      }
     }
 
     function setStatus(cls, label) {
@@ -2849,7 +3261,14 @@ registerProcessor("uni-audio-processor", AudioProcessor);
 
 
     // ── Boot ──────────────────────────────────────────────────────────────────────
-    connect();
+    if (DEMO_ID) {
+      connect({ startVoice: true, greet: 1 });
+    } else {
+      initWelcomeState();
+      if (new URLSearchParams(window.location.search).get("mode") === "ask") {
+        btnAskClara.click();
+      }
+    }
   </script>
   <!-- First-run guided tour -->
   <div id="tourRoot" aria-hidden="true">
@@ -2875,9 +3294,9 @@ registerProcessor("uni-audio-processor", AudioProcessor);
     // ── First-run guided tour (coachmarks) ──────────────────────────────────────
     (function () {
       const STEPS = [
-        { sel: null, title: "Welcome to Waypoint", body: "Meet {agent} — your real-time voice AI course counsellor. Here's a quick 20-second tour.", place: "center" },
-        { sel: "#voiceBtn", title: "Voice is on — just start talking", body: "{agent} greets you and starts listening the moment you arrive, like a phone call. Tap the mic to mute and switch to text-only mode; tap again to unmute and return to voice.", place: "top",
-          titleMobile: "Tap the mic to talk", bodyMobile: "Tap the mic to start the conversation — {agent} listens and replies out loud. Tap it again to mute and switch to text-only mode." },
+        { sel: null, title: "Welcome to Waypoint", body: "Meet {agent} — your real-time voice AI course counsellor. This showcase uses fictional data. Explore options and next steps; eligibility is not confirmed. Here's a quick tour.", place: "center" },
+        { sel: "#voiceBtn", title: "Talk with {agent}", body: "Click 'Talk to {agent}' to start a live voice conversation. {agent} listens and replies out loud. Tap the mic again to mute or pause voice.", place: "top",
+          titleMobile: "Tap to talk", bodyMobile: "Tap 'Talk to {agent}' to begin speaking. Tap again to mute or switch to text-only mode." },
         { sel: "#textInput", title: "Or just type", body: "Prefer to type? Ask your question here and {agent} answers the same way.", place: "top" },
         { sel: "#mediaBtn", title: "Show, don't just tell", body: "Share a photo — like a school report — or your screen, and {agent} can see it and respond.", place: "top" },
         { sel: "#hoodToggle", title: "Peek under the hood", body: "Turn this on to watch the exact tools {agent} calls, with their inputs and results, as you chat.", place: "bottom" },
@@ -3021,6 +3440,112 @@ registerProcessor("uni-audio-processor", AudioProcessor);
           start();
           if (typeof ga === "function") ga("tour_started", { trigger: "auto" });
         }, 900);
+      }
+    })();
+  </script>
+
+  <!-- Showcase Exit Confirmation Modal -->
+  <div id="showcaseExitModal" class="exit-modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="exitModalTitle">
+    <div class="exit-modal-card">
+      <h3 id="exitModalTitle" style="font-size:16px;font-weight:600;margin-bottom:8px;color:var(--color-primary);">Leave this conversation?</h3>
+      <p style="font-size:13.5px;color:var(--color-secondary);line-height:1.5;margin-bottom:20px;">
+        Leave this conversation to view the live example preview? Returning starts a new conversation.
+      </p>
+      <div style="display:flex;justify-content:flex-end;gap:10px;">
+        <button id="exitModalCancelBtn" class="exit-btn-cancel" type="button">Stay here</button>
+        <button id="exitModalConfirmBtn" class="exit-btn-confirm" type="button">View live example</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Showcase navigation & exit confirmation modal ──
+    (function initShowcaseExitModal() {
+      function attach() {
+        const showcaseLink = document.getElementById("showcaseFooterLink");
+        const showcaseSep = document.getElementById("showcaseFooterSep");
+        const modal = document.getElementById("showcaseExitModal");
+        const cancelBtn = document.getElementById("exitModalCancelBtn");
+        const confirmBtn = document.getElementById("exitModalConfirmBtn");
+
+        if (!showcaseLink || !modal || !cancelBtn || !confirmBtn) return;
+
+        // Hide on /demo/<id>
+        if (window.location.pathname.startsWith("/demo")) {
+          showcaseLink.style.display = "none";
+          if (showcaseSep) showcaseSep.style.display = "none";
+          return;
+        }
+
+        let previouslyFocusedElement = null;
+
+        function performFullTeardownAndLeave() {
+          userInitiatedDisconnect = true;
+          try { stopAgentAudio(); } catch (e) {}
+          try { stopRecording(); } catch (e) {}
+          try { stopScreenSharing(); } catch (e) {}
+          try { ws?.close(); } catch (e) {}
+          window.location.href = "/showcase";
+        }
+
+        function openModal() {
+          previouslyFocusedElement = document.activeElement;
+          modal.style.display = "flex";
+          cancelBtn.focus();
+        }
+
+        function closeModal() {
+          modal.style.display = "none";
+          if (previouslyFocusedElement && typeof previouslyFocusedElement.focus === "function") {
+            previouslyFocusedElement.focus();
+          } else {
+            showcaseLink.focus();
+          }
+        }
+
+        showcaseLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          const isLive = ws && ws.readyState === WebSocket.OPEN;
+          if (isLive) {
+            openModal();
+          } else {
+            performFullTeardownAndLeave();
+          }
+        });
+
+        cancelBtn.addEventListener("click", closeModal);
+        confirmBtn.addEventListener("click", performFullTeardownAndLeave);
+
+        // Focus trap & Escape key
+        modal.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            closeModal();
+            return;
+          }
+          if (e.key === "Tab") {
+            const focusables = [cancelBtn, confirmBtn];
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            if (e.shiftKey) {
+              if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          }
+        });
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", attach);
+      } else {
+        attach();
       }
     })();
   </script>

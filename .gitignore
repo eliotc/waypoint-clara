@@ -24,3 +24,23 @@ eval_report.json
 extracted_secrets.txt
 
 .tmp/
+
+assignment/
+
+waypoint-wiki.md
+
+# Evaluation evidence (commit reviewed synthetic fixtures, not generated runs)
+evaluation/runs/
+
+# Private local documentation — never commit
+/docs/private/
+
+.mailbox/
+
+evaluation/experiments/**/runs/
+*.pcm
+testing/red-team/*-results.json
+
+# Evaluation records generated at runtime (e.g. by the showcase runner); not published.
+# Labelled synthetic test fixtures live under evaluation/tests/fixtures/records/.
+/evaluation/records/

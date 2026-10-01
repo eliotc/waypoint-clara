@@ -1,0 +1,349 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://waypoint.vozara.ai/schemas/eval_records_v1.json",
+  "title": "Waypoint Evaluation Records Schema v1.0",
+  "description": "Defines the 4 linked records for evaluation outcomes: Run, Assessment, Issue, and VerificationEvent.",
+  "$defs": {
+    "evidence_ref": {
+      "type": "object",
+      "required": ["artifact_id", "citation_path"],
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "description": "Unique identifier or file path of the artifact containing the evidence"
+        },
+        "artifact_sha256": {
+          "type": ["string", "null"],
+          "description": "SHA256 checksum of the artifact"
+        },
+        "location": {
+          "type": ["object", "null"],
+          "description": "Structured pointer into the artifact (e.g. turn_id, event_index, speaker)",
+          "properties": {
+            "turn_id": { "type": ["integer", "string"] },
+            "speaker": { "type": "string" },
+            "event_index": { "type": "integer" }
+          },
+          "additionalProperties": true
+        },
+        "citation_path": {
+          "type": "string",
+          "description": "JSON pointer, line reference, or key path to the cited item"
+        },
+        "excerpt": {
+          "type": ["string", "null"],
+          "description": "Optional short literal excerpt or formatted quote for quick scanning"
+        }
+      },
+      "additionalProperties": false
+    },
+    "attributed_hypothesis": {
+      "type": "object",
+      "required": ["hypothesis_id", "proposed_by", "proposed_at", "summary", "confidence", "review_status"],
+      "properties": {
+        "hypothesis_id": { "type": "string" },
+        "proposed_by": { "type": "string" },
+        "proposed_at": { "type": "string", "format": "date-time" },
+        "summary": { "type": "string", "minLength": 1 },
+        "confidence": { "type": "string", "enum": ["low", "medium", "high"] },
+        "suspected_component": { "type": "string" },
+        "supporting_evidence_refs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence_ref" }
+        },
+        "review_status": {
+          "type": "string",
+          "enum": ["proposed", "accepted", "rejected", "superseded"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "denominators": {
+      "type": "object",
+      "required": ["total_opportunities", "passes", "issues", "incomplete", "execution_errors"],
+      "properties": {
+        "total_opportunities": { "type": "integer", "minimum": 0 },
+        "passes": { "type": "integer", "minimum": 0 },
+        "issues": { "type": "integer", "minimum": 0 },
+        "incomplete": { "type": "integer", "minimum": 0 },
+        "execution_errors": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "run_record": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "record_type",
+        "run_id",
+        "started_at",
+        "status",
+        "target",
+        "environment",
+        "scenario"
+      ],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "record_type": { "const": "run" },
+        "run_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$" },
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": ["string", "null"], "format": "date-time" },
+        "status": {
+          "type": "string",
+          "enum": ["completed", "stopped", "failed", "running"]
+        },
+        "target": {
+          "type": "object",
+          "required": ["agent_name", "model_id", "runtime"],
+          "properties": {
+            "agent_name": { "type": "string" },
+            "model_id": { "type": "string" },
+            "runtime": { "type": "string" }
+          },
+          "additionalProperties": true
+        },
+        "environment": {
+          "type": "object",
+          "required": [
+            "git_commit",
+            "git_dirty",
+            "application_source_sha256",
+            "prompt_sha256",
+            "dataset_version"
+          ],
+          "properties": {
+            "git_commit": { "type": "string" },
+            "git_dirty": { "type": "boolean" },
+            "application_source_sha256": { "type": "string" },
+            "prompt_sha256": { "type": "string" },
+            "dataset_version": { "type": "string" },
+            "dataset_sha256": { "type": ["string", "null"] }
+          },
+          "additionalProperties": true
+        },
+        "scenario": {
+          "type": "object",
+          "required": ["scenario_id", "version", "name", "turn_count"],
+          "properties": {
+            "scenario_id": { "type": "string" },
+            "version": { "type": "string" },
+            "name": { "type": "string" },
+            "turn_count": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": true
+        },
+        "artifacts": {
+          "type": ["object", "null"],
+          "properties": {
+            "raw_trace_path": { "type": ["string", "null"] },
+            "raw_trace_sha256": { "type": ["string", "null"] },
+            "audio_bytes": { "type": ["integer", "null"] }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "assessment_record": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "record_type",
+        "assessment_id",
+        "run_id",
+        "assessed_at",
+        "evaluator",
+        "denominators",
+        "results"
+      ],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "record_type": { "const": "assessment" },
+        "assessment_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$" },
+        "run_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$" },
+        "assessed_at": { "type": "string", "format": "date-time" },
+        "evaluator": {
+          "type": "object",
+          "required": ["kind", "reviewer_role", "rubric_version", "configuration_hash"],
+          "properties": {
+            "kind": { "type": "string", "enum": ["model", "human", "automated_check"] },
+            "reviewer_role": {
+              "type": "string",
+              "enum": ["automated_judge", "implementer_self_review", "independent_review"]
+            },
+            "model_id": { "type": ["string", "null"] },
+            "rubric_version": { "type": "string" },
+            "configuration_hash": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "supersedes_assessment_id": { "type": ["string", "null"] },
+        "denominators": { "$ref": "#/$defs/denominators" },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["result_id", "criterion_id", "outcome", "severity", "summary", "evidence_refs", "tags"],
+            "properties": {
+              "result_id": { "type": "string" },
+              "criterion_id": { "type": "string" },
+              "outcome": {
+                "type": "string",
+                "enum": ["pass", "issue_observed", "unable_to_assess", "execution_error"]
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["none", "low", "medium", "major", "critical"]
+              },
+              "summary": { "type": "string", "minLength": 1 },
+              "evidence_refs": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/evidence_ref" }
+              },
+              "tags": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "issue_id": { "type": ["string", "null"] }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "issue_record": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "record_type",
+        "issue_id",
+        "title",
+        "status",
+        "primary_layer",
+        "taxonomy_tags",
+        "affected_criteria",
+        "first_observed_in_run_id",
+        "first_observed_in_assessment_id",
+        "attributed_hypotheses",
+        "linked_runs",
+        "linked_assessments"
+      ],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "record_type": { "const": "issue" },
+        "issue_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$" },
+        "title": { "type": "string", "minLength": 1 },
+        "status": {
+          "type": "string",
+          "enum": [
+            "open",
+            "hypothesis_proposed",
+            "repair_implemented",
+            "verified",
+            "rejected_not_a_defect"
+          ]
+        },
+        "primary_layer": {
+          "type": "string",
+          "enum": ["application", "domain_evaluation", "harness"]
+        },
+        "taxonomy_tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "affected_criteria": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "first_observed_in_run_id": { "type": "string" },
+        "first_observed_in_assessment_id": { "type": "string" },
+        "attributed_hypotheses": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/attributed_hypothesis" }
+        },
+        "proposed_repair": {
+          "type": ["object", "null"],
+          "required": ["layer", "summary"],
+          "properties": {
+            "layer": { "type": "string", "enum": ["application", "domain_evaluation", "harness"] },
+            "summary": { "type": "string" },
+            "target_files": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "linked_runs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "linked_assessments": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "verification_record": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "record_type",
+        "event_id",
+        "event_type",
+        "timestamp",
+        "actor",
+        "actor_role",
+        "target_issue_id",
+        "disposition_change"
+      ],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "record_type": { "const": "verification_event" },
+        "event_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$" },
+        "event_type": {
+          "type": "string",
+          "enum": ["adjudication", "repair_implementation", "verification_retest"]
+        },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "actor": { "type": "string" },
+        "actor_role": {
+          "type": "string",
+          "enum": ["implementer", "independent_reviewer", "owner"]
+        },
+        "target_issue_id": { "type": "string" },
+        "disposition_change": {
+          "type": "object",
+          "required": ["previous_status", "new_status", "rationale"],
+          "properties": {
+            "previous_status": { "type": "string" },
+            "new_status": { "type": "string" },
+            "rationale": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "implementation_reference": {
+          "type": ["object", "null"],
+          "properties": {
+            "git_commit": { "type": ["string", "null"] },
+            "patch_summary": { "type": ["string", "null"] },
+            "affected_files": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "verification_run_id": { "type": ["string", "null"] },
+        "verification_assessment_id": { "type": ["string", "null"] },
+        "superseded_assessment_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

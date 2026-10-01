@@ -1,0 +1,20 @@
+{
+  "protocol_version": 3,
+  "experiment_id": "EXP-SIM-003",
+  "evidence_kind": "adaptive_persona_live_text",
+  "target": {
+    "endpoint": "http://127.0.0.1:8765",
+    "model": "gemini-3.1-flash-live-preview",
+    "require_embeddings": true,
+    "turn_timeout_seconds": 90
+  },
+  "dataset_id": "clara-local-seed-v2",
+  "personas": "../../domains/education/personas/discovery-synthetic-v1.json",
+  "adaptive_turns": 4,
+  "recap_request": "Before we finish, please give me a recap of what we have established and what I can do next.",
+  "limits": "Eight fresh local Clara sessions, four fixed invented profiles times two simulator models, AB/BA order balanced. Four adaptive turns plus elicited recap and interpretation per session; at most 40 simulator calls and 40 user turns, no script-level retry. Transcript only, no UI/audio perception, no population/adoption inference. Different trajectories and supported thinking settings confound direct failure-count comparisons.",
+  "models": [
+    "gemini-2.5-flash",
+    "gemini-3.8-flash"
+  ]
+}

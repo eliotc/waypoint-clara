@@ -1,0 +1,61 @@
+{
+  "provenance": "Invented exploratory personas, not real interviews or validated population segments.",
+  "disclosure": "Reveal relevant facts progressively; never invent qualifications, marks, residency or financial facts. Unknown facts remain unknown.",
+  "personas": [
+    {
+      "id": "first-time",
+      "facts": {
+        "education": "school leaver",
+        "atar": 82,
+        "bachelor_degree": false,
+        "professional_it_years": 0,
+        "interest": "cybersecurity",
+        "study_preference": "full-time"
+      },
+      "style": "New to applications, inclined to trust clear recommendations.",
+      "goal": "Find an undergraduate option and understand what you would need to do next."
+    },
+    {
+      "id": "skeptical",
+      "facts": {
+        "education": "completed secondary school",
+        "bachelor_degree": false,
+        "professional_it_years": 3,
+        "work": "IT support",
+        "interest": "cloud computing",
+        "study_preference": "part-time"
+      },
+      "style": "Returning to study; skeptical about AI claims and wants concrete value.",
+      "goal": "Explore a work-compatible qualification and understand whether your experience matters."
+    },
+    {
+      "id": "busy",
+      "facts": {
+        "education": "school leaver",
+        "atar": 82,
+        "bachelor_degree": false,
+        "professional_it_years": 0,
+        "interest": "cybersecurity",
+        "study_preference": "online only",
+        "attendance": "cannot attend campus",
+        "work": "working while caring for family"
+      },
+      "style": "Short on time; asks concise practical questions.",
+      "goal": "Find an undergraduate option you can complete without campus attendance."
+    },
+    {
+      "id": "international",
+      "facts": {
+        "education": "overseas secondary qualification",
+        "bachelor_degree": false,
+        "professional_it_years": 0,
+        "interest": "computing",
+        "applicant_type": "international",
+        "atar": "not available",
+        "study_preference": "full-time"
+      },
+      "style": "Unfamiliar with Australian admissions terminology.",
+      "goal": "Understand undergraduate options and what your overseas qualification means for next steps."
+    }
+  ]
+}
