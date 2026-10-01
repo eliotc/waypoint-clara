@@ -3455,3 +3455,65 @@ blockquote {
   .journey-progress,.story-intro { padding:18px; }
   #statusPill { font-size:20px; }
 }
+
+/* ==========================================================================
+   Phones and narrow tablets: stack the progress panel above the stage and
+   let the page scroll instead of locking panels to the viewport.
+   ========================================================================== */
+@media (max-width: 800px) {
+  body.showcase-viewport-locked {
+    height: auto;
+    min-height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .showcase-header { height: auto; padding: 8px 12px; }
+  .header-inner { padding: 0; gap: 8px; }
+  .brand-divider,
+  .brand-page-title,
+  .static-pill-note { display: none; }
+  .btn-header-cta { white-space: nowrap; }
+
+  .showcase-app-layout {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .showcase-sidebar,
+  .showcase-sidebar.collapsed {
+    width: 100%;
+    height: auto;
+    padding: 12px;
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid rgba(33, 34, 38, 0.08);
+    box-shadow: none;
+  }
+  /* Question and criteria lists repeat what the stage shows; keep the panel short. */
+  .sidebar-substeps-list,
+  .sidebar-criteria-list { display: none; }
+
+  .showcase-main-stage {
+    height: auto;
+    overflow: visible;
+    padding: 12px;
+  }
+  .idle-card-inner { padding: 24px 16px; }
+  .idle-cta-guide { display: none; }
+
+  .recording-columns.single-frame {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+    gap: 12px;
+  }
+  .conversation-column,
+  .findings-column {
+    width: 100% !important;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    overflow: visible;
+  }
+  .panel-splitter { display: none; }
+}
