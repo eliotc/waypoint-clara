@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "experiment_id": "EXP-000",
+  "title": "Validate the evaluation foundation using synthetic evidence",
+  "status": "ready",
+  "owner": "Eliot (demo product owner)",
+  "hypothesis": "The harness preserves supplied constraints and evidence, distinguishes deterministic checks from human judgment, and never reports unresolved review as full success.",
+  "domain": "education",
+  "dataset": "../../domains/education/fixtures/catalog-v1.json",
+  "target": {
+    "adapter": "fixture",
+    "model": null,
+    "reference_model": "gemini-3.1-flash-live-preview",
+    "fixture": "../../domains/education/fixtures/traces-v1.json"
+  },
+  "scenarios": [
+    "../../domains/education/scenarios/constraints-001.json",
+    "../../domains/education/scenarios/gate-001.json"
+  ],
+  "repetitions": 1,
+  "contract": "../../domains/education/contract.md"
+}

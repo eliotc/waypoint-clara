@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "record_type": "run",
+  "run_id": "run-synthetic-incomplete",
+  "started_at": "2026-01-01T00:00:00Z",
+  "completed_at": "2026-01-01T00:02:00Z",
+  "status": "completed",
+  "target": {
+    "agent_name": "clara",
+    "model_id": "example-live-model",
+    "runtime": "synthetic-fixture"
+  },
+  "environment": {
+    "git_commit": "ec9a2a769c8cdc3fcd86866769aa8cf315d19b71",
+    "git_dirty": false,
+    "application_source_sha256": "4e2f18367dc7ed08768919c26b2a02444958b573a01f29c05120e0bc899cef65",
+    "prompt_sha256": "82af13913f18058675cf8d59a2107c545ec9007a33811234acb7bf7a5d32afb5",
+    "dataset_version": "clara-local-seed-v2",
+    "dataset_sha256": "c8bb71fe2bc4bbbe7c0cfa4abf497276c26488c1c14eb4b599cacda92be26b6b"
+  },
+  "scenario": {
+    "scenario_id": "synthetic-incomplete",
+    "version": "1.0.0",
+    "name": "Synthetic fixture: incomplete evidence",
+    "turn_count": 6
+  },
+  "artifacts": {
+    "raw_trace_path": "synthetic/traces/example-trace.json",
+    "raw_trace_sha256": "ffa917ab501c3bdbf9af28ad9527c67cb8084ad442bef2e587afe73cc2f16d26",
+    "audio_bytes": 0
+  }
+}

@@ -1,0 +1,635 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "experiment": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.1"
+        },
+        "experiment_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "ready"
+          ]
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hypothesis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "domain": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataset": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "adapter": {
+                  "const": "fixture"
+                },
+                "model": {
+                  "type": "null"
+                },
+                "reference_model": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "fixture": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "adapter",
+                "model",
+                "reference_model",
+                "fixture"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "adapter": {
+                  "const": "clara_live"
+                },
+                "model": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "endpoint": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "require_embeddings": {
+                  "type": "boolean"
+                },
+                "turn_timeout_seconds": {
+                  "type": "number",
+                  "minimum": 5,
+                  "maximum": 180
+                }
+              },
+              "required": [
+                "adapter",
+                "model",
+                "endpoint",
+                "require_embeddings",
+                "turn_timeout_seconds"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "repetitions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "contract": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "schema_version",
+        "experiment_id",
+        "title",
+        "status",
+        "owner",
+        "hypothesis",
+        "domain",
+        "dataset",
+        "target",
+        "scenarios",
+        "repetitions",
+        "contract"
+      ],
+      "additionalProperties": false
+    },
+    "persona": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.1"
+        },
+        "persona_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "synthetic",
+                "interview",
+                "research"
+              ]
+            },
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "limitations": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "limitations"
+          ],
+          "additionalProperties": false
+        },
+        "facts": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "goals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "disclosure_policy": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "schema_version",
+        "persona_id",
+        "name",
+        "provenance",
+        "facts",
+        "goals",
+        "disclosure_policy"
+      ],
+      "additionalProperties": false
+    },
+    "scenario": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.1"
+        },
+        "scenario_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "persona": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task": {
+          "type": "string",
+          "minLength": 1
+        },
+        "user_turns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+              },
+              "criterion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "severity": {
+                "enum": [
+                  "critical",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "pointer": {
+                "type": "string",
+                "pattern": "^(/.*)?$"
+              },
+              "operator": {
+                "enum": [
+                  "equals",
+                  "manual"
+                ]
+              },
+              "expected": {},
+              "instruction": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "criterion",
+              "severity",
+              "pointer",
+              "operator"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "operator": {
+                      "const": "equals"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "expected"
+                  ],
+                  "not": {
+                    "required": [
+                      "instruction"
+                    ]
+                  }
+                },
+                "else": {
+                  "required": [
+                    "instruction"
+                  ],
+                  "not": {
+                    "required": [
+                      "expected"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "schema_version",
+        "scenario_id",
+        "persona",
+        "task",
+        "user_turns",
+        "checks"
+      ],
+      "additionalProperties": false
+    },
+    "dataset": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.1"
+        },
+        "dataset_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "provenance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clock": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "data": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "schema_version",
+        "dataset_id",
+        "provenance",
+        "clock",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "trace": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.1"
+        },
+        "scenario_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "turns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "user": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assistant": {
+                "type": "string"
+              },
+              "tools": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "arguments": {
+                      "type": "object"
+                    },
+                    "result": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "arguments",
+                    "result"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 0
+              },
+              "cards": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "minItems": 0
+              }
+            },
+            "required": [
+              "user",
+              "assistant",
+              "tools",
+              "cards"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "observations": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "schema_version",
+        "scenario_id",
+        "turns",
+        "observations"
+      ],
+      "additionalProperties": false
+    },
+    "fixture": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.1"
+        },
+        "dataset_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "provenance": {
+          "const": "hand-authored synthetic traces; not model output"
+        },
+        "traces": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/trace"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "schema_version",
+        "dataset_id",
+        "provenance",
+        "traces"
+      ],
+      "additionalProperties": false
+    },
+    "report": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.1"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "experiment_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+        },
+        "evidence_kind": {
+          "enum": [
+            "synthetic_fixture",
+            "live_text_input"
+          ]
+        },
+        "completed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "summary": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "statuses": {
+              "type": "object",
+              "properties": {
+                "PASS": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "FAIL": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "NEEDS_HUMAN": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "ERROR": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "SKIPPED": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "PASS",
+                "FAIL",
+                "NEEDS_HUMAN",
+                "ERROR",
+                "SKIPPED"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "total",
+            "statuses"
+          ],
+          "additionalProperties": false
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenario_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+              },
+              "repetition": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "status": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "NEEDS_HUMAN",
+                  "ERROR",
+                  "SKIPPED"
+                ]
+              },
+              "checks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "criterion": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "severity": {
+                      "enum": [
+                        "critical",
+                        "high",
+                        "medium",
+                        "low"
+                      ]
+                    },
+                    "pointer": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "PASS",
+                        "FAIL",
+                        "NEEDS_HUMAN",
+                        "ERROR",
+                        "SKIPPED"
+                      ]
+                    },
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "criterion",
+                    "severity",
+                    "pointer",
+                    "status",
+                    "reason"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 0
+              },
+              "trace": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "error": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "scenario_id",
+              "repetition",
+              "status",
+              "checks",
+              "trace"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "schema_version",
+        "run_id",
+        "experiment_id",
+        "evidence_kind",
+        "completed_at",
+        "summary",
+        "results"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

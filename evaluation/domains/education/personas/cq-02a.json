@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "persona_id": "cq-02a",
+  "name": "CQ-02A synthetic fixed-input profile",
+  "provenance": {
+    "kind": "synthetic",
+    "source": "Independently invented education conversation-quality case; owner accepted the matrix.",
+    "limitations": "No real participant or population representation. Only supplied user turns establish disclosed facts."
+  },
+  "facts": {
+    "disclosed_messages": [
+      "I am new to university admissions. What does the ATAR cutoff for the Bachelor of Cybersecurity mean?"
+    ],
+    "variant": "Novice knowledge"
+  },
+  "goals": [
+    "Understand the course information requested in the scripted messages."
+  ],
+  "disclosure_policy": "Fixed inputs only. No generative persona; do not infer additional personal facts."
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.1",
+  "experiment_id": "EXP-LIVE-001",
+  "title": "Read-only Clara Live baseline",
+  "status": "ready",
+  "owner": "Eliot (demo product owner)",
+  "hypothesis": "The real Live agent can clarify an underspecified request and retrieve event information with recorded audio and grounded evidence, without database writes.",
+  "domain": "education",
+  "dataset": "../../domains/education/fixtures/live-seed.json",
+  "target": {
+    "adapter": "clara_live",
+    "model": "gemini-3.1-flash-live-preview",
+    "endpoint": "http://127.0.0.1:8765",
+    "require_embeddings": false,
+    "turn_timeout_seconds": 60
+  },
+  "scenarios": [
+    "../../domains/education/scenarios/live-gate-001.json",
+    "../../domains/education/scenarios/live-events-001.json"
+  ],
+  "repetitions": 1,
+  "contract": "../../domains/education/contract.md"
+}

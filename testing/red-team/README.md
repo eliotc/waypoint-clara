@@ -1,5 +1,12 @@
 # Waypoint (Clara) — Adversarial & Test Suite
 
+> **September 2026 update:** `run_regression.py` now requires a disposable
+> `EVAL_DATABASE_URL`, saves full tool arguments/results in a unique run report,
+> and routes semantic judgments to human review. Empty responses cannot pass.
+> The stored `regression-results.json` is historical and has not been rescored.
+> See [the foundation](../../evaluation/README.md) for offline commands and exit statuses.
+
+
 Manual/agent-driven test suites for the Clara voice agent, focused on **safety
 posture** first and **functionality + quality** second. These complement, not
 replace, the automated `eval_suite.py` (tool routing/correctness) and the
@@ -39,7 +46,7 @@ to accept hostile input?
 - **`FN-*` Functional**: each tool fires on the right intent; recommendation
   gate, schedule validation, party-size limits, out-of-scope rules, ATAR
   pass-through, turn-isolation, and empty-result handling behave correctly.
-- **`NF-*` Non-functional**: TTFT latency (<1.5s), spoken response length
+- **`NF-*` Non-functional**: voice response/card latency baseline (numerical targets pending), spoken response length
   (~50 words), card rendering, fresh-session-on-reconnect, concurrency
   (`_MAX_CONCURRENT=5`) and hourly rate limit (`_MAX_PER_HOUR=100`), long-session
   stability (no 1007/1008/1011), and multilingual QoS. These use a `procedure`
@@ -86,3 +93,12 @@ review. The full `auto_flags` dictionary (including the expanded set:
 ```bash
 python3 -c "import json; d=json.load(open('testing/red-team/expanded-suite.json')); print(len(d['scenarios']), 'scenarios')"
 ```
+
+### September behavior alignment
+
+The expanded suite follows the provisional database-grounding, clarification and
+latency rules. The baseline suite remains a historical record of the original
+40 scenarios; its fixed fact-count gate is superseded for new evaluations by
+[the behavior contract](../../evaluation/domains/education/contract.md).
+Historical saved outcomes have not been rerun or regraded. Supplemental handover,
+clarification and recovery procedures are in the manual UI suite, BC-01–BC-06.

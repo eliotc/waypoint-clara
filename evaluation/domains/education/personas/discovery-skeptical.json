@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "persona_id": "discovery-skeptical",
+  "name": "skeptical (synthetic replay)",
+  "provenance": {
+    "kind": "synthetic",
+    "source": "Synthetic scenario designed from owner-approved counselling journeys; no real participant.",
+    "limitations": "Tests a plausible situation; does not represent the student population."
+  },
+  "facts": {
+    "source": "EXP-SIM-002 skeptical disclosed user messages; fixed regression, no generative simulator"
+  },
+  "goals": [
+    "Test accepted discovery defects"
+  ],
+  "disclosure_policy": "Only scripted messages are sent; private persona facts are not evidence of disclosure."
+}

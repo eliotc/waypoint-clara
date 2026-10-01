@@ -8,16 +8,16 @@ Layer 1 — Tool Correctness: calls each tool directly against the real DB and
            asserts on result shape, counts, and expected fields.
 
 Layer 2 — Tool Routing: sends natural-language queries to Gemini (text mode,
-           zero-cost vs. audio) and checks whether the model selects the
+           a text proxy for audio) and checks whether the model selects the
            expected tool. No actual tool execution.
 
 Usage
 -----
     # Run both layers (default):
-    DATABASE_URL=<dsn> GOOGLE_API_KEY=<key> python eval_suite.py
+    EVAL_DATABASE_URL=<disposable-dsn> GOOGLE_API_KEY=<key> python eval_suite.py
 
     # Skip Gemini routing tests:
-    DATABASE_URL=<dsn> GOOGLE_API_KEY=<key> python eval_suite.py --layer1-only
+    EVAL_DATABASE_URL=<disposable-dsn> GOOGLE_API_KEY=<key> python eval_suite.py --layer1-only
 
     # Skip direct tool tests:
     GOOGLE_API_KEY=<key> python eval_suite.py --layer2-only
@@ -56,7 +56,6 @@ def _load_dotenv(env_path: Path) -> None:
             val = val.strip().strip('"').strip("'")
             os.environ.setdefault(key, val)
 
-_load_dotenv(Path(__file__).parent / ".env")
 
 # ── Colour helpers ─────────────────────────────────────────────────────────────
 GREEN  = "\033[32m"
@@ -76,6 +75,9 @@ def _head(msg): print(f"\n{BOLD}{CYAN}{msg}{RESET}")
 
 def run_layer1() -> list[dict]:
     _head("Layer 1: Tool Correctness (Direct DB Calls)")
+
+    from evaluation.isolation import configure_evaluation_database
+    configure_evaluation_database()
 
     # tools.py lives in backend/; add it to path
     sys.path.insert(0, str(Path(__file__).parent / "backend"))
@@ -443,6 +445,7 @@ def _build_tool_declarations():
             parameters=t.Schema(type="OBJECT", properties={
                 "query":   t.Schema(type="STRING"),
                 "faculty": t.Schema(type="STRING"),
+                "student_atar": t.Schema(type="INTEGER"),
             }, required=["query"]),
         ),
         t.FunctionDeclaration(
@@ -452,6 +455,7 @@ def _build_tool_declarations():
                 "interests":              t.Schema(type="STRING"),
                 "strengths":              t.Schema(type="STRING"),
                 "study_mode_preference":  t.Schema(type="STRING"),
+                "student_atar": t.Schema(type="INTEGER"),
             }, required=["interests", "strengths"]),
         ),
         t.FunctionDeclaration(
@@ -480,6 +484,7 @@ def _build_tool_declarations():
             ),
             parameters=t.Schema(type="OBJECT", properties={
                 "query": t.Schema(type="STRING"),
+                "faculty": t.Schema(type="STRING"),
             }, required=["query"]),
         ),
         t.FunctionDeclaration(
@@ -704,12 +709,20 @@ def run_layer2b(queries_path: str) -> list[dict]:
 
 # ── Report ─────────────────────────────────────────────────────────────────────
 
-def print_report(layer1: list[dict], layer2: list[dict], layer2b: list[dict] = []) -> bool:
+def print_report(layer1: list[dict], layer2: list[dict], layer2b: Optional[list[dict]] = None,
+                 requested_layers: Optional[list[str]] = None) -> bool:
     _head("═══ Evaluation Report ═══")
 
     def _avg_latency(results):
         valid = [r["latency_ms"] for r in results if r.get("latency_ms", -1) > 0]
         return round(sum(valid) / len(valid)) if valid else 0
+
+    layer2b = layer2b or []
+    layers = {"layer1": layer1, "layer2": layer2, "layer2b": layer2b}
+    requested_layers = requested_layers if requested_layers is not None else [k for k, v in layers.items() if v]
+    missing_layers = [name for name in requested_layers if not layers[name]]
+    if missing_layers:
+        _skip("Requested layers produced no results: " + ", ".join(missing_layers))
 
     # Flatten layer2b turn results for counting
     layer2b_turns = [t for conv in layer2b for t in conv.get("turns", [])]
@@ -736,8 +749,10 @@ def print_report(layer1: list[dict], layer2: list[dict], layer2b: list[dict] = [
               f"avg {_avg_latency(layer2b_turns)}ms/turn")
 
     pct = (100 * passed // total) if total else 0
-    colour = GREEN if pct == 100 else (YELLOW if pct >= 80 else RED)
-    print(f"\n  {BOLD}{colour}Overall: {passed}/{total} passed ({pct}%){RESET}")
+    incomplete = not total or bool(missing_layers)
+    colour = YELLOW if incomplete else (GREEN if pct == 100 else (YELLOW if pct >= 80 else RED))
+    label = "INCOMPLETE — executed checks" if incomplete else "Overall"
+    print(f"\n  {BOLD}{colour}{label}: {passed}/{total} passed ({pct}%){RESET}")
 
     failures = [r for r in all_results if not r["passed"]]
     if failures:
@@ -747,35 +762,49 @@ def print_report(layer1: list[dict], layer2: list[dict], layer2b: list[dict] = [
             print(f"    - {label[:72]}")
 
     # Write JSON report
+    from datetime import datetime, timezone
+    from uuid import uuid4
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ") + "-" + uuid4().hex[:8]
     report = {
-        "summary": {"total": total, "passed": passed, "pct": pct},
+        "schema_version": "legacy-1",
+        "run_id": run_id,
+        "evidence_kind": "direct_tools_and_text_proxy",
+        "routing_model": "gemini-2.5-flash",
+        "coverage": {"requested": requested_layers, "missing": missing_layers},
+        "summary": {"total": total, "passed": passed, "pct": pct,
+                    "status": "INCOMPLETE" if not total or missing_layers else ("PASS" if passed == total else "FAIL")},
         "layer1":   layer1,
         "layer2":   layer2,
         "layer2b":  layer2b,
     }
-    report_path = Path(__file__).parent / "eval_report.json"
-    with open(report_path, "w") as f:
+    report_path = Path(__file__).parent / "evaluation/runs" / ("legacy-" + run_id) / "report.json"
+    report_path.parent.mkdir(parents=True, exist_ok=False)
+    with open(report_path, "x") as f:
         json.dump(report, f, indent=2)
-    print(f"\n  Full report → {report_path.name}")
+    print(f"\n  Full report → {report_path}")
 
-    return passed == total
+    return total > 0 and passed == total and not missing_layers
 
 
 # ── Entry point ────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Waypoint evaluation suite")
-    parser.add_argument("--layer1-only", action="store_true",
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--layer1-only", action="store_true",
                         help="Only run direct tool tests (no Gemini API needed)")
-    parser.add_argument("--layer2-only", action="store_true",
+    selection.add_argument("--layer2-only", action="store_true",
                         help="Only run single-turn routing tests (no DATABASE_URL needed)")
-    parser.add_argument("--layer2b-only", action="store_true",
+    selection.add_argument("--layer2b-only", action="store_true",
                         help="Only run multi-turn routing tests (no DATABASE_URL needed)")
     parser.add_argument("--no-multiturn", action="store_true",
                         help="Skip Layer 2b multi-turn tests (faster run)")
     parser.add_argument("--queries", default="data/eval_queries.json",
                         help="Path to eval_queries.json (default: data/eval_queries.json)")
     args = parser.parse_args()
+    _load_dotenv(Path(__file__).parent / ".env")
+    if args.layer2b_only and args.no_multiturn:
+        parser.error("--layer2b-only conflicts with --no-multiturn")
 
     layer1_results:  list[dict] = []
     layer2_results:  list[dict] = []
@@ -786,7 +815,10 @@ if __name__ == "__main__":
     run_l2b   = not args.layer1_only and not args.layer2_only and not args.no_multiturn
 
     if run_db:
-        layer1_results = run_layer1()
+        try:
+            layer1_results = run_layer1()
+        except ValueError as exc:
+            parser.error(str(exc))
 
     if run_l2:
         layer2_results = run_layer2(args.queries)
@@ -794,5 +826,8 @@ if __name__ == "__main__":
     if run_l2b:
         layer2b_results = run_layer2b(args.queries)
 
-    ok = print_report(layer1_results, layer2_results, layer2b_results)
-    sys.exit(0 if ok else 1)
+    requested = [name for name, selected in (("layer1", run_db), ("layer2", run_l2), ("layer2b", run_l2b)) if selected]
+    ok = print_report(layer1_results, layer2_results, layer2b_results, requested)
+    incomplete = ((run_db and not layer1_results) or (run_l2 and not layer2_results)
+                  or (run_l2b and not layer2b_results))
+    sys.exit(2 if incomplete else (0 if ok else 1))

@@ -1,0 +1,17 @@
+# Local disposable infrastructure only; never connect this to the demo service.
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: waypoint_eval
+      POSTGRES_PASSWORD: waypoint_eval_local
+      POSTGRES_DB: postgres
+    ports:
+      - "127.0.0.1:55432:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U waypoint_eval -d postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 20

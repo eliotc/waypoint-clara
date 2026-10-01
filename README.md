@@ -1,5 +1,12 @@
 # Waypoint — AI Voice Course Counsellor
 
+> **Evaluation foundation (September 2026):** Start with [evaluation/README.md](evaluation/README.md)
+> for versioned experiments, offline harness checks and preserved run evidence.
+> The historical scores below are not a current validation of Clara. Legacy DB
+> suites now require a disposable `EVAL_DATABASE_URL`; reports are written to
+> unique directories under `evaluation/runs/`.
+
+
 Waypoint is a real-time voice AI counsellor ("Clara") for a fictional Australian university. It's an exploration of what's possible with Google ADK, Gemini Live native audio, and pgvector RAG — open-sourced so other developers building on the same stack can skip the potholes I hit.
 
 **Live demo:** https://waypoint.vozara.ai/

@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "record_type": "run",
+  "run_id": "run-synthetic-catalogue-contradiction",
+  "started_at": "2026-01-01T00:00:00Z",
+  "completed_at": "2026-01-01T00:02:00Z",
+  "status": "completed",
+  "target": {
+    "agent_name": "clara",
+    "model_id": "example-live-model",
+    "runtime": "synthetic-fixture"
+  },
+  "environment": {
+    "git_commit": "102c16af0faf88a802f2267e5c0b110ff6613c77",
+    "git_dirty": true,
+    "application_source_sha256": "310d51b84d4cc43dc852f61b3510aba411b0bfdf46ed92e50a7e871e5d461b9c",
+    "prompt_sha256": "b69e817269f72d19f832ff1c27b92f4dcc6eda50d1ccf49b14c8c116d35aeb4a",
+    "dataset_version": "clara-local-seed-v2",
+    "dataset_sha256": "c8bb71fe2bc4bbbe7c0cfa4abf497276c26488c1c14eb4b599cacda92be26b6b"
+  },
+  "scenario": {
+    "scenario_id": "synthetic-catalogue",
+    "version": "1.0.0",
+    "name": "Synthetic fixture: catalogue contradiction",
+    "turn_count": 6
+  },
+  "artifacts": {
+    "raw_trace_path": "synthetic/traces/example-trace.json",
+    "raw_trace_sha256": "dd1bbae80e1a40347918e258c05ba6afcfcd22acd47c3400bdb80628ac3eb7c2",
+    "audio_bytes": 0
+  }
+}

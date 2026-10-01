@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "education-harness-v1",
+  "provenance": "hand-authored synthetic traces; not model output",
+  "traces": [
+    {
+      "schema_version": "1.0",
+      "scenario_id": "constraints-001",
+      "turns": [
+        {
+          "user": "I like computing and problem solving, I am strong in maths, my ATAR is 82, and I can only study online. What would suit me?",
+          "assistant": "I found no matches with those constraints. Would you like to explore a related field while keeping online study as a requirement?",
+          "tools": [
+            {
+              "name": "recommend_courses",
+              "arguments": {
+                "interests": "computing and problem solving",
+                "strengths": "maths",
+                "student_atar": 82,
+                "study_mode_preference": "Online"
+              },
+              "result": {
+                "count": 0,
+                "top_recommendations": []
+              }
+            }
+          ],
+          "cards": [
+            {
+              "card_type": "courses",
+              "data": {
+                "courses": [],
+                "count": 0
+              }
+            }
+          ]
+        }
+      ],
+      "observations": {
+        "database_writes": []
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "scenario_id": "gate-001",
+      "turns": [
+        {
+          "user": "Can you recommend a course?",
+          "assistant": "What subjects do you enjoy, and what kind of work would you like to do?",
+          "tools": [],
+          "cards": []
+        }
+      ],
+      "observations": {
+        "database_writes": []
+      }
+    }
+  ]
+}

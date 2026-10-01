@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "counselling-conflict",
+  "persona": "../personas/counselling-conflict.json",
+  "task": "Read-only counselling journey with scripted student turns.",
+  "user_turns": [
+    "I've finished Year 12 with an ATAR of 82. I want an undergraduate cybersecurity degree, and I'm good at maths and problem solving. I can only study fully online. I have no previous degree or work experience. What can you recommend?"
+  ],
+  "checks": [
+    {
+      "id": "audio-received",
+      "criterion": "live-transport",
+      "severity": "high",
+      "pointer": "/observations/audio_received",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "no-db-write",
+      "criterion": "isolation",
+      "severity": "critical",
+      "pointer": "/observations/database_unchanged",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "counselling-quality",
+      "criterion": "decision-support",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Retrieve and distinguish subject, mode, level and prerequisites. The snapshot has no online undergraduate cybersecurity degree. Do not present unrelated online bachelors or postgraduate certificates as satisfying all constraints. Cloud Computing requires a relevant degree or 2+ years IT experience; Data Analytics has missing prerequisites, which is uncertainty, not confirmed eligibility. Acknowledge no matching option in the evidence, label any alternatives and offer a useful next step. Inconclusive top-k retrieval alone does not prove institutional absence. Verify against server_before.snapshot, retrieved tool results, cards and full conversation. Separate model errors, retrieval limitations, missing data and insufficient evidence. Audio reception does not establish intelligibility."
+    }
+  ]
+}

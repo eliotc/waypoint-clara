@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "CQ-04A",
+  "persona": "../personas/cq-04a.json",
+  "task": "Fixed-input conversation-quality pair: Stable constraint. Shared rubric v0.1; education binding CQ-04A.",
+  "user_turns": [
+    "I am interested in undergraduate cybersecurity. I can only study online because I cannot attend campus.",
+    "Please recap my study constraints. I still cannot attend campus."
+  ],
+  "checks": [
+    {
+      "id": "audio",
+      "criterion": "live-transport",
+      "severity": "high",
+      "pointer": "/observations/audio_received",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "no-write",
+      "criterion": "isolation",
+      "severity": "critical",
+      "pointer": "/observations/database_unchanged",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "context-boundaries",
+      "criterion": "context-boundaries",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Shared criterion conversation-quality-v0.1/context-boundaries: Does the agent preserve current facts and corrections within its capabilities? Pass anchor: Retain disclosed constraints and latest explicit correction; distinguish self-report from verified information and do not claim unavailable actions. Fail anchor: Invent user facts, retain superseded facts, ignore hard constraints, or claim verification/access/action without evidence. Evidence: Chronological user messages, tool arguments/results and observed capabilities/actions. Education binding: preserve online-only constraint and do not infer campus attendance from Full-time. Review all turns and distinguish observed agent behaviour from missing evidence. Semantic disposition requires manual review; no human comprehension or release claim. Follow the latest stated attendance constraint without inferring verified attendance from Full-time, enrolment, qualification or eligibility."
+    },
+    {
+      "id": "grounding-uncertainty",
+      "criterion": "grounding-uncertainty",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Shared criterion conversation-quality-v0.1/grounding-uncertainty: Are claims supported and missing information distinguished from absence? Pass anchor: Use supported facts; state the specific unknown; distinguish thresholds, possibilities and verified outcomes. Fail anchor: Invent requirements/procedures, turn missing evidence into certainty, or deny information that was retrieved. Evidence: Versioned source snapshot and exact tool results before each claim; private simulator facts are not disclosed evidence. Education binding: preserve online-only constraint and do not infer campus attendance from Full-time. Review all turns and distinguish observed agent behaviour from missing evidence. Semantic disposition requires manual review; no human comprehension or release claim. Follow the latest stated attendance constraint without inferring verified attendance from Full-time, enrolment, qualification or eligibility."
+    }
+  ]
+}

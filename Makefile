@@ -11,7 +11,7 @@ PROXY_PORT ?= 5433
 # These point at the live instance the app's DATABASE_URL (in .env) expects — note
 # this is a DIFFERENT instance from $(INSTANCE) above, which is only for deploy.
 PROXY_INSTANCE   ?= universal-cs-assistant-agent:us-central1:customer-assistant-vectordb
-CREDENTIALS_FILE ?= /home/eliotc/.config/waypoint-local-dev.json
+CREDENTIALS_FILE ?= $(HOME)/.config/waypoint-local-dev.json
 
 # ── Local dev ────────────────────────────────────────────────────────────────
 
@@ -77,9 +77,27 @@ help:
 	@echo "    make logs         Tail Cloud Run logs (last 100 lines)"
 	@echo ""
 	@echo "  Evaluation"
+	@echo "    make eval-validate Validate offline experiment assets"
+	@echo "    make eval-fixture Replay synthetic evidence (exit 2 if review pending)"
+	@echo "    make eval-test    Test evaluation machinery offline"
 	@echo "    make eval         Run full eval suite (Layer 1 + 2 + 2b)"
 	@echo "    make eval-layer1  Tool correctness only (no API key needed)"
 	@echo "    make eval-layer2  Routing tests only (no DB needed)"
 	@echo ""
 
 .PHONY: run proxy seed-prod psql-prod deploy logs eval eval-layer1 eval-layer2 help
+
+# Offline evaluation foundation (uses the local venv; no API or database calls).
+EVAL_PYTHON ?= .venv/bin/python
+EVAL_EXPERIMENT ?= evaluation/experiments/EXP-000/config.json
+
+eval-validate:
+	$(EVAL_PYTHON) -m evaluation validate $(EVAL_EXPERIMENT)
+
+eval-fixture:
+	$(EVAL_PYTHON) -m evaluation run $(EVAL_EXPERIMENT)
+
+eval-test:
+	$(EVAL_PYTHON) -m unittest discover -s evaluation/tests -v
+
+.PHONY: eval-validate eval-fixture eval-test

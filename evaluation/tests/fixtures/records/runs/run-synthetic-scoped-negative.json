@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "record_type": "run",
+  "run_id": "run-synthetic-scoped-negative",
+  "started_at": "2026-01-01T00:00:00Z",
+  "completed_at": "2026-01-01T00:02:00Z",
+  "status": "completed",
+  "target": {
+    "agent_name": "clara",
+    "model_id": "example-live-model",
+    "runtime": "synthetic-fixture"
+  },
+  "environment": {
+    "git_commit": "ffaa980e2ce6e546fcbf880e07251b870a4ad20c",
+    "git_dirty": false,
+    "application_source_sha256": "7d32919283dc5c4b3033d2500b7f32fb8c66d0c8c7cef23922812203c8fd9e9c",
+    "prompt_sha256": "47fb3fd588eb4777fd3d7de608840779520a2c1be0fffdd215247710ae32134f",
+    "dataset_version": "clara-local-seed-v2",
+    "dataset_sha256": "c8bb71fe2bc4bbbe7c0cfa4abf497276c26488c1c14eb4b599cacda92be26b6b"
+  },
+  "scenario": {
+    "scenario_id": "synthetic-scope",
+    "version": "1.0.0",
+    "name": "Synthetic fixture: scoped negative conclusion",
+    "turn_count": 5
+  },
+  "artifacts": {
+    "raw_trace_path": "synthetic/traces/example-trace.json",
+    "raw_trace_sha256": "7bbb005d62f973c3cc3bfd9162cfdd1d815b6e29a141f32f866d6ca4fe42b64d",
+    "audio_bytes": 0
+  }
+}

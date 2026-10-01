@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "persona_id": "cq-03b",
+  "name": "CQ-03B synthetic fixed-input profile",
+  "provenance": {
+    "kind": "synthetic",
+    "source": "Independently invented education conversation-quality case; owner accepted the matrix.",
+    "limitations": "No real participant or population representation. Only supplied user turns establish disclosed facts."
+  },
+  "facts": {
+    "disclosed_messages": [
+      "Is a portfolio required for the Bachelor of Cybersecurity?",
+      "Please recap the answer and anything you could not confirm."
+    ],
+    "variant": "Missing fact"
+  },
+  "goals": [
+    "Understand the course information requested in the scripted messages."
+  ],
+  "disclosure_policy": "Fixed inputs only. No generative persona; do not infer additional personal facts."
+}

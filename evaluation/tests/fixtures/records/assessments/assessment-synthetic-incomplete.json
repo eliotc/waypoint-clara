@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0",
+  "record_type": "assessment",
+  "assessment_id": "assessment-synthetic-incomplete",
+  "run_id": "run-synthetic-incomplete",
+  "assessed_at": "2026-01-01T00:05:00Z",
+  "evaluator": {
+    "kind": "model",
+    "reviewer_role": "automated_judge",
+    "model_id": "example-judge-model",
+    "rubric_version": "example-judge-rubric-v1",
+    "configuration_hash": "1c885cb745cc83ce43b966d4ae1027733406be708d096b4de9118b212925c1a9"
+  },
+  "supersedes_assessment_id": null,
+  "denominators": {
+    "total_opportunities": 4,
+    "passes": 3,
+    "issues": 0,
+    "incomplete": 1,
+    "execution_errors": 0
+  },
+  "results": [
+    {
+      "result_id": "res-syn-inc-1",
+      "criterion_id": "grounded_advice",
+      "outcome": "unable_to_assess",
+      "severity": "none",
+      "summary": "Synthetic fixture: the cited requirement is absent from the retrieved payload, so support cannot be verified.",
+      "evidence_refs": [
+        {
+          "artifact_id": "synthetic/traces/example-trace.json",
+          "artifact_sha256": "ffa917ab501c3bdbf9af28ad9527c67cb8084ad442bef2e587afe73cc2f16d26",
+          "location": {
+            "turn_id": 2,
+            "speaker": "Clara"
+          },
+          "citation_path": "/turns/1/speech_content",
+          "excerpt": "Synthetic example: entry requires a degree or two years of experience."
+        },
+        {
+          "artifact_id": "synthetic/traces/example-trace.json",
+          "artifact_sha256": "ffa917ab501c3bdbf9af28ad9527c67cb8084ad442bef2e587afe73cc2f16d26",
+          "location": {
+            "turn_id": 1,
+            "speaker": "tool"
+          },
+          "citation_path": "/tools/0/result/courses/0/entry_requirements",
+          "excerpt": "entry_requirements: null"
+        }
+      ],
+      "tags": [
+        "missing_evidence",
+        "fail_closed_validation"
+      ],
+      "issue_id": null
+    },
+    {
+      "result_id": "res-syn-inc-2",
+      "criterion_id": "preserved_facts",
+      "outcome": "pass",
+      "severity": "none",
+      "summary": "Synthetic fixture: preserved_facts supported.",
+      "evidence_refs": [
+        {
+          "artifact_id": "synthetic/traces/example-trace.json",
+          "artifact_sha256": "ffa917ab501c3bdbf9af28ad9527c67cb8084ad442bef2e587afe73cc2f16d26",
+          "location": {
+            "turn_id": 2,
+            "speaker": "Clara"
+          },
+          "citation_path": "/turns/1/speech_content",
+          "excerpt": "Synthetic example response."
+        }
+      ],
+      "tags": [],
+      "issue_id": null
+    },
+    {
+      "result_id": "res-syn-inc-3",
+      "criterion_id": "honest_uncertainty",
+      "outcome": "pass",
+      "severity": "none",
+      "summary": "Synthetic fixture: honest_uncertainty supported.",
+      "evidence_refs": [
+        {
+          "artifact_id": "synthetic/traces/example-trace.json",
+          "artifact_sha256": "ffa917ab501c3bdbf9af28ad9527c67cb8084ad442bef2e587afe73cc2f16d26",
+          "location": {
+            "turn_id": 2,
+            "speaker": "Clara"
+          },
+          "citation_path": "/turns/1/speech_content",
+          "excerpt": "Synthetic example response."
+        }
+      ],
+      "tags": [],
+      "issue_id": null
+    },
+    {
+      "result_id": "res-syn-inc-4",
+      "criterion_id": "conversation_quality",
+      "outcome": "pass",
+      "severity": "none",
+      "summary": "Synthetic fixture: conversation_quality supported.",
+      "evidence_refs": [
+        {
+          "artifact_id": "synthetic/traces/example-trace.json",
+          "artifact_sha256": "ffa917ab501c3bdbf9af28ad9527c67cb8084ad442bef2e587afe73cc2f16d26",
+          "location": {
+            "turn_id": 2,
+            "speaker": "Clara"
+          },
+          "citation_path": "/turns/1/speech_content",
+          "excerpt": "Synthetic example response."
+        }
+      ],
+      "tags": [],
+      "issue_id": null
+    }
+  ]
+}

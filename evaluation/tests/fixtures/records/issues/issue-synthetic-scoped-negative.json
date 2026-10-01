@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "record_type": "issue",
+  "issue_id": "issue-synthetic-scoped-negative",
+  "title": "Synthetic fixture: rubric penalises a scoped negative conclusion",
+  "status": "rejected_not_a_defect",
+  "primary_layer": "domain_evaluation",
+  "taxonomy_tags": [
+    "rubric_misalignment",
+    "false_positive"
+  ],
+  "affected_criteria": [
+    "scoped_negative_conclusion"
+  ],
+  "first_observed_in_run_id": "run-synthetic-scoped-negative",
+  "first_observed_in_assessment_id": "assessment-synthetic-scope-provisional",
+  "attributed_hypotheses": [
+    {
+      "hypothesis_id": "hyp-synthetic-scope",
+      "proposed_by": "example-reviewer",
+      "proposed_at": "2026-01-01T00:10:00Z",
+      "summary": "Synthetic fixture: the conclusion is accurate within the scope the student set.",
+      "confidence": "high",
+      "review_status": "accepted"
+    }
+  ],
+  "proposed_repair": {
+    "layer": "domain_evaluation",
+    "summary": "Synthetic fixture: judge negative conclusions against active scope.",
+    "target_files": []
+  },
+  "linked_runs": [
+    "run-synthetic-scoped-negative"
+  ],
+  "linked_assessments": [
+    "assessment-synthetic-scope-provisional"
+  ]
+}

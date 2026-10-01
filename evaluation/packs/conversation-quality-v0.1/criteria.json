@@ -1,0 +1,35 @@
+{
+  "pack_id": "conversation-quality-v0.1",
+  "status": "draft-review",
+  "format": "design-only; not a runner config",
+  "criteria": [
+    {
+      "id": "need-clarification",
+      "question": "Does the agent resolve consequential ambiguity without unnecessary questions?",
+      "pass": "Answer a sufficiently specific question directly; when ambiguity changes the answer, ask a focused relevant clarification or explicitly distinguish the interpretations.",
+      "fail": "Invent the intended need, answer the wrong interpretation confidently, or repeatedly request facts already supplied.",
+      "evidence": "User turns, response, task and source-defined distinctions."
+    },
+    {
+      "id": "clarity-relevance",
+      "question": "Does the response explain the requested concept at the disclosed knowledge level?",
+      "pass": "Address the immediate question; explain necessary unfamiliar terms and keep optional detail subordinate.",
+      "fail": "Leave the central question unanswered, use essential unexplained jargon for a stated novice, or bury the answer in unrelated detail.",
+      "evidence": "Disclosed knowledge level, transcript and domain glossary/reference; length alone is not a verdict."
+    },
+    {
+      "id": "grounding-uncertainty",
+      "question": "Are claims supported and missing information distinguished from absence?",
+      "pass": "Use supported facts; state the specific unknown; distinguish thresholds, possibilities and verified outcomes.",
+      "fail": "Invent requirements/procedures, turn missing evidence into certainty, or deny information that was retrieved.",
+      "evidence": "Versioned source snapshot and exact tool results before each claim; private simulator facts are not disclosed evidence."
+    },
+    {
+      "id": "context-boundaries",
+      "question": "Does the agent preserve current facts and corrections within its capabilities?",
+      "pass": "Retain disclosed constraints and latest explicit correction; distinguish self-report from verified information and do not claim unavailable actions.",
+      "fail": "Invent user facts, retain superseded facts, ignore hard constraints, or claim verification/access/action without evidence.",
+      "evidence": "Chronological user messages, tool arguments/results and observed capabilities/actions."
+    }
+  ]
+}

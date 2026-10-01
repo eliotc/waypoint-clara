@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "CQ-02A",
+  "persona": "../personas/cq-02a.json",
+  "task": "Fixed-input conversation-quality pair: Novice knowledge. Shared rubric v0.1; education binding CQ-02A.",
+  "user_turns": [
+    "I am new to university admissions. What does the ATAR cutoff for the Bachelor of Cybersecurity mean?"
+  ],
+  "checks": [
+    {
+      "id": "audio",
+      "criterion": "live-transport",
+      "severity": "high",
+      "pointer": "/observations/audio_received",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "no-write",
+      "criterion": "isolation",
+      "severity": "critical",
+      "pointer": "/observations/database_unchanged",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "clarity-relevance",
+      "criterion": "clarity-relevance",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Shared criterion conversation-quality-v0.1/clarity-relevance: Does the response explain the requested concept at the disclosed knowledge level? Pass anchor: Address the immediate question; explain necessary unfamiliar terms and keep optional detail subordinate. Fail anchor: Leave the central question unanswered, use essential unexplained jargon for a stated novice, or bury the answer in unrelated detail. Evidence: Disclosed knowledge level, transcript and domain glossary/reference; length alone is not a verdict. Education binding: explain ATAR/cutoff in ordinary language; reference ATAR and Entry Requirements. Review all turns and distinguish observed agent behaviour from missing evidence. Semantic disposition requires manual review; no human comprehension or release claim. Consult ATAR and Entry Requirements; a cutoff is not admission assurance. A brief basic definition is not automatically a failure for the knowledgeable variant."
+    },
+    {
+      "id": "grounding-uncertainty",
+      "criterion": "grounding-uncertainty",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Shared criterion conversation-quality-v0.1/grounding-uncertainty: Are claims supported and missing information distinguished from absence? Pass anchor: Use supported facts; state the specific unknown; distinguish thresholds, possibilities and verified outcomes. Fail anchor: Invent requirements/procedures, turn missing evidence into certainty, or deny information that was retrieved. Evidence: Versioned source snapshot and exact tool results before each claim; private simulator facts are not disclosed evidence. Education binding: explain ATAR/cutoff in ordinary language; reference ATAR and Entry Requirements. Review all turns and distinguish observed agent behaviour from missing evidence. Semantic disposition requires manual review; no human comprehension or release claim. Consult ATAR and Entry Requirements; a cutoff is not admission assurance. A brief basic definition is not automatically a failure for the knowledgeable variant."
+    },
+    {
+      "id": "context-boundaries",
+      "criterion": "context-boundaries",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Shared criterion conversation-quality-v0.1/context-boundaries: Does the agent preserve current facts and corrections within its capabilities? Pass anchor: Retain disclosed constraints and latest explicit correction; distinguish self-report from verified information and do not claim unavailable actions. Fail anchor: Invent user facts, retain superseded facts, ignore hard constraints, or claim verification/access/action without evidence. Evidence: Chronological user messages, tool arguments/results and observed capabilities/actions. Education binding: explain ATAR/cutoff in ordinary language; reference ATAR and Entry Requirements. Review all turns and distinguish observed agent behaviour from missing evidence. Semantic disposition requires manual review; no human comprehension or release claim. Consult ATAR and Entry Requirements; a cutoff is not admission assurance. A brief basic definition is not automatically a failure for the knowledgeable variant."
+    }
+  ]
+}

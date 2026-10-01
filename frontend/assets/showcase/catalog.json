@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "entries": [
+    {
+      "id": "returning-to-study",
+      "title": "Returning to study",
+      "summary": "Work experience, no bachelor's degree",
+      "status": "available",
+      "example_path": "returning-to-study/example.json"
+    },
+    {
+      "id": "online-only-study",
+      "title": "Online-only study",
+      "summary": "A course goal with a firm attendance constraint",
+      "status": "review_pending",
+      "example_path": null
+    },
+    {
+      "id": "unsure-what-counts",
+      "title": "Unsure what counts",
+      "summary": "Mixed work and study experience",
+      "status": "review_pending",
+      "example_path": null
+    }
+  ]
+}

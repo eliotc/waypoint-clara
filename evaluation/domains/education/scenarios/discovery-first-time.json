@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "discovery-first-time",
+  "persona": "../personas/discovery-first-time.json",
+  "task": "Replay the five saved user messages from EXP-SIM-002 to probe accepted defects. Clara replies are newly generated; this is not an adaptive continuation.",
+  "user_turns": [
+    "Hi Clara! I'm hoping to find out about undergraduate options for cybersecurity. I'm a school leaver and got an ATAR of 82. I'm looking to study full-time.",
+    "The Bachelor of Cybersecurity sounds interesting. What are the entry requirements I'd need to meet? And what would I need to do next if I wanted to apply for that course?",
+    "That's good news about the ATAR! I'm not sure if there are other requirements though. Can you tell me what I would need to do next to apply for that course? I'm not sure if I'd need to do anything else besides meet the entry requirements.",
+    "Thanks, that's helpful! So I apply through VTAC. Is there anything else I'd need to do, like write a personal statement or submit a portfolio? And what's the typical timeline for applying?",
+    "Before we finish, please give me a recap of what we have established and what I can do next."
+  ],
+  "checks": [
+    {
+      "id": "audio",
+      "criterion": "live-transport",
+      "severity": "high",
+      "pointer": "/observations/audio_received",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "no-write",
+      "criterion": "isolation",
+      "severity": "critical",
+      "pointer": "/observations/database_unchanged",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "discovery-fidelity",
+      "criterion": "decision-support",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "Missing portfolio/personal-statement requirements remain unknown, never just ATAR. Compare dates with server snapshot observed_at; August 2026 opening is past. Preserve ATAR82 and full-time study; no invented qualifications. Recap must preserve material eligibility uncertainty. Inspect all turns, tool arguments/results and authoritative snapshot. Missing evidence is not a pass. No-match without an action is allowed under decision0007."
+    }
+  ]
+}

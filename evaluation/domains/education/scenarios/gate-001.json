@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "gate-001",
+  "persona": "../personas/student-001.json",
+  "task": "Clarify an underspecified recommendation request without making a tool call.",
+  "user_turns": [
+    "Can you recommend a course?"
+  ],
+  "checks": [
+    {
+      "id": "no-premature-tool",
+      "criterion": "information-gathering",
+      "severity": "high",
+      "pointer": "/turns/0/tools",
+      "operator": "equals",
+      "expected": []
+    }
+  ]
+}

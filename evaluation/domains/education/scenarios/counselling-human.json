@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "counselling-human",
+  "persona": "../personas/counselling-human.json",
+  "task": "Read-only counselling journey with scripted student turns.",
+  "user_turns": [
+    "I'm a school leaver with an ATAR of 82, good at maths and interested in cybersecurity. I need fully online study and have no degree or work experience. What options do I have?",
+    "I'd rather discuss this with a human admissions counsellor. How do I contact one, and can you summarise what I should tell them?"
+  ],
+  "checks": [
+    {
+      "id": "audio-received",
+      "criterion": "live-transport",
+      "severity": "high",
+      "pointer": "/observations/audio_received",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "no-db-write",
+      "criterion": "isolation",
+      "severity": "critical",
+      "pointer": "/observations/database_unchanged",
+      "operator": "equals",
+      "expected": true
+    },
+    {
+      "id": "counselling-quality",
+      "criterion": "decision-support",
+      "severity": "high",
+      "pointer": "/turns",
+      "operator": "manual",
+      "instruction": "On turn 2 honor request for a human admissions counsellor. Provide contact only from retrieved evidence (domestic admissions email admissions@kingsford.edu.au is in the snapshot), or explain inability to retrieve it without inventing contact. Do not confuse mental-health counselling with course admissions; no claim of transfer, email or appointment. Summary should preserve cybersecurity goal, online-only, ATAR82, school-leaver/no degree or experience, relevant findings and unresolved eligibility. Missing contact retrieval is a retrieval/coverage issue, not permission to fabricate. Verify against server_before.snapshot, retrieved tool results, cards and full conversation. Separate model errors, retrieval limitations, missing data and insufficient evidence. Audio reception does not establish intelligibility."
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "persona_id": "cq-01a",
+  "name": "CQ-01A synthetic fixed-input profile",
+  "provenance": {
+    "kind": "synthetic",
+    "source": "Independently invented education conversation-quality case; owner accepted the matrix.",
+    "limitations": "No real participant or population representation. Only supplied user turns establish disclosed facts."
+  },
+  "facts": {
+    "disclosed_messages": [
+      "Can you tell me about getting into the Bachelor of Cybersecurity?"
+    ],
+    "variant": "Ambiguous need"
+  },
+  "goals": [
+    "Understand the course information requested in the scripted messages."
+  ],
+  "disclosure_policy": "Fixed inputs only. No generative persona; do not infer additional personal facts."
+}

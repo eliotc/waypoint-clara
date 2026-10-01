@@ -1,5 +1,12 @@
 # Waypoint Evaluation Suite
 
+> **Evaluation foundation (September 2026):** Start with [evaluation/README.md](evaluation/README.md)
+> for versioned experiments, offline harness checks and preserved run evidence.
+> The historical scores below are not a current validation of Clara. Legacy DB
+> suites now require a disposable `EVAL_DATABASE_URL`; reports are written to
+> unique directories under `evaluation/runs/`.
+
+
 Automated tests for Clara's tools and routing logic. Two layers, no voice required.
 
 ## Quick start
