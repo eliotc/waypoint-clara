@@ -464,6 +464,19 @@
         display: none;
       }
     }
+    /* Phones in conversation: the drag handle resizes both ways (the older
+       420px minimum blocked enlarging the research panel), the handle is a
+       real touch target, and the page itself does not scroll. */
+    @media (max-width: 767px) {
+      html, body { overflow: hidden; overscroll-behavior: none; }
+      .via-panel { height: 50dvh; min-height: 260px; max-height: none; }
+      .resize-handle { height: 28px; touch-action: none; }
+      .resize-handle::before,
+      .resize-handle:hover::before,
+      .resize-handle.dragging::before { width: 72px; height: 5px; }
+      .sidebar-header { padding: 8px 16px !important; }
+      .sidebar-header img { height: 32px !important; }
+    }
     .welcome-title {
       font-size: 24px;
       font-weight: 700;
@@ -1833,6 +1846,13 @@
             <button type="button" class="starter-chip" data-prompt="Could my work experience help me get in?">Could my work experience help me get in?</button>
           </div>
         </div>
+        <div id="voiceStartPrompt" class="onboarding-guidance" style="display:none;">
+          <div class="onboarding-prompt">
+            <h2 class="onboarding-title">Clara is ready to talk</h2>
+            <p class="onboarding-subtitle">Tap below to start a voice conversation. Your browser will ask to use your microphone.</p>
+          </div>
+          <button type="button" class="welcome-btn welcome-btn-primary" id="btnStartVoice">Start talking</button>
+        </div>
         <div class="via-msg via-msg-ai" id="emptyMsg">
           <div class="via-msg-bubble">Connecting to Clara…</div>
         </div>
@@ -3052,21 +3072,46 @@ registerProcessor("uni-audio-processor", AudioProcessor);
       }
     }
 
+    // Start a live voice session in which Clara greets the student. Call this
+    // from a tap: browsers only allow the microphone and audio playback then.
+    function startVoiceSession() {
+      const prompt = document.getElementById("voiceStartPrompt");
+      if (prompt) prompt.style.display = "none";
+      try {
+        const ctx = getPlaybackCtx();
+        if (ctx.state === "suspended") ctx.resume();
+      } catch (e) { /* playback is retried when audio arrives */ }
+      textInput.disabled = false;
+      sendBtn.disabled = false;
+      voiceBtn.disabled = false;
+      voiceBtn.click();
+    }
+
+    // Arriving without a tap (e.g. from the showcase link): show the
+    // conversation with a single "Start talking" button.
+    function showVoiceStartPrompt() {
+      const welcome = document.getElementById("welcomeContainer");
+      const prompt = document.getElementById("voiceStartPrompt");
+      if (welcome) welcome.style.display = "none";
+      document.body.classList.remove("welcome-active");
+      messages.style.display = "flex";
+      if (emptyMsg) emptyMsg.style.display = "none";
+      if (prompt) prompt.style.display = "block";
+    }
+
     const btnAskClara = document.getElementById("btnAskClara");
     if (btnAskClara) {
       btnAskClara.addEventListener("click", () => {
-        const welcome = document.getElementById("welcomeContainer");
-        const onboarding = document.getElementById("onboardingGuidance");
-        if (welcome) welcome.style.display = "none";
-        document.body.classList.remove("welcome-active");
-        messages.style.display = "flex";
-        if (onboarding) onboarding.style.display = "block";
-        if (emptyMsg) emptyMsg.style.display = "none";
-        voiceBtn.disabled = false;
-        textInput.disabled = false;
-        sendBtn.disabled = false;
-        textInput.focus();
         ga('welcome_choice', { choice: 'ask_clara' });
+        startVoiceSession();
+      });
+    }
+
+    const btnStartVoice = document.getElementById("btnStartVoice");
+    if (btnStartVoice) {
+      btnStartVoice.addEventListener("click", () => {
+        ga('welcome_choice', { choice: 'ask_clara_from_link' });
+        startVoiceSession();
       });
     }
 
@@ -3178,7 +3223,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
         if (isVertical) {
           const newH = clientY - rect.top;
           const maxH = rect.height - MIN_SIDEBAR - 6;
-          panel.style.height = Math.max(200, Math.min(maxH, newH)) + "px";
+          panel.style.height = Math.max(260, Math.min(maxH, newH)) + "px";
         } else {
           const newW = clientX - rect.left;
           const maxW = rect.width - MIN_SIDEBAR - 6;
@@ -3288,7 +3333,7 @@ registerProcessor("uni-audio-processor", AudioProcessor);
     } else {
       initWelcomeState();
       if (new URLSearchParams(window.location.search).get("mode") === "ask") {
-        btnAskClara.click();
+        showVoiceStartPrompt();
       }
     }
   </script>
