@@ -3461,10 +3461,13 @@ blockquote {
    let the page scroll instead of locking panels to the viewport.
    ========================================================================== */
 @media (max-width: 800px) {
+  /* The base rule locks html and body to the viewport with overflow hidden;
+     release both so the document itself scrolls on phones. */
+  html,
   body.showcase-viewport-locked {
     height: auto;
     min-height: 100dvh;
-    overflow-y: auto;
+    overflow: visible;
   }
 
   .showcase-header { height: auto; padding: 8px 12px; }
