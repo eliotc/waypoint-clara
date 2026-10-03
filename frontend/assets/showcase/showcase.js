@@ -2,6 +2,12 @@
 (() => {
   'use strict';
   const el = id => document.getElementById(id);
+  // On phones the progress panel stacks above the stage, so bring the active
+  // column into view when it starts. Desktop layouts are left untouched.
+  const revealOnNarrow = node => {
+    if (!node || typeof node.scrollIntoView !== 'function' || typeof window.matchMedia !== 'function') return;
+    if (window.matchMedia('(max-width: 800px)').matches) node.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   let socket = null, audio = null, running = false, generation = 0;
   let runId = null, turnId = null, lastSeq = 0, nextTime = 0;
   let sources = new Set(), completed = false, heard = false, acknowledged = false;
@@ -862,6 +868,7 @@
     setStepFocus(1);
     stage(1,'Starting a fresh dialogue for Alex. No microphone is needed.');
     status('Connecting to Clara…');
+    revealOnNarrow(el('conversationColumn'));
 
     try {
       const Audio=window.AudioContext||window.webkitAudioContext;
@@ -880,7 +887,7 @@
           if(!runId) runId=message.run_id;
           if(message.run_id!==runId || !Number.isInteger(message.seq) || message.seq<=lastSeq) return;
           lastSeq=message.seq;
-          if(message.type==='turn_start') turn(message);
+          if(message.type==='turn_start') { turn(message); if (message.turn_id===1) revealOnNarrow(el('conversationColumn')); }
           else if(message.type==='audio' && message.turn_id===turnId) play(message.data);
           else if(message.type==='transcript' && message.turn_id===turnId) {
             const b = bubbles.get(turnId); if (b) b.textContent=message.text;
@@ -895,6 +902,7 @@
               updateQuestionPills(scenario.student_messages.length + 1);
               stage(2,'Running Quality & Fact Check against course catalog evidence (~15–20s)…');
               status('Running Quality & Fact Check…');
+              revealOnNarrow(el('findingsColumn'));
             }
             if(message.state==='completed') {
               setProgress(100);
