@@ -221,11 +221,33 @@ def _get_conn():
 
 
 COURSE_EVIDENCE_LIMITS = (
-    "Null entry requirements mean unknown, not waived. Online is a delivery label, "
+    "entry_facts separates recorded entry facts from unrecorded ones: state the known "
+    "facts when asked about entry, and treat only the not_recorded items as unknown "
+    "(unknown, not waived). Online is a delivery label, "
     "not proof of part-time workload or attendance arrangements; Full-time does not "
     "prove campus attendance. Correct any student assumption about these explicitly. "
     "Eligibility and institutional procedures are not established by course relevance."
 )
+
+
+def _entry_facts(course: dict) -> dict:
+    """Split a course's entry evidence into recorded facts and unrecorded items.
+
+    A recorded ATAR cutoff stays a known fact even when no other requirements
+    are recorded, so the model never reports the cutoff itself as unknown.
+    """
+    known, not_recorded = [], []
+    atar = course.get("atar_cutoff")
+    if atar is not None:
+        known.append(f"Recorded ATAR cutoff: {atar} (indicative, not a guarantee of entry)")
+    else:
+        not_recorded.append("ATAR cutoff")
+    requirements = (course.get("entry_requirements") or "").strip()
+    if requirements:
+        known.append(f"Recorded entry requirements: {requirements}")
+    else:
+        not_recorded.append("Prerequisite subjects or other entry requirements")
+    return {"known": known, "not_recorded": not_recorded}
 
 
 # ── Tool 1: get_course_detail ─────────────────────────────────────────────────
@@ -291,6 +313,7 @@ def get_course_detail(course_name: str) -> dict:
         "duration_years": course["duration_years"],
         "atar_cutoff": course["atar_cutoff"],
         "entry_requirements": course.get("entry_requirements"),
+        "entry_facts": _entry_facts(course),
         "annual_fee_aud": course["annual_fee_aud"],
         "career_outcomes": course["career_outcomes"],
         "description": course.get("description"),
@@ -366,6 +389,7 @@ def compare_courses(course_name_a: str, course_name_b: str) -> dict:
                 "duration_years": c["duration_years"],
                 "atar_cutoff": c["atar_cutoff"],
                 "entry_requirements": c.get("entry_requirements"),
+                "entry_facts": _entry_facts(c),
                 "annual_fee_aud": c["annual_fee_aud"],
                 "description": c.get("description"),
                 "career_outcomes": c.get("career_outcomes"),
@@ -410,7 +434,8 @@ def _course_response(rows, limit, key, degree_status: Optional[dict] = None,
                 'data':{'courses':candidates, 'count':len(candidates)},
                 'spoken_summary':'These are exploratory options; check the stated requirements.'})
     def compact(c):
-        return {k:c[k] for k in ('name','level','study_mode','atar_cutoff','entry_requirements','suitability')}
+        return {**{k:c[k] for k in ('name','level','study_mode','atar_cutoff','entry_requirements','suitability')},
+                'entry_facts': _entry_facts(c)}
     response = {'eligibility_notice': ('Entry eligibility is unverified for one or more displayed options. Say this aloud before offering a choice.'
                 if any(c['suitability']['status'] == 'unknown' for c in candidates) else None),
             'evidence_limits': COURSE_EVIDENCE_LIMITS,
