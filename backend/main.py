@@ -5,7 +5,7 @@ Architecture:
   - Per-connection InMemorySessionService + Runner (avoids event-loop conflicts)
   - Audio pipeline: Runner.run_live() + LiveRequestQueue
   - Tool dispatch:  ADK handles automatically (tools registered on sage Agent)
-  - display_data:   side-channel via registered async callbacks
+  - Cards:          side-channel via registered async callbacks
 
 Browser audio protocol:
   Browser → Server  binary : raw PCM 16-bit LE, 16 000 Hz, mono
@@ -343,7 +343,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
 
     loop = asyncio.get_event_loop()
 
-    # display_data side-channel — cards → browser via same WebSocket
+    # Card side-channel — cards → browser via same WebSocket
     async def send_card(payload: dict):
         try:
             await websocket.send_text(json.dumps(payload))
