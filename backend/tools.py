@@ -24,9 +24,9 @@ def _get_genai_client() -> genai.Client:
         _genai_client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
     return _genai_client
 
-# ── display_data side-channel ─────────────────────────────────────────────────
+# ── Card side-channel ─────────────────────────────────────────────────────────
 # Day 4 WebSocket bridge registers an async callback here per session.
-# display_data calls it via run_coroutine_threadsafe so the frontend gets cards
+# _send_card calls it via run_coroutine_threadsafe so the frontend gets cards
 # without waiting for the model to finish speaking.
 
 _display_callbacks: dict[str, tuple[asyncio.AbstractEventLoop, Callable]] = {}
@@ -925,26 +925,3 @@ def search_scholarships(
     names = [s["name"] for s in scholarships[:3]]
     return {"count": len(scholarships), "top_scholarships": names}
 
-
-# ── Tool 7: display_data ──────────────────────────────────────────────────────
-
-def display_data(type: str, data: dict, spoken_summary: str) -> dict:
-    """
-    Send structured data to the student's browser as a visual card.
-    Call this alongside every substantive spoken response so the UI shows details.
-    type: 'courses', 'events', 'booking', 'info'.
-    data: the structured payload to render (course list, event list, booking confirmation, etc.).
-    spoken_summary: the short spoken version already being said (≤50 words).
-    Returns immediately; card delivery is async via WebSocket.
-    """
-    payload = {"type": "card", "card_type": type, "data": data, "spoken_summary": spoken_summary}
-    log.info("display_data called: type=%s, callbacks=%d", type, len(_display_callbacks))
-
-    if _display_callbacks:
-        _send_card(payload)
-    else:
-        # No WebSocket yet (testing) — log to console
-        import json
-        print(f"[display_data] {type}: {json.dumps(data, default=str)[:120]} …")
-
-    return {"delivered": True, "type": type}

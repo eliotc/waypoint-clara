@@ -52,7 +52,7 @@ Calls each tool function **directly** against the live DB and asserts on the res
 **What it does not test:**
 - Whether the *right* result is returned — only that *something* is returned
 - Result quality or semantic accuracy
-- The `display_data` card side-channel (no WebSocket in test context)
+- The card side-channel (no WebSocket in test context)
 - Course description/career_outcomes content (only shape is checked)
 
 ---
