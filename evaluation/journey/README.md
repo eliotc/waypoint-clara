@@ -1,6 +1,6 @@
 # Clara learning journey
 
-Updated: 2026-09-27. This is the current map; dated checkpoints preserve earlier
+Updated: 2026-10-10. This is the current map; dated checkpoints preserve earlier
 thinking. Start here when resuming an evaluation increment, then follow the links
 relevant to the question. Operational setup lives in [LIVE.md](../LIVE.md).
 
@@ -47,6 +47,7 @@ and controlled rerun followed. Spoken uncertainty and handover fidelity remain u
 | CP-019 *(withheld)* | Sep 22 | Evaluator comparison pilot: typed decisions still need semantic calibration |
 | [CP-020](checkpoints/CP-020-contextual-scope-adjudication.md) | Sep 22 | Decision 0011 contextual scope adjudication on C15 |
 | CP-021 *(withheld)* | Sep 22 | Tiered evaluation: deterministic checks first, escalation for consequential or uncertain claims |
+| [CP-025](checkpoints/CP-025-calibration-independence-and-retrieval-provenance.md) | Oct 10 | Known calibration cases remain development data; matched comparisons need retrieval provenance |
 
 CP-001–005 are retrospective reconstructions written Sep 7, not contemporaneous
 notes. Their sources and limitations are recorded individually. CP-006–014 are contemporaneous checkpoints. No earlier Git commits or precise conversation timestamps have
@@ -177,3 +178,13 @@ current-outcome trends. This is a local harness slice, not a public history API.
 [CP-024](checkpoints/CP-024-lifecycle-pilot-assessment-gap.md) records a completed
 three-session transport pilot whose authored all-pass assessments missed material
 claims. Stored results require accurate reviewer provenance and separately preserved regrades.
+
+## 2026-10-10 — Evidence boundaries for the next benchmark
+
+[CP-025](checkpoints/CP-025-calibration-independence-and-retrieval-provenance.md)
+records planning/code-review findings: moving known calibration examples does not
+make them unseen; the current database snapshot excludes embeddings; received-event
+timestamps do not alone establish claim/audio alignment. Preserve retrieval state
+across repair comparisons and assess adaptive simulator validity separately from
+fixed-script repeatability. These are reviewer recommendations, not changes to the
+frozen rubric, completed benchmark results or a new owner decision.
